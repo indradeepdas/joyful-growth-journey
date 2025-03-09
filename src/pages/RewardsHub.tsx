@@ -1,188 +1,155 @@
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { REWARDS } from '@/services/mockData';
-import GoodCoinIcon from '@/components/GoodCoinIcon';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Wallet, ShieldAlert } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
+import GoodCoinIcon from '@/components/GoodCoinIcon';
+import { useQuery } from '@tanstack/react-query';
+import { getRewards } from '@/services/rewardsService';
 
-const RewardsHub: React.FC = () => {
-  const { user, isAuthenticated, getChildData } = useAuth();
-  const [goodCoins, setGoodCoins] = useState<number | null>(null);
-  const { toast } = useToast();
+const RewardsHub = () => {
+  const navigate = useNavigate();
+  const { toast: uiToast } = useToast();
+  const [userCoins, setUserCoins] = useState<number>(120); // Placeholder value
 
-  useEffect(() => {
-    if (isAuthenticated && user?.role === 'child') {
-      const childData = getChildData();
-      if (childData) {
-        setGoodCoins(childData.goodCoins);
-      }
-    } else {
-      // For demo/guests, show a default balance
-      setGoodCoins(250);
-    }
-  }, [isAuthenticated, user, getChildData]);
+  const { data: rewards, isLoading, error } = useQuery({
+    queryKey: ['rewards'],
+    queryFn: getRewards
+  });
 
-  const handleRedeem = (reward: typeof REWARDS[0]) => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Login Required",
-        description: "Please login to redeem rewards.",
-        variant: "destructive",
+  const handleRedeem = (rewardId: string, coinCost: number) => {
+    if (userCoins < coinCost) {
+      toast('Not enough GoodCoins', {
+        description: 'You need more GoodCoins to redeem this reward',
+        action: {
+          label: 'Earn more',
+          onClick: () => navigate('/activities')
+        }
       });
       return;
     }
 
-    if (user?.role !== 'child') {
-      toast({
-        title: "Child Account Required",
-        description: "Only children can redeem rewards.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (goodCoins !== null && goodCoins < reward.goodCoins) {
-      toast({
-        title: "Not Enough GoodCoins",
-        description: `You need ${reward.goodCoins - goodCoins} more GoodCoins to redeem this reward.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Simulate successful redemption
-    toast({
-      title: "Reward Redeemed!",
-      description: `You've successfully redeemed ${reward.name}. Your parent will be notified.`,
+    // In a real app, we would call an API to redeem the reward
+    toast('Reward Redeemed!', {
+      description: 'Your reward has been redeemed successfully!'
     });
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-goodchild-background">
-      <Navbar />
-      
-      <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-b from-goodchild-blue/10 to-white py-16 px-6">
-          <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-goodchild-text-primary animate-slide-down">
-              Your Rewards Hub!
-            </h1>
-            <p className="text-xl text-goodchild-text-secondary max-w-2xl mx-auto mb-8 animate-slide-up">
-              Earn GoodCoins and get awesome rewards!
-            </p>
-            <div className="relative w-32 h-32 mx-auto mb-8 animate-float">
-              <img 
-                src="https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?q=80&w=2069&auto=format&fit=crop" 
-                alt="Treasure chest" 
-                className="w-full h-full object-cover rounded-xl shadow-glow"
-              />
-            </div>
-          </div>
-        </section>
-        
-        {/* GoodCoin Balance (Fixed Position) */}
-        <div className="fixed bottom-6 right-6 z-10">
-          <div className="bg-white shadow-medium rounded-full py-3 px-5 flex items-center gap-3 animate-pulse-gentle">
-            <GoodCoinIcon size="lg" animated />
-            <div className="flex flex-col">
-              <span className="text-xs text-goodchild-text-secondary">Your Balance</span>
-              <span className="text-lg font-bold text-goodchild-text-primary">
-                {goodCoins !== null ? goodCoins : '...'}
-              </span>
-            </div>
-          </div>
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse-gentle text-xl font-medium">Loading rewards...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <div className="text-xl font-medium text-goodchild-red mb-4">
+          Oops! Something went wrong
         </div>
-        
-        {/* Rewards Grid */}
-        <section className="py-16 px-6">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold mb-10 text-center text-goodchild-text-primary">
-              Available Rewards
-            </h2>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {REWARDS.map((reward) => (
-                <div 
-                  key={reward.id}
-                  className="bg-white rounded-2xl shadow-soft overflow-hidden transition-transform duration-300 hover:shadow-medium hover:-translate-y-1"
-                >
-                  <div className="relative w-full h-48">
-                    <img 
-                      src={reward.imageUrl} 
-                      alt={reward.name} 
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-4 right-4 bg-goodchild-yellow/90 text-goodchild-text-primary font-bold px-3 py-1 rounded-full text-sm">
-                      Discount!
-                    </div>
+        <Button onClick={() => window.location.reload()}>Try Again</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-goodchild-background pb-16">
+      {/* Header Section */}
+      <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 text-center">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-goodchild-text-primary mb-4 animate-slide-down">
+          Your Rewards Hub!
+        </h1>
+        <p className="text-xl text-goodchild-text-secondary max-w-2xl mx-auto animate-slide-up">
+          Earn GoodCoins and get awesome rewards!
+        </p>
+        <div className="mt-8 max-w-xl mx-auto">
+          <img 
+            src="/treasure-chest.svg" 
+            alt="Treasure chest with GoodCoins" 
+            className="w-full h-auto animate-float"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "https://placehold.co/600x400/FFD166/073B4C?text=Treasure+Chest";
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Fixed GoodCoin Balance */}
+      <div className="fixed top-20 right-4 z-30 glass-card py-2 px-4 shadow-glow-yellow animate-fade-in">
+        <div className="good-coin text-lg">
+          <GoodCoinIcon className="w-6 h-6 animate-coin-spin" />
+          <span>{userCoins}</span>
+        </div>
+      </div>
+
+      {/* Rewards Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {rewards?.map((reward) => (
+            <Card key={reward.id} className="bg-white/80 backdrop-blur-sm overflow-hidden rounded-2xl shadow-soft hover:shadow-medium transition-all duration-300">
+              <div className="relative w-full h-48">
+                <img 
+                  src={reward.imageUrl} 
+                  alt={reward.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://placehold.co/600x400/EFF1F3/073B4C?text=Reward";
+                  }}
+                />
+                {reward.discount > 0 && (
+                  <div className="absolute top-2 right-2 bg-goodchild-red text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse-gentle">
+                    Discount!
                   </div>
-                  
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-goodchild-text-primary mb-2">
-                      {reward.name}
-                    </h3>
-                    <p className="text-goodchild-text-secondary text-sm mb-4 line-clamp-2">
-                      {reward.description}
-                    </p>
-                    
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <div className="flex flex-col">
-                          <span className="text-sm text-goodchild-text-secondary line-through">
-                            ${reward.originalPrice.toFixed(2)}
-                          </span>
-                          <span className="text-xl font-bold text-goodchild-blue">
-                            ${reward.discountedPrice.toFixed(2)}
-                          </span>
-                        </div>
-                        <div className="flex items-center mt-2">
-                          <GoodCoinIcon className="mr-1" />
-                          <span className="font-bold">{reward.goodCoins}</span>
-                        </div>
-                      </div>
-                      
-                      <button
-                        onClick={() => handleRedeem(reward)}
-                        className="btn-primary text-sm px-4 py-2"
-                      >
-                        Redeem
-                      </button>
-                    </div>
+                )}
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl font-bold text-goodchild-text-primary mb-2">{reward.name}</h3>
+                <div className="flex justify-between items-center mb-3">
+                  <div>
+                    {reward.originalPrice !== reward.discountedPrice && (
+                      <span className="text-goodchild-text-secondary line-through mr-2">
+                        ${reward.originalPrice.toFixed(2)}
+                      </span>
+                    )}
+                    <span className="text-goodchild-text-primary font-bold">
+                      ${reward.discountedPrice.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="good-coin">
+                    <GoodCoinIcon className="w-5 h-5" />
+                    {reward.coinCost}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        {/* Call to Action */}
-        <section className="bg-goodchild-blue/10 py-16 px-6">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4 text-goodchild-text-primary">
-              Start earning GoodCoins today!
-            </h2>
-            <p className="text-goodchild-text-secondary mb-8">
-              Complete activities, learn new skills, and earn rewards with GoodCoins.
-            </p>
-            <div className="flex justify-center gap-4 flex-wrap">
-              <a href="#" className="btn-primary inline-flex items-center gap-2">
-                <Wallet size={18} />
-                <span>View Activities</span>
-              </a>
-              <a href="#" className="btn-outline inline-flex items-center gap-2">
-                <ShieldAlert size={18} />
-                <span>How it Works</span>
-              </a>
-            </div>
-          </div>
-        </section>
-      </main>
-      
-      <Footer />
+                <Button 
+                  onClick={() => handleRedeem(reward.id, reward.coinCost)}
+                  className="w-full bg-goodchild-blue text-white hover:bg-goodchild-blue/90"
+                >
+                  Get it Now!
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Call to Action */}
+      <div className="mt-16 text-center">
+        <h2 className="text-2xl font-bold text-goodchild-text-primary mb-4">
+          Start earning GoodCoins today!
+        </h2>
+        <Button 
+          onClick={() => navigate('/activities')}
+          className="bg-goodchild-green text-white hover:bg-goodchild-green/90"
+        >
+          Explore Activities
+        </Button>
+      </div>
     </div>
   );
 };
