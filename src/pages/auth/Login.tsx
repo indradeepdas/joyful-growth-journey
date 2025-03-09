@@ -13,17 +13,11 @@ const Login: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Add effect to handle redirect after login - making this more robust
+  // Add effect to handle redirect after login
   useEffect(() => {
     if (isAuthenticated && profile) {
-      console.log('Login - Authenticated user detected:', { profile });
-      
-      // Add a small delay to ensure the navigation happens after all state updates
-      setTimeout(() => {
-        const route = profile.role === 'parent' ? '/parent-dashboard' : '/child-dashboard';
-        console.log('Login - Redirecting to:', route);
-        navigate(route, { replace: true });
-      }, 100);
+      const route = profile.role === 'parent' ? '/parent-dashboard' : '/child-dashboard';
+      navigate(route, { replace: true });
     }
   }, [isAuthenticated, profile, navigate]);
 
@@ -38,7 +32,6 @@ const Login: React.FC = () => {
     
     try {
       setIsLoading(true);
-      console.log('Login - Attempting sign in with:', email);
       await signIn(email, password);
       toast({
         title: "Success!",
@@ -46,7 +39,6 @@ const Login: React.FC = () => {
       });
       // Redirect will happen in the useEffect
     } catch (error) {
-      console.error('Login error:', error);
       if (error instanceof Error) {
         setErrorMessage(error.message);
       } else {

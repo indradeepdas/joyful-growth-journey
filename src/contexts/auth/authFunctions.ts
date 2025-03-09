@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@/types';
 import { SupabaseProfile, SupabaseChild } from '@/services/types';
@@ -68,6 +69,7 @@ export const signUp = async (email: string, password: string, firstName: string,
   if (error) throw error;
 
   if (data.user) {
+    // Create a profile for the user
     await supabase
       .from('profiles')
       .insert({
@@ -103,11 +105,6 @@ export const updatePassword = async (newPassword: string): Promise<void> => {
 export const createChildAccount = async (data: CreateChildAccountParams, parentId: string | undefined): Promise<void> => {
   try {
     console.log('Creating child account in database:', data);
-    console.log('Parent ID:', parentId);
-    
-    if (!parentId) {
-      throw new Error("Parent ID is missing. Make sure you're logged in as a parent.");
-    }
     
     // First, insert the profile record
     const { error: profileError } = await supabase
@@ -121,15 +118,10 @@ export const createChildAccount = async (data: CreateChildAccountParams, parentI
         role: 'child'
       });
       
-    if (profileError) {
-      console.error("Error creating profile:", profileError);
-      throw profileError;
-    }
-    
-    console.log('Profile created successfully, now creating child record');
+    if (profileError) throw profileError;
     
     // Then, insert the child record in the children table
-    const { data: childData, error: childError } = await supabase
+    const { error } = await supabase
       .from('children')
       .insert({
         id: data.userId,
@@ -139,15 +131,9 @@ export const createChildAccount = async (data: CreateChildAccountParams, parentI
         nickname: data.nickname || null,
         avatar: data.avatar || null,
         good_coins: 0
-      })
-      .select();
+      });
       
-    if (childError) {
-      console.error("Error creating child record:", childError);
-      throw childError;
-    }
-    
-    console.log('Child record created successfully:', childData);
+    if (error) throw error;
     
   } catch (error) {
     console.error("Error creating child account:", error);

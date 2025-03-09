@@ -1,3 +1,4 @@
+
 import { DevelopmentArea } from '@/types';
 
 export interface SupabaseActivity {
@@ -47,29 +48,6 @@ export interface SupabaseDevelopmentArea {
   created_at?: string;
 }
 
-export interface SupabaseChildProgress {
-  id: string;
-  child_id: string;
-  development_area_id: string;
-  progress: number;
-  created_at: string;
-  updated_at: string;
-  development_areas?: {
-    created_at: string;
-    description: string;
-    id: string;
-    name: string;
-  };
-}
-
-export interface SupabaseRedemption {
-  id: string;
-  child_id: string;
-  reward_id: string;
-  good_coins: number;
-  created_at: string;
-}
-
 export interface SupabaseReward {
   id: string;
   name: string;
@@ -94,6 +72,23 @@ export interface SupabaseTransaction {
   created_at: string;
   description?: string | null;
   created_by?: string | null;
+}
+
+export interface SupabaseChildProgress {
+  id: string;
+  child_id: string;
+  development_area_id: string;
+  progress: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SupabaseRedemption {
+  id: string;
+  child_id: string;
+  reward_id?: string | null;
+  good_coins: number;
+  created_at: string;
 }
 
 // Define types for the services

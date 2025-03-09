@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Plus, Upload } from 'lucide-react';
+import { User, Plus } from 'lucide-react';
 
 const childAccountSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -36,7 +36,6 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   const form = useForm<ChildAccountFormValues>({
     resolver: zodResolver(childAccountSchema),
@@ -52,27 +51,6 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Avatar image must be less than 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Validate file type (only images)
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Invalid file type",
-          description: "Please upload an image file",
-          variant: "destructive",
-        });
-        return;
-      }
-      
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
     }
@@ -106,29 +84,10 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
       // 2. Upload avatar if provided
       let avatarUrl = null;
       if (avatarFile) {
-        // Ensure the storage bucket exists
-        const { data: bucketData, error: bucketError } = await supabase.storage.getBucket('avatars');
-        if (bucketError && bucketError.message.includes('does not exist')) {
-          // Create avatars bucket if it doesn't exist
-          await supabase.storage.createBucket('avatars', {
-            public: true,
-            fileSizeLimit: 5242880, // 5MB in bytes
-          });
-        }
-        
-        // Generate a unique filename
-        const fileName = `${authData.user.id}-${Date.now()}-${avatarFile.name}`;
-        
-        // Upload the file with progress tracking
+        const fileName = `${Date.now()}-${avatarFile.name}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('avatars')
-          .upload(fileName, avatarFile, {
-            cacheControl: '3600',
-            upsert: true,
-            onUploadProgress: (progress) => {
-              setUploadProgress(Math.round((progress.loaded / progress.total) * 100));
-            }
-          });
+          .upload(fileName, avatarFile);
           
         if (uploadError) throw uploadError;
         
@@ -164,7 +123,6 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
       form.reset();
       setAvatarFile(null);
       setAvatarPreview(null);
-      setUploadProgress(0);
       
       // Call onClose if provided
       if (onClose) {
@@ -215,15 +173,14 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
             <div className="flex justify-center mb-4">
               <div className="relative">
                 <Avatar className="w-24 h-24">
-                  <AvatarImage src={avatarPreview || undefined} alt="Child avatar" />
+                  <AvatarImage src={avatarPreview || undefined} />
                   <AvatarFallback>
                     <User className="h-12 w-12" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute -bottom-2 -right-2">
-                  <label htmlFor="avatar-upload" className="cursor-pointer bg-primary text-primary-foreground rounded-full p-1 shadow-md hover:bg-primary/90 transition-colors">
-                    <Upload className="h-4 w-4" />
-                    <span className="sr-only">Upload avatar</span>
+                  <label htmlFor="avatar-upload" className="cursor-pointer bg-primary text-primary-foreground rounded-full p-1 shadow-md">
+                    <Plus className="h-4 w-4" />
                     <input
                       id="avatar-upload"
                       type="file"
@@ -235,16 +192,6 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
                 </div>
               </div>
             </div>
-            
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div 
-                  className="bg-blue-600 h-2.5 rounded-full" 
-                  style={{ width: `${uploadProgress}%` }}
-                ></div>
-                <p className="text-xs text-center mt-1">Uploading: {uploadProgress}%</p>
-              </div>
-            )}
             
             <div className="grid grid-cols-2 gap-4">
               <FormField
