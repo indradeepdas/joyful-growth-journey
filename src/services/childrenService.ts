@@ -1,59 +1,58 @@
 
-import { ChildData } from './types';
+import { supabase } from '@/integrations/supabase/client';
+import { ChildData } from '@/services/types';
 
-// Mock data for children
-export const mockChildren: ChildData[] = [
-  {
-    id: '1',
-    name: 'Emma Johnson',
-    nickname: 'Em',
-    avatar: 'https://placehold.co/200x200/FFD166/073B4C?text=Emma',
-    goodCoins: 120,
-    parentId: 'parent-1',
-    developmentAreas: [
-      { name: 'Health & Mind', progress: 70 },
-      { name: 'Effective Communication', progress: 85 },
-      { name: 'Personal Enrichment', progress: 60 },
-      { name: 'Creativity', progress: 90 },
-      { name: 'Deeper Family Bonds', progress: 75 },
-      { name: 'Emotional Intelligence', progress: 65 },
-      { name: 'Social Skills', progress: 80 }
-    ]
-  },
-  {
-    id: '2',
-    name: 'Noah Smith',
-    nickname: 'No',
-    avatar: 'https://placehold.co/200x200/06D6A0/073B4C?text=Noah',
-    goodCoins: 85,
-    parentId: 'parent-1',
-    developmentAreas: [
-      { name: 'Health & Mind', progress: 60 },
-      { name: 'Effective Communication', progress: 70 },
-      { name: 'Personal Enrichment', progress: 80 },
-      { name: 'Creativity', progress: 65 },
-      { name: 'Deeper Family Bonds', progress: 85 },
-      { name: 'Emotional Intelligence', progress: 75 },
-      { name: 'Social Skills', progress: 90 }
-    ]
+export const getChildren = async (parentId: string): Promise<ChildData[]> => {
+  const { data, error } = await supabase
+    .from('children')
+    .select('*')
+    .eq('parent_id', parentId);
+
+  if (error) {
+    console.error('Error fetching children:', error);
+    throw error;
   }
-];
 
-// Function to get all child data
-export const getChildData = async (): Promise<ChildData[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockChildren);
-    }, 800);
-  });
+  if (!data) return [];
+
+  const children: ChildData[] = data.map(child => ({
+    id: child.id,
+    name: child.name,
+    surname: child.surname, // Add this required field
+    nickname: child.nickname || '',
+    avatar: child.avatar || '',
+    goodCoins: child.good_coins,
+    parentId: child.parent_id,
+    developmentAreas: []
+  }));
+
+  return children;
 };
 
-// Function to get a specific child's data by ID
-export const getChildById = async (id: string): Promise<ChildData | undefined> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const child = mockChildren.find(child => child.id === id);
-      resolve(child);
-    }, 300);
-  });
+export const getChildById = async (childId: string): Promise<ChildData | null> => {
+  const { data, error } = await supabase
+    .from('children')
+    .select('*')
+    .eq('id', childId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching child by ID:', error);
+    return null;
+  }
+
+  if (!data) return null;
+
+  const child: ChildData = {
+    id: data.id,
+    name: data.name,
+    surname: data.surname, // Add this required field
+    nickname: data.nickname || '',
+    avatar: data.avatar || '',
+    goodCoins: data.good_coins,
+    parentId: data.parent_id,
+    developmentAreas: []
+  };
+
+  return child;
 };

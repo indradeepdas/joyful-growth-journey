@@ -90,7 +90,8 @@ const ChildDashboard: React.FC = () => {
                 child_id: transaction.child_id,
                 amount: transaction.amount,
                 transaction_type: transaction.type === 'spend' ? 'spend' : 'earn',
-                type: transaction.type,
+                // Fix: Explicitly type-cast the string to our Transaction type's expected values
+                type: (transaction.type as 'earned' | 'spent' | 'penalty' | 'given'),
                 description: transaction.description,
                 created_by: transaction.created_by,
                 created_at: transaction.created_at
@@ -174,7 +175,8 @@ const ChildDashboard: React.FC = () => {
             child_id: transaction.child_id,
             amount: transaction.amount,
             transaction_type: transaction.type === 'spend' ? 'spend' : 'earn',
-            type: transaction.type,
+            // Fix: Ensure proper typing for the transaction type
+            type: (transaction.type as 'earned' | 'spent' | 'penalty' | 'given'),
             description: transaction.description,
             created_by: transaction.created_by,
             created_at: transaction.created_at

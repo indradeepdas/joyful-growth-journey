@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import {
   SupabaseChild,
@@ -254,6 +253,28 @@ export const getTransactions = async (childId: string): Promise<SupabaseTransact
   }
   
   return data as SupabaseTransaction[];
+};
+
+const addTransactions = async (transactions) => {
+  // Ensure each transaction has the required 'type' field (not optional)
+  const formattedTransactions = transactions.map(transaction => ({
+    child_id: transaction.child_id,
+    amount: transaction.amount,
+    type: transaction.type || 'earned', // Ensure type is always provided
+    description: transaction.description || null,
+    created_by: transaction.created_by,
+    // Don't include transaction_type as it's not in the schema
+    // Only include reward_id and activity_id if they're in the schema
+    ...(transaction.reward_id ? { reward_id: transaction.reward_id } : {}),
+    ...(transaction.activity_id ? { activity_id: transaction.activity_id } : {})
+  }));
+
+  const { data, error } = await supabase
+    .from('transactions')
+    .insert(formattedTransactions);
+
+  if (error) throw error;
+  return data;
 };
 
 export const createTransaction = async (
