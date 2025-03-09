@@ -1,4 +1,3 @@
-
 import { DevelopmentArea } from '@/types';
 
 export interface SupabaseActivity {
@@ -55,6 +54,12 @@ export interface SupabaseChildProgress {
   progress: number;
   created_at: string;
   updated_at: string;
+  development_areas?: {
+    created_at: string;
+    description: string;
+    id: string;
+    name: string;
+  };
 }
 
 export interface SupabaseRedemption {
