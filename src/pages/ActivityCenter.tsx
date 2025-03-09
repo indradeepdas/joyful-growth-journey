@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -632,7 +633,7 @@ const ActivityCenter: React.FC = () => {
                     </SelectContent>
                   </Select>
                   
-                  {profile?.role === 'parent' && (\
+                  {profile?.role === 'parent' && (
                     <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
                       <DialogTrigger asChild>
                         <Button className="whitespace-nowrap">
