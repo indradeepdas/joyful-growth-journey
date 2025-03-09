@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -26,7 +25,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { SupabaseChild } from '@/services/types';
+import { SupabaseChild, SupabaseTransaction } from '@/services/types';
 
 const ParentDashboard: React.FC = () => {
   const { user, profile, childAccounts, isAuthenticated } = useSupabaseAuth();
@@ -73,12 +72,18 @@ const ParentDashboard: React.FC = () => {
           if (transactionsError) {
             console.error('Error fetching transactions:', transactionsError);
           } else if (transactionsData) {
-            const formattedTransactions = transactionsData.map(transaction => 
-              adaptSupabaseTransaction({
-                ...transaction,
-                type: transaction.type as 'earned' | 'spent' | 'penalty' | 'given'
-              })
-            );
+            const formattedTransactions = transactionsData.map(transaction => {
+              const compatibleTransaction: SupabaseTransaction = {
+                id: transaction.id,
+                child_id: transaction.child_id,
+                amount: transaction.amount,
+                transaction_type: transaction.type as 'earn' | 'spend',
+                description: transaction.description,
+                created_by: transaction.created_by,
+                created_at: transaction.created_at
+              };
+              return adaptSupabaseTransaction(compatibleTransaction);
+            });
             setTransactions(formattedTransactions);
           }
         }
@@ -131,7 +136,7 @@ const ParentDashboard: React.FC = () => {
           {
             child_id: childId,
             amount: -10,
-            type: 'penalty' as 'penalty',
+            type: 'penalty',
             description: 'Penalty applied',
             created_by: user?.id
           }
@@ -159,12 +164,18 @@ const ParentDashboard: React.FC = () => {
         .limit(5);
         
       if (!transactionsError && transactionsData) {
-        const formattedTransactions = transactionsData.map(transaction => 
-          adaptSupabaseTransaction({
-            ...transaction,
-            type: transaction.type as 'earned' | 'spent' | 'penalty' | 'given'
-          })
-        );
+        const formattedTransactions = transactionsData.map(transaction => {
+          const compatibleTransaction: SupabaseTransaction = {
+            id: transaction.id,
+            child_id: transaction.child_id,
+            amount: transaction.amount,
+            transaction_type: transaction.type as 'earn' | 'spend',
+            description: transaction.description,
+            created_by: transaction.created_by,
+            created_at: transaction.created_at
+          };
+          return adaptSupabaseTransaction(compatibleTransaction);
+        });
         setTransactions(formattedTransactions);
       }
     } catch (error) {
@@ -185,7 +196,7 @@ const ParentDashboard: React.FC = () => {
           {
             child_id: childId,
             amount: 20,
-            type: 'given' as 'given',
+            type: 'given',
             description: 'GoodCoins added by parent',
             created_by: user?.id
           }
@@ -213,12 +224,18 @@ const ParentDashboard: React.FC = () => {
         .limit(5);
         
       if (!transactionsError && transactionsData) {
-        const formattedTransactions = transactionsData.map(transaction => 
-          adaptSupabaseTransaction({
-            ...transaction,
-            type: transaction.type as 'earned' | 'spent' | 'penalty' | 'given'
-          })
-        );
+        const formattedTransactions = transactionsData.map(transaction => {
+          const compatibleTransaction: SupabaseTransaction = {
+            id: transaction.id,
+            child_id: transaction.child_id,
+            amount: transaction.amount,
+            transaction_type: transaction.type as 'earn' | 'spend',
+            description: transaction.description,
+            created_by: transaction.created_by,
+            created_at: transaction.created_at
+          };
+          return adaptSupabaseTransaction(compatibleTransaction);
+        });
         setTransactions(formattedTransactions);
       }
     } catch (error) {
@@ -247,13 +264,7 @@ const ParentDashboard: React.FC = () => {
               </p>
             </div>
             
-            <button 
-              onClick={() => setShowChildForm(true)}
-              className="btn-primary inline-flex items-center gap-2 self-start"
-            >
-              <Plus size={18} />
-              <span>Create Child Account</span>
-            </button>
+            <ChildAccountForm />
           </header>
           
           <section className="mb-10">
@@ -273,13 +284,7 @@ const ParentDashboard: React.FC = () => {
                 <p className="text-goodchild-text-secondary mb-4">
                   You haven't added any children yet.
                 </p>
-                <button 
-                  onClick={() => setShowChildForm(true)}
-                  className="btn-primary inline-flex items-center gap-2"
-                >
-                  <Plus size={18} />
-                  <span>Add Your First Child</span>
-                </button>
+                <ChildAccountForm />
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -554,8 +559,6 @@ const ParentDashboard: React.FC = () => {
       </main>
       
       <Footer />
-      
-      {showChildForm && <ChildAccountForm onClose={() => setShowChildForm(false)} />}
     </div>
   );
 };

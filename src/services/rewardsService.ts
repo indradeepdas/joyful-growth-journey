@@ -1,20 +1,22 @@
 
 // Rewards service functions and data
 
+import { supabase } from '@/integrations/supabase/client';
+
 export interface Reward {
   id: string;
   name: string;
   description: string;
   imageUrl: string;
-  originalPrice: number;
-  discountedPrice: number;
+  originalPrice: number | null;
+  discountedPrice: number | null;
   discount: number;
   coinCost: number;
   category: string;
   available: boolean;
 }
 
-// Mock data for rewards
+// Mock data for rewards (used as fallback or for public pages)
 export const mockRewards: Reward[] = [
   {
     id: '1',
@@ -78,35 +80,161 @@ export const mockRewards: Reward[] = [
   }
 ];
 
-// Function to get all rewards
+// Function to get all rewards from Supabase
 export const getRewards = async (): Promise<Reward[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockRewards);
-    }, 800);
-  });
+  try {
+    console.log('Fetching rewards from Supabase');
+    const { data, error } = await supabase
+      .from('rewards')
+      .select('*');
+      
+    if (error) {
+      console.error('Error fetching rewards:', error);
+      throw error;
+    }
+    
+    if (!data || data.length === 0) {
+      console.log('No rewards found in database, returning mock data');
+      return mockRewards;
+    }
+    
+    // Convert Supabase reward data to our Reward interface
+    const rewards: Reward[] = data.map(reward => ({
+      id: reward.id,
+      name: reward.name,
+      description: reward.description || '',
+      imageUrl: reward.image_url || `https://placehold.co/600x400/random?text=${encodeURIComponent(reward.name)}`,
+      originalPrice: reward.original_price,
+      discountedPrice: reward.discounted_price,
+      discount: reward.original_price && reward.discounted_price 
+        ? Math.round(((reward.original_price - reward.discounted_price) / reward.original_price) * 100) 
+        : 0,
+      coinCost: reward.good_coins,
+      category: 'General', // Default category if not available in data
+      available: true
+    }));
+    
+    console.log('Fetched rewards:', rewards);
+    return rewards;
+  } catch (error) {
+    console.error('Error in getRewards:', error);
+    return mockRewards; // Fallback to mock data
+  }
 };
 
 // Function to get a specific reward by ID
 export const getRewardById = async (id: string): Promise<Reward | undefined> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const reward = mockRewards.find((r) => r.id === id);
-      resolve(reward);
-    }, 300);
-  });
+  try {
+    const { data, error } = await supabase
+      .from('rewards')
+      .select('*')
+      .eq('id', id)
+      .single();
+      
+    if (error) {
+      console.error('Error fetching reward:', error);
+      // Try to find in mock data as fallback
+      return mockRewards.find((r) => r.id === id);
+    }
+    
+    if (!data) {
+      return mockRewards.find((r) => r.id === id);
+    }
+    
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description || '',
+      imageUrl: data.image_url || `https://placehold.co/600x400/random?text=${encodeURIComponent(data.name)}`,
+      originalPrice: data.original_price,
+      discountedPrice: data.discounted_price,
+      discount: data.original_price && data.discounted_price 
+        ? Math.round(((data.original_price - data.discounted_price) / data.original_price) * 100) 
+        : 0,
+      coinCost: data.good_coins,
+      category: 'General',
+      available: true
+    };
+  } catch (error) {
+    console.error('Error in getRewardById:', error);
+    return mockRewards.find((r) => r.id === id);
+  }
 };
 
 // Function to redeem a reward (would connect to backend in real implementation)
 export const redeemReward = async (rewardId: string, userId: string): Promise<{ success: boolean; message: string }> => {
-  // This would be a POST request to the backend in a real app
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Mock successful redemption
-      resolve({
-        success: true,
-        message: "Reward redeemed successfully!",
+  try {
+    // First get the reward to check its cost
+    const { data: rewardData, error: rewardError } = await supabase
+      .from('rewards')
+      .select('*')
+      .eq('id', rewardId)
+      .single();
+      
+    if (rewardError) throw rewardError;
+    
+    // Check if user has child profile
+    const { data: childData, error: childError } = await supabase
+      .from('children')
+      .select('*')
+      .eq('id', userId)
+      .single();
+      
+    if (childError && childError.code !== 'PGRST116') {
+      throw childError;
+    }
+    
+    if (!childData) {
+      throw new Error("Only children can redeem rewards");
+    }
+    
+    // Check if child has enough coins
+    if (childData.good_coins < rewardData.good_coins) {
+      throw new Error(`Not enough GoodCoins. You need ${rewardData.good_coins} but only have ${childData.good_coins}.`);
+    }
+    
+    // Begin transaction
+    // 1. Add redemption record
+    const { error: redemptionError } = await supabase
+      .from('redemptions')
+      .insert({
+        child_id: userId,
+        reward_id: rewardId,
+        good_coins: rewardData.good_coins
       });
-    }, 800);
-  });
+      
+    if (redemptionError) throw redemptionError;
+    
+    // 2. Update child's coins
+    const { error: updateError } = await supabase
+      .from('children')
+      .update({ good_coins: childData.good_coins - rewardData.good_coins })
+      .eq('id', userId);
+      
+    if (updateError) throw updateError;
+    
+    // 3. Add transaction record
+    const { error: transactionError } = await supabase
+      .from('transactions')
+      .insert({
+        child_id: userId,
+        amount: -rewardData.good_coins,
+        type: 'spent',
+        description: `Redeemed ${rewardData.name}`,
+        created_by: userId
+      });
+      
+    if (transactionError) throw transactionError;
+    
+    return {
+      success: true,
+      message: "Reward redeemed successfully!",
+    };
+  } catch (error) {
+    console.error('Error redeeming reward:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to redeem reward",
+    };
+  }
 };

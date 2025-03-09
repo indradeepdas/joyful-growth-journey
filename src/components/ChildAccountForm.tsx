@@ -23,7 +23,12 @@ const childAccountSchema = z.object({
 
 type ChildAccountFormValues = z.infer<typeof childAccountSchema>;
 
-const ChildAccountForm = () => {
+// The component can accept an onClose prop, but it's optional
+interface ChildAccountFormProps {
+  onClose?: () => void;
+}
+
+const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
   const { toast } = useToast();
   const { user, createChildAccount } = useSupabaseAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -118,6 +123,11 @@ const ChildAccountForm = () => {
       form.reset();
       setAvatarFile(null);
       setAvatarPreview(null);
+      
+      // Call onClose if provided
+      if (onClose) {
+        onClose();
+      }
       
     } catch (err) {
       console.error("Error creating child account:", err);
@@ -278,6 +288,7 @@ const ChildAccountForm = () => {
                   form.reset();
                   setAvatarFile(null);
                   setAvatarPreview(null);
+                  if (onClose) onClose();
                 }}
               >
                 Cancel
