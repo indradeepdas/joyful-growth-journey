@@ -19,16 +19,13 @@ const LandingHeader = () => {
         <Link to="/" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
           Home
         </Link>
-        <Link to="/parent-dashboard" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
+        <Link to="/public/dashboard" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
           Parent Dashboard
         </Link>
-        <Link to="/child-dashboard" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
-          Child Dashboard
-        </Link>
-        <Link to="/activities" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
+        <Link to="/public/activities" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
           Activity Center
         </Link>
-        <Link to="/rewards" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
+        <Link to="/public/rewards" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
           Rewards Hub
         </Link>
       </nav>
@@ -38,7 +35,7 @@ const LandingHeader = () => {
           <Button variant="outline" className="hidden sm:inline-flex">Log In</Button>
         </Link>
         <Link to="/signup">
-          <Button>Sign Up</Button>
+          <Button className="bg-[#FFA500] hover:bg-[#E69500]">Sign Up</Button>
         </Link>
       </div>
     </header>

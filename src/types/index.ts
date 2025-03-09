@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   email: string;
@@ -47,10 +46,12 @@ export interface Reward {
 export interface Transaction {
   id: string;
   childId: string;
+  activityId?: string;
+  rewardId?: string;
   amount: number;
-  type: 'earned' | 'spent' | 'penalty' | 'given';
   description: string;
   createdAt: string;
+  type: 'earned' | 'spent' | 'penalty' | 'given';
 }
 
 export interface Redemption {

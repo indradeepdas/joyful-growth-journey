@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -9,9 +9,17 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const { signIn } = useSupabaseAuth();
+  const { signIn, isAuthenticated, profile } = useSupabaseAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Add effect to handle redirect after login
+  useEffect(() => {
+    if (isAuthenticated && profile) {
+      const route = profile.role === 'parent' ? '/parent-dashboard' : '/child-dashboard';
+      navigate(route, { replace: true });
+    }
+  }, [isAuthenticated, profile, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +37,7 @@ const Login: React.FC = () => {
         title: "Success!",
         description: "You have successfully logged in.",
       });
-      // Redirect will happen automatically via the SupabaseAuthContext effect
+      // Redirect will happen in the useEffect
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message);

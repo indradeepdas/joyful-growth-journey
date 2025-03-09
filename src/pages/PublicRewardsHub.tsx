@@ -11,13 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import GoodCoinIcon from '@/components/GoodCoinIcon';
 import { Search, Lock, Tag } from 'lucide-react';
 
-// Sample rewards for preview
+// Sample rewards with real images for preview
 const sampleRewards = [
   {
     id: '1',
     name: '30 Minutes Extra Screen Time',
     description: 'Earn 30 minutes of additional screen time to be used at your discretion.',
-    imageUrl: 'https://placehold.co/400x300/FFD166/073B4C?text=Screen+Time',
+    imageUrl: 'https://images.unsplash.com/photo-1544652478-6653e09f18a2?w=600&h=400&fit=crop',
     goodCoins: 50,
     originalPrice: null,
     discountedPrice: null
@@ -26,7 +26,7 @@ const sampleRewards = [
     id: '2',
     name: 'Choose Dinner For The Family',
     description: 'Get to pick what the family has for dinner one night this week.',
-    imageUrl: 'https://placehold.co/400x300/06D6A0/073B4C?text=Dinner+Choice',
+    imageUrl: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&h=400&fit=crop',
     goodCoins: 75,
     originalPrice: null,
     discountedPrice: null
@@ -35,7 +35,7 @@ const sampleRewards = [
     id: '3',
     name: 'Movie Night Selection',
     description: 'Choose the movie for the next family movie night.',
-    imageUrl: 'https://placehold.co/400x300/118AB2/FFFFFF?text=Movie+Night',
+    imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&h=400&fit=crop',
     goodCoins: 60,
     originalPrice: null,
     discountedPrice: null
@@ -44,7 +44,7 @@ const sampleRewards = [
     id: '4',
     name: 'Stay Up 30 Minutes Later',
     description: 'Push your bedtime back by 30 minutes for one night.',
-    imageUrl: 'https://placehold.co/400x300/EF476F/FFFFFF?text=Late+Night',
+    imageUrl: 'https://images.unsplash.com/photo-1531353826977-0941b4779a1c?w=600&h=400&fit=crop',
     goodCoins: 40,
     originalPrice: null,
     discountedPrice: null
@@ -53,7 +53,7 @@ const sampleRewards = [
     id: '5',
     name: 'Special Treat',
     description: 'Receive a special dessert or treat of your choice.',
-    imageUrl: 'https://placehold.co/400x300/FFD166/073B4C?text=Special+Treat',
+    imageUrl: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&h=400&fit=crop',
     goodCoins: 35,
     originalPrice: 5.99,
     discountedPrice: 4.99
@@ -62,7 +62,7 @@ const sampleRewards = [
     id: '6',
     name: 'Day Trip Choice',
     description: 'Choose the destination for the next family day trip or outing.',
-    imageUrl: 'https://placehold.co/400x300/06D6A0/073B4C?text=Day+Trip',
+    imageUrl: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=400&fit=crop',
     goodCoins: 100,
     originalPrice: null,
     discountedPrice: null
@@ -71,7 +71,7 @@ const sampleRewards = [
     id: '7',
     name: '$10 Gift Card',
     description: 'Redeem for a $10 gift card to your favorite store or online service.',
-    imageUrl: 'https://placehold.co/400x300/118AB2/FFFFFF?text=Gift+Card',
+    imageUrl: 'https://images.unsplash.com/photo-1556742031-c6961e8560b0?w=600&h=400&fit=crop',
     goodCoins: 150,
     originalPrice: 10.00,
     discountedPrice: 10.00
@@ -80,7 +80,7 @@ const sampleRewards = [
     id: '8',
     name: 'No Chores Day',
     description: 'Get a day off from your regular chores and responsibilities.',
-    imageUrl: 'https://placehold.co/400x300/EF476F/FFFFFF?text=No+Chores',
+    imageUrl: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&h=400&fit=crop',
     goodCoins: 80,
     originalPrice: null,
     discountedPrice: null
@@ -129,7 +129,7 @@ const PublicRewardsHub: React.FC = () => {
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Link to="/signup">
-                <Button size="lg">Create Your Account</Button>
+                <Button size="lg" className="bg-[#FFA500] hover:bg-[#E69500]">Create Your Account</Button>
               </Link>
               <Link to="/login">
                 <Button variant="outline" size="lg">Log In</Button>
@@ -164,13 +164,13 @@ const PublicRewardsHub: React.FC = () => {
             </div>
           </div>
           
-          {/* Rewards grid */}
+          {/* Rewards grid with improved alignment */}
           {filteredRewards.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
               {filteredRewards.map((reward) => (
                 <Card 
                   key={reward.id} 
-                  className="overflow-hidden hover:shadow-md transition-shadow"
+                  className="overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full"
                 >
                   <div className="relative h-48 overflow-hidden">
                     <img
@@ -184,9 +184,9 @@ const PublicRewardsHub: React.FC = () => {
                     </div>
                   </div>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">{reward.name}</CardTitle>
+                    <CardTitle className="text-xl line-clamp-1">{reward.name}</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-grow">
                     <p className="text-goodchild-text-secondary line-clamp-3 mb-4">
                       {reward.description}
                     </p>
@@ -203,9 +203,9 @@ const PublicRewardsHub: React.FC = () => {
                       </div>
                     )}
                   </CardContent>
-                  <CardFooter className="pt-0">
+                  <CardFooter className="pt-0 mt-auto">
                     <Button 
-                      className="w-full"
+                      className="w-full bg-[#FFA500] hover:bg-[#E69500]"
                       onClick={() => window.location.href = '/login'}
                     >
                       <Lock className="mr-2 h-4 w-4" />
@@ -235,7 +235,7 @@ const PublicRewardsHub: React.FC = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link to="/signup">
-                <Button>Create Account</Button>
+                <Button className="bg-[#FFA500] hover:bg-[#E69500]">Create Account</Button>
               </Link>
               <Link to="/login">
                 <Button variant="outline">Log In</Button>

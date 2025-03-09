@@ -6,8 +6,10 @@ export interface SupabaseActivity {
   title: string;
   description: string;
   development_area_id?: string | null;
+  developmentAreaName?: string;
   coin_reward: number;
   completed: boolean;
+  completed_date?: string | null;
   due_date?: string | null;
   created_by?: string | null;
   assigned_to?: string | null;
@@ -64,6 +66,25 @@ export interface SupabaseTransaction {
   reward_id?: string | null;
   amount: number;
   transaction_type: 'earn' | 'spend';
+  type?: 'earned' | 'spent' | 'penalty' | 'given';
   created_at: string;
   description?: string | null;
+  created_by?: string | null;
+}
+
+export interface SupabaseChildProgress {
+  id: string;
+  child_id: string;
+  development_area_id: string;
+  progress: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SupabaseRedemption {
+  id: string;
+  child_id: string;
+  reward_id?: string | null;
+  good_coins: number;
+  created_at: string;
 }

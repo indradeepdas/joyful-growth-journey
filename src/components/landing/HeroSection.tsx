@@ -20,7 +20,7 @@ const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <Link to="/signup">
-              <Button size="lg" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto bg-[#FFA500] hover:bg-[#E69500]">
                 Get Started Free
               </Button>
             </Link>
@@ -37,8 +37,8 @@ const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
         <div className="md:w-1/2 flex justify-center md:justify-end">
           <div className="glass-card p-6 rounded-xl w-full max-w-md">
             <img 
-              src="https://placehold.co/600x400/FFD166/073B4C?text=Happy+Family" 
-              alt="Happy family using The Good Child Project" 
+              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600&h=400" 
+              alt="Happy parent and child" 
               className="w-full h-auto rounded-lg mb-4" 
             />
             <div className="text-center">

@@ -5,7 +5,7 @@ import { Instagram, Twitter, Facebook, Mail } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-goodchild-blue text-white py-12 px-6">
+    <footer className="bg-[#FFA500] text-white py-12 px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
         <div className="md:col-span-2">
           <Link to="/" className="inline-block mb-4">
@@ -50,10 +50,9 @@ const Footer: React.FC = () => {
           <h4 className="text-lg font-bold mb-4">Quick Links</h4>
           <ul className="space-y-3">
             <li><Link to="/" className="text-white/80 hover:text-white transition-colors">Home</Link></li>
-            <li><Link to="/parent-dashboard" className="text-white/80 hover:text-white transition-colors">Parent Dashboard</Link></li>
-            <li><Link to="/child-dashboard" className="text-white/80 hover:text-white transition-colors">Child Dashboard</Link></li>
-            <li><Link to="/activity-center" className="text-white/80 hover:text-white transition-colors">Activity Center</Link></li>
-            <li><Link to="/rewards-hub" className="text-white/80 hover:text-white transition-colors">Rewards Hub</Link></li>
+            <li><Link to="/public/dashboard" className="text-white/80 hover:text-white transition-colors">Parent Dashboard</Link></li>
+            <li><Link to="/public/activities" className="text-white/80 hover:text-white transition-colors">Activity Center</Link></li>
+            <li><Link to="/public/rewards" className="text-white/80 hover:text-white transition-colors">Rewards Hub</Link></li>
           </ul>
         </div>
         

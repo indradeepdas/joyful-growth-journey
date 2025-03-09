@@ -70,7 +70,7 @@ const Index: React.FC = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => navigate('/public/dashboard')} className="w-full">
+                <Button onClick={() => navigate('/public/dashboard')} className="w-full bg-[#FFA500] hover:bg-[#E69500]">
                   View Sample Dashboard
                 </Button>
               </CardFooter>
@@ -86,7 +86,7 @@ const Index: React.FC = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => navigate('/public/activities')} className="w-full">
+                <Button onClick={() => navigate('/public/activities')} className="w-full bg-[#FFA500] hover:bg-[#E69500]">
                   Explore Activities
                 </Button>
               </CardFooter>
@@ -102,7 +102,7 @@ const Index: React.FC = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => navigate('/public/rewards')} className="w-full">
+                <Button onClick={() => navigate('/public/rewards')} className="w-full bg-[#FFA500] hover:bg-[#E69500]">
                   See Rewards
                 </Button>
               </CardFooter>

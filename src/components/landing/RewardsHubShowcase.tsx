@@ -74,8 +74,8 @@ const RewardsHubShowcase = () => {
         </div>
         
         <div className="text-center">
-          <Link to="/rewards">
-            <Button size="lg">
+          <Link to="/public/rewards">
+            <Button size="lg" className="bg-[#FFA500] hover:bg-[#E69500]">
               Visit Rewards Hub
             </Button>
           </Link>
