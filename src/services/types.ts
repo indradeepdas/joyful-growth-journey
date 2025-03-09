@@ -84,6 +84,9 @@ export interface SupabaseActivity {
   completed_date: string | null;
   created_at: string;
   updated_at: string;
+  estimated_time: string | null;
+  // Optional field for join queries
+  developmentAreaName?: string;
 }
 
 export interface SupabaseTransaction {

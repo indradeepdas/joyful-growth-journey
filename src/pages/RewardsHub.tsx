@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { getSupabaseClient } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Reward } from '@/types';
 import { adaptSupabaseReward } from '@/utils/typeAdapters';
@@ -25,7 +24,6 @@ const RewardsHub: React.FC = () => {
   
   // Function to fetch rewards from Supabase
   const fetchRewards = async (): Promise<Reward[]> => {
-    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('rewards')
       .select('*');
@@ -46,8 +44,6 @@ const RewardsHub: React.FC = () => {
     if (!profile?.id) {
       throw new Error("You must be logged in to redeem rewards");
     }
-    
-    const supabase = getSupabaseClient();
     
     // First get the reward to check its cost
     const { data: rewardData, error: rewardError } = await supabase
@@ -282,7 +278,7 @@ const RewardsHub: React.FC = () => {
             ) : (
               <div className="col-span-full text-center py-12">
                 <div className="mb-4">
-                  <SearchIcon className="h-12 w-12 mx-auto text-goodchild-text-secondary opacity-60" />
+                  <Search className="h-12 w-12 mx-auto text-goodchild-text-secondary opacity-60" />
                 </div>
                 <h3 className="text-xl font-medium mb-2">No rewards found</h3>
                 <p className="text-goodchild-text-secondary">

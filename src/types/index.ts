@@ -31,6 +31,7 @@ export interface Activity {
   childId: string;
   dueDate?: string;
   completedDate?: string;
+  estimatedTime?: string;
 }
 
 export interface Reward {

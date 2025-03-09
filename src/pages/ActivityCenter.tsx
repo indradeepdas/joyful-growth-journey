@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 import { Calendar as CalendarIcon, Search, Clock, Tag, ChevronLeft, Plus, Save, Calendar as CalendarComponent, AlertCircle, CheckCircle, Brain, MessageSquare, User, Lightbulb, Heart, Zap, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { getSupabaseClient } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Activity, DevelopmentArea } from '@/types';
 import { SupabaseActivity, SupabaseChild, SupabaseDevelopmentArea } from '@/services/types';
@@ -146,8 +146,6 @@ const ActivityCenter: React.FC = () => {
   
   // Query to fetch activities from Supabase
   const fetchActivities = async (): Promise<Activity[]> => {
-    const supabase = getSupabaseClient();
-    
     // Join with development_areas table to get the area name
     const { data, error } = await supabase
       .from('activities')
@@ -234,6 +232,7 @@ const ActivityCenter: React.FC = () => {
           created_by: user?.id,
           due_date: null,
           completed: false,
+          estimated_time: data.estimatedTime,
         });
         
       if (error) throw error;
