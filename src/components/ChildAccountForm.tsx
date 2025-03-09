@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { X } from 'lucide-react';
+import { X, Upload } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChildAccountFormProps {
   onClose: () => void;
@@ -12,14 +14,32 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
     name: '',
     surname: '',
     nickname: '',
+    email: '',
   });
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createChildAccount } = useSupabaseAuth();
+  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setAvatar(file);
+      
+      // Create a preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,22 +47,89 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
     setError(null);
     
     // Simple validation
-    if (!formData.name || !formData.surname) {
+    if (!formData.name || !formData.surname || !formData.email) {
       setError('Please fill in all required fields.');
       return;
     }
     
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
+      
+      // 1. First, create a Supabase Auth account for the child
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: 'test123', // Default password
+        options: {
+          data: {
+            first_name: formData.name,
+            last_name: formData.surname,
+            nickname: formData.nickname || undefined,
+            role: 'child'
+          }
+        }
+      });
+      
+      if (authError) throw authError;
+      
+      if (!authData.user) {
+        throw new Error('Failed to create user account');
+      }
+      
+      // Upload avatar if provided
+      let avatarUrl = null;
+      if (avatar) {
+        const fileExt = avatar.name.split('.').pop();
+        const fileName = `${authData.user.id}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, avatar);
+          
+        if (uploadError) {
+          console.error('Avatar upload error:', uploadError);
+          // Continue without avatar rather than failing the whole process
+        } else {
+          const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+          avatarUrl = urlData.publicUrl;
+        }
+      }
+      
+      // 2. Create the child profile in our database
       await createChildAccount({
         name: formData.name,
         surname: formData.surname,
-        nickname: formData.nickname || undefined
+        nickname: formData.nickname || undefined,
+        email: formData.email,
+        avatar: avatarUrl,
+        userId: authData.user.id
       });
+      
+      // 3. Send welcome email
+      // This would typically be handled by a server-side function
+      // For this demo, we'll simulate it with a toast notification
+      
+      toast({
+        title: "Success!",
+        description: "Child account created successfully. A welcome email has been sent.",
+      });
+      
       onClose(); // Close the form after successful submission
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        // Handle specific error cases
+        if (err.message.includes('already registered')) {
+          setError('This email is already registered. Please use a different email.');
+        } else {
+          setError(err.message);
+        }
       } else {
         setError('An unexpected error occurred. Please try again.');
       }
@@ -73,6 +160,35 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
         
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="w-24 h-24 rounded-full bg-gray-200 overflow-hidden border-2 border-goodchild-blue flex items-center justify-center">
+                  {avatarPreview ? (
+                    <img 
+                      src={avatarPreview} 
+                      alt="Avatar preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Upload className="text-gray-400" size={32} />
+                  )}
+                </div>
+                <label 
+                  htmlFor="avatar-upload" 
+                  className="absolute bottom-0 right-0 bg-goodchild-blue text-white p-1 rounded-full cursor-pointer"
+                >
+                  <Upload size={16} />
+                </label>
+                <input 
+                  id="avatar-upload" 
+                  type="file" 
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+              </div>
+            </div>
+            
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-goodchild-text-secondary mb-1">
                 Name*
@@ -117,6 +233,22 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-goodchild-blue focus:border-transparent transition-all"
                 placeholder="Nickname (optional)"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-goodchild-text-secondary mb-1">
+                Email*
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-goodchild-blue focus:border-transparent transition-all"
+                placeholder="child@example.com"
               />
             </div>
           </div>

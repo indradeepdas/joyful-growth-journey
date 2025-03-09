@@ -1,139 +1,146 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { cn } from '@/lib/utils';
-import { Menu, X, LogOut, Home, User } from 'lucide-react';
+import { useMobile } from '@/hooks/use-mobile';
+import { Menu, X } from 'lucide-react';
+import GoodCoinIcon from '@/components/GoodCoinIcon';
 
 const Navbar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { user, logout, isAuthenticated, profile } = useSupabaseAuth();
   const location = useLocation();
-  
-  const isActive = (path: string) => location.pathname === path;
-  
-  const toggleMenu = () => setIsOpen(!isOpen);
-  const closeMenu = () => setIsOpen(false);
-  
-  const handleLogout = async () => {
-    await logout();
-    closeMenu();
+  const { user, profile, isLoading, signOut } = useSupabaseAuth();
+  const isMobile = useMobile();
+  const [showMenu, setShowMenu] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
+
+  // Determine if we should show auth links or dashboard links
+  const isAuthenticated = !!user && !!profile;
   
-  const isParent = profile?.role === 'parent';
-  const isChild = profile?.role === 'child';
-  
-  const navItems = [
-    { name: 'Home', path: '/' },
-    ...(isParent ? [{ name: 'Parent Dashboard', path: '/parent-dashboard' }] : []),
-    ...(isChild ? [{ name: 'Child Dashboard', path: '/child-dashboard' }] : []),
-    { name: 'Activity Center', path: '/activities' },
-    { name: 'Rewards Hub', path: '/rewards' },
-  ];
+  // Helper function to get the correct route based on authentication status
+  const getRouteForLink = (authenticatedRoute: string, publicRoute: string) => {
+    return isAuthenticated ? authenticatedRoute : publicRoute;
+  };
 
   return (
-    <header className="w-full py-4 px-6 bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-50 transition-all duration-300">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2" onClick={closeMenu}>
-          <span className="text-2xl font-bold text-goodchild-blue">The Good Child</span>
-          <span className="text-xl font-bold text-goodchild-text-secondary">Project</span>
+    <header className="sticky top-0 bg-white shadow-sm z-40">
+      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <Link to="/" className="flex items-center font-bold text-xl text-goodchild-text-primary">
+          GoodChild
+          <GoodCoinIcon className="ml-2 w-6 h-6" />
         </Link>
         
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "font-medium transition-colors duration-200 hover:text-goodchild-blue",
-                isActive(item.path) 
-                  ? "text-goodchild-blue underline decoration-goodchild-blue decoration-2 underline-offset-8" 
-                  : "text-goodchild-text-secondary"
-              )}
-            >
-              {item.name}
-            </Link>
-          ))}
+        {/* Desktop navigation */}
+        <nav className="hidden md:flex items-center space-x-6">
+          <Link 
+            to={getRouteForLink('/parent-dashboard', '/public/dashboard')} 
+            className={`nav-link ${location.pathname === '/parent-dashboard' || location.pathname === '/child-dashboard' || location.pathname === '/public/dashboard' ? 'active' : ''}`}
+          >
+            Dashboard
+          </Link>
+          <Link 
+            to={getRouteForLink('/activities', '/public/activities')} 
+            className={`nav-link ${location.pathname === '/activities' || location.pathname === '/public/activities' ? 'active' : ''}`}
+          >
+            Activity Center
+          </Link>
+          <Link 
+            to={getRouteForLink('/rewards', '/public/rewards')} 
+            className={`nav-link ${location.pathname === '/rewards' || location.pathname === '/public/rewards' ? 'active' : ''}`}
+          >
+            Rewards Hub
+          </Link>
           
           {isAuthenticated ? (
-            <div className="flex items-center gap-4 ml-4">
-              <div className="flex items-center gap-2 text-goodchild-text-secondary">
-                <User size={18} />
-                <span className="font-medium">{profile?.first_name || 'User'}</span>
-              </div>
-              <button 
-                onClick={handleLogout}
-                className="flex items-center gap-2 bg-goodchild-red/10 text-goodchild-red px-4 py-2 rounded-full hover:bg-goodchild-red/20 transition-colors"
-              >
-                <LogOut size={18} />
-                <span>Logout</span>
+            <>
+              <button onClick={handleSignOut} className="btn-secondary">
+                Sign Out
               </button>
-            </div>
+            </>
           ) : (
-            <Link 
-              to="/login" 
-              className="btn-primary ml-4"
-            >
-              Login / Sign Up
-            </Link>
+            <>
+              <Link to="/login" className="nav-link">
+                Sign In
+              </Link>
+              <Link to="/signup" className="btn-primary">
+                Create Account
+              </Link>
+            </>
           )}
         </nav>
         
-        {/* Mobile Menu Button */}
-        <button 
-          className="md:hidden text-goodchild-text-primary hover:text-goodchild-blue"
-          onClick={toggleMenu}
-          aria-label={isOpen ? "Close menu" : "Open menu"}
+        {/* Mobile menu button */}
+        <button
+          onClick={() => setShowMenu(true)}
+          className="md:hidden text-goodchild-text-primary focus:outline-none"
+          aria-label="Open Menu"
         >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
+          <Menu size={24} />
         </button>
       </div>
       
-      {/* Mobile Navigation */}
-      {isOpen && (
-        <div className="md:hidden fixed inset-0 bg-white z-40 pt-20 px-6 animate-fade-in">
-          <nav className="flex flex-col gap-6">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "text-xl font-medium py-2 border-b border-gray-100",
-                  isActive(item.path) 
-                    ? "text-goodchild-blue" 
-                    : "text-goodchild-text-secondary"
-                )}
-                onClick={closeMenu}
-              >
-                {item.name}
+      {/* Mobile navigation menu */}
+      {showMenu && (
+        <div className="md:hidden fixed inset-0 bg-black/50 z-50">
+          <div className="h-full w-64 bg-white p-5 flex flex-col animate-slide-in-right">
+            <div className="flex items-center justify-between mb-6">
+              <Link to="/" className="flex items-center font-bold text-xl text-goodchild-text-primary">
+                GoodChild
+                <GoodCoinIcon className="ml-2 w-6 h-6" />
               </Link>
-            ))}
+              <button
+                onClick={() => setShowMenu(false)}
+                className="text-goodchild-text-primary focus:outline-none"
+                aria-label="Close Menu"
+              >
+                <X size={24} />
+              </button>
+            </div>
             
-            {isAuthenticated ? (
-              <div className="flex flex-col gap-4 mt-4">
-                <div className="flex items-center gap-2 text-goodchild-text-secondary py-2">
-                  <User size={20} />
-                  <span className="font-medium">{profile?.first_name || 'User'}</span>
-                </div>
-                <button 
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 bg-goodchild-red/10 text-goodchild-red px-4 py-3 rounded-full hover:bg-goodchild-red/20 transition-colors"
-                >
-                  <LogOut size={20} />
-                  <span>Logout</span>
-                </button>
-              </div>
-            ) : (
+            <div className="flex flex-col space-y-4 mt-8">
               <Link 
-                to="/login" 
-                className="btn-primary mt-6 text-center"
-                onClick={closeMenu}
+                to={getRouteForLink('/parent-dashboard', '/public/dashboard')} 
+                className={`mobile-nav-link ${location.pathname === '/parent-dashboard' || location.pathname === '/child-dashboard' || location.pathname === '/public/dashboard' ? 'active' : ''}`}
+                onClick={() => setShowMenu(false)}
               >
-                Login / Sign Up
+                Dashboard
               </Link>
-            )}
-          </nav>
+              <Link 
+                to={getRouteForLink('/activities', '/public/activities')} 
+                className={`mobile-nav-link ${location.pathname === '/activities' || location.pathname === '/public/activities' ? 'active' : ''}`}
+                onClick={() => setShowMenu(false)}
+              >
+                Activity Center
+              </Link>
+              <Link 
+                to={getRouteForLink('/rewards', '/public/rewards')} 
+                className={`mobile-nav-link ${location.pathname === '/rewards' || location.pathname === '/public/rewards' ? 'active' : ''}`}
+                onClick={() => setShowMenu(false)}
+              >
+                Rewards Hub
+              </Link>
+              
+              {isAuthenticated ? (
+                <button onClick={handleSignOut} className="mobile-nav-link">
+                  Sign Out
+                </button>
+              ) : (
+                <>
+                  <Link to="/login" className="mobile-nav-link" onClick={() => setShowMenu(false)}>
+                    Sign In
+                  </Link>
+                  <Link to="/signup" className="btn-primary" onClick={() => setShowMenu(false)}>
+                    Create Account
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </header>

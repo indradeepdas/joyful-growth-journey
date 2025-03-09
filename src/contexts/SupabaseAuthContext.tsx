@@ -1,398 +1,259 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Session } from '@supabase/supabase-js';
+import { User } from '@/types';
 import { SupabaseProfile, SupabaseChild } from '@/services/types';
 
-interface SignUpData {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
-
-interface LoginData {
-  email: string;
-  password: string;
-}
-
-interface CreateChildData {
+// Add the new types for creating a child account
+type CreateChildAccountParams = {
   name: string;
   surname: string;
   nickname?: string;
-}
+  email: string;
+  avatar?: string | null;
+  userId: string;
+};
 
-interface AuthContextType {
+// Update the context type to include the new function
+type SupabaseAuthContextType = {
   user: User | null;
-  session: Session | null;
   profile: SupabaseProfile | null;
   childAccounts: SupabaseChild[];
-  isLoading: boolean;
   isAuthenticated: boolean;
-  login: (data: LoginData) => Promise<void>;
-  signUp: (data: SignUpData) => Promise<void>;
-  logout: () => Promise<void>;
+  isLoading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
-  createChildAccount: (childData: CreateChildData) => Promise<void>;
-  getProfile: () => Promise<SupabaseProfile | null>;
-  getChildren: () => Promise<SupabaseChild[]>;
-}
+  updatePassword: (newPassword: string) => Promise<void>;
+  createChildAccount: (data: CreateChildAccountParams) => Promise<void>;
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const SupabaseAuthContext = createContext<SupabaseAuthContextType>({
+  user: null,
+  profile: null,
+  childAccounts: [],
+  isAuthenticated: false,
+  isLoading: true,
+  signIn: async () => {},
+  signUp: async () => {},
+  signOut: async () => {},
+  resetPassword: async () => {},
+  updatePassword: async () => {},
+  createChildAccount: async () => {},
+});
+
+export const useSupabaseAuth = () => useContext(SupabaseAuthContext);
 
 export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<SupabaseProfile | null>(null);
   const [childAccounts, setChildAccounts] = useState<SupabaseChild[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkSession = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Get the current session
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting session:', error);
-          return;
-        }
-        
-        if (session) {
-          setSession(session);
-          setUser(session.user);
-          
-          // Fetch the user's profile
-          const profile = await getProfile();
-          if (profile) {
-            setProfile(profile);
-          }
-          
-          // If user is a parent, fetch their children
-          if (profile && profile.role === 'parent') {
-            const children = await getChildren();
-            setChildAccounts(children);
-          }
-        }
-      } catch (error) {
-        console.error('Session check error:', error);
-      } finally {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      setUser(session?.user || null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+        fetchChildAccounts();
+      } else {
         setIsLoading(false);
       }
-    };
-    
-    checkSession();
-    
-    // Listen for authentication state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Fetch the user's profile
-          const profile = await getProfile();
-          if (profile) {
-            setProfile(profile);
-          }
-          
-          // If user is a parent, fetch their children
-          if (profile && profile.role === 'parent') {
-            const children = await getChildren();
-            setChildAccounts(children);
-          }
-        } else {
-          setProfile(null);
-          setChildAccounts([]);
-        }
-        
+    }
+
+    getSession();
+
+    supabase.auth.onAuthStateChange(async (_event, session: Session | null) => {
+      setUser(session?.user || null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+        fetchChildAccounts();
+      } else {
+        setProfile(null);
+        setChildAccounts([]);
         setIsLoading(false);
       }
-    );
-    
-    return () => {
-      subscription.unsubscribe();
-    };
+    });
   }, []);
-  
-  const getProfile = async (): Promise<SupabaseProfile | null> => {
+
+  const fetchProfile = async (userId: string) => {
     try {
-      if (!user) return null;
-      
-      const { data, error } = await supabase
+      const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
-      
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-      
-      return data as SupabaseProfile;
+
+      if (error) throw error;
+
+      setProfile({
+        id: profileData.id,
+        first_name: profileData.first_name,
+        last_name: profileData.last_name,
+        nickname: profileData.nickname,
+        avatar_url: profileData.avatar_url,
+        role: profileData.role,
+        created_at: profileData.created_at,
+        updated_at: profileData.updated_at,
+      });
     } catch (error) {
-      console.error('Get profile error:', error);
-      return null;
+      console.error("Error fetching profile:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  const getChildren = async (): Promise<SupabaseChild[]> => {
+
+  const fetchChildAccounts = async () => {
     try {
-      if (!user) return [];
-      
-      const { data, error } = await supabase
+      const { data: childData, error } = await supabase
         .from('children')
         .select('*')
-        .eq('parent_id', user.id)
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching children:', error);
-        return [];
-      }
-      
-      return data as SupabaseChild[];
+        .eq('parent_id', user?.id);
+
+      if (error) throw error;
+
+      setChildAccounts(childData || []);
     } catch (error) {
-      console.error('Get children error:', error);
-      return [];
+      console.error("Error fetching child accounts:", error);
     }
   };
-  
-  const signUp = async ({ email, password, firstName, lastName }: SignUpData): Promise<void> => {
+
+  const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error signing in:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+    try {
+      setIsLoading(true);
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: email,
+        password: password,
         options: {
           data: {
             first_name: firstName,
             last_name: lastName,
-            role: 'parent'
+            role: 'parent',
           }
         }
       });
-      
-      if (error) {
-        toast({
-          title: "Sign up failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
+      if (error) throw error;
+
+      if (data.user) {
+        // Create a profile for the user
+        await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            first_name: firstName,
+            last_name: lastName,
+            role: 'parent',
+          });
       }
-      
-      toast({
-        title: "Sign up successful",
-        description: "Welcome to The Good Child Project!",
-      });
-      
-      // Navigate to login page
-      navigate('/login');
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error("Error signing up:", error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
-  
-  const login = async ({ email, password }: LoginData): Promise<void> => {
+
+  const signOut = async () => {
     try {
       setIsLoading(true);
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (error) {
-        toast({
-          title: "Login failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
-      }
-      
-      setSession(data.session);
-      setUser(data.user);
-      
-      // Fetch user profile
-      const profile = await getProfile();
-      if (profile) {
-        setProfile(profile);
-        
-        // If user is a parent, fetch their children
-        if (profile.role === 'parent') {
-          const children = await getChildren();
-          setChildAccounts(children);
-          
-          // Navigate to the parent dashboard
-          navigate('/parent-dashboard');
-        } else {
-          // Navigate to the child dashboard
-          navigate('/child-dashboard');
-        }
-      }
-      
-      toast({
-        title: "Login successful",
-        description: "You've been logged in successfully!",
-      });
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const logout = async (): Promise<void> => {
-    try {
-      setIsLoading(true);
-      
       const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        toast({
-          title: "Logout failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
-      }
-      
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      setChildAccounts([]);
-      
-      toast({
-        title: "Logged out",
-        description: "You've been successfully logged out.",
-      });
-      
-      // Navigate to home page
-      navigate('/');
+      if (error) throw error;
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Error signing out:", error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
-  
-  const resetPassword = async (email: string): Promise<void> => {
+
+  const resetPassword = async (email: string) => {
     try {
       setIsLoading(true);
-      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
-      
-      if (error) {
-        toast({
-          title: "Password reset failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
-      }
-      
-      toast({
-        title: "Password reset link sent",
-        description: "Please check your email for further instructions.",
-      });
+      if (error) throw error;
     } catch (error) {
-      console.error('Password reset error:', error);
+      console.error("Error resetting password:", error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
-  
-  const createChildAccount = async (childData: CreateChildData): Promise<void> => {
+
+  const updatePassword = async (newPassword: string) => {
     try {
       setIsLoading(true);
-      
-      if (!user) {
-        throw new Error('You must be logged in to create a child account');
-      }
-      
-      // Insert the child record
-      const { data, error } = await supabase
-        .from('children')
-        .insert([
-          {
-            parent_id: user.id,
-            name: childData.name,
-            surname: childData.surname,
-            nickname: childData.nickname || null
-          }
-        ])
-        .select();
-      
-      if (error) {
-        toast({
-          title: "Child account creation failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
-      }
-      
-      // Add the new child to the state
-      if (data && data.length > 0) {
-        setChildAccounts([...childAccounts, data[0] as SupabaseChild]);
-        
-        toast({
-          title: "Child account created",
-          description: "The child account has been successfully created.",
-        });
-      }
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
     } catch (error) {
-      console.error('Child account creation error:', error);
+      console.error("Error updating password:", error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
-  
-  return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      profile,
-      childAccounts,
-      isLoading,
-      isAuthenticated: !!user,
-      login,
-      signUp,
-      logout,
-      resetPassword,
-      createChildAccount,
-      getProfile,
-      getChildren
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
 
-export const useSupabaseAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useSupabaseAuth must be used within a SupabaseAuthProvider');
-  }
-  return context;
+  // Add the createChildAccount function
+  const createChildAccount = async (data: CreateChildAccountParams) => {
+    try {
+      // Insert the child record in the children table
+      const { error } = await supabase
+        .from('children')
+        .insert({
+          id: data.userId,
+          parent_id: user?.id,
+          name: data.name,
+          surname: data.surname,
+          nickname: data.nickname || null,
+          avatar: data.avatar || null,
+          good_coins: 0
+        });
+        
+      if (error) throw error;
+      
+      // Refresh the child accounts list
+      fetchChildAccounts();
+      
+    } catch (error) {
+      console.error("Error creating child account:", error);
+      throw error;
+    }
+  };
+
+  return (
+    <SupabaseAuthContext.Provider
+      value={{
+        user,
+        profile,
+        childAccounts,
+        isAuthenticated: !!user && !!profile,
+        isLoading,
+        signIn,
+        signUp,
+        signOut,
+        resetPassword,
+        updatePassword,
+        createChildAccount
+      }}
+    >
+      {children}
+    </SupabaseAuthContext.Provider>
+  );
 };

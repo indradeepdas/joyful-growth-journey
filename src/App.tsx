@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,36 +15,50 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ActivityCenter from "./pages/ActivityCenter";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPassword from "./pages/auth/ResetPassword";
+import PublicDashboard from './pages/PublicDashboard';
+import PublicActivityCenter from './pages/PublicActivityCenter';
+import PublicRewardsHub from './pages/PublicRewardsHub';
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <SupabaseAuthProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            
-            {/* Protected routes */}
-            <Route path="/rewards" element={<PrivateRoute><RewardsHub /></PrivateRoute>} />
-            <Route path="/parent-dashboard" element={<PrivateRoute role="parent"><ParentDashboard /></PrivateRoute>} />
-            <Route path="/child-dashboard" element={<PrivateRoute role="child"><ChildDashboard /></PrivateRoute>} />
-            <Route path="/activities" element={<PrivateRoute><ActivityCenter /></PrivateRoute>} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </SupabaseAuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <SupabaseAuthProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              
+              {/* Auth routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              
+              {/* Public versions of dashboard pages */}
+              <Route path="/public/dashboard" element={<PublicDashboard />} />
+              <Route path="/public/activities" element={<PublicActivityCenter />} />
+              <Route path="/public/rewards" element={<PublicRewardsHub />} />
+              
+              {/* Protected routes */}
+              <Route element={<PrivateRoute />}>
+                <Route path="/parent-dashboard" element={<ParentDashboard />} />
+                <Route path="/child-dashboard" element={<ChildDashboard />} />
+                <Route path="/activities" element={<ActivityCenter />} />
+                <Route path="/rewards" element={<RewardsHub />} />
+              </Route>
+              
+              {/* 404 route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </SupabaseAuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
