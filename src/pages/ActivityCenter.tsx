@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,6 @@ import * as z from 'zod';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar as CalendarIcon, Search, Clock, Tag, ChevronLeft, Plus, Save, Calendar as CalendarComponent, AlertCircle, CheckCircle, Brain, MessageSquare, User, Lightbulb, Heart, Zap, Users } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -171,7 +171,6 @@ const ActivityCenter: React.FC = () => {
   const fetchChildren = async (): Promise<SupabaseChild[]> => {
     if (!user || profile?.role !== 'parent') return [];
     
-    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('children')
       .select('*')
@@ -183,7 +182,6 @@ const ActivityCenter: React.FC = () => {
   
   // Query to fetch development areas
   const fetchDevelopmentAreas = async (): Promise<SupabaseDevelopmentArea[]> => {
-    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('development_areas')
       .select('*');
@@ -212,8 +210,6 @@ const ActivityCenter: React.FC = () => {
   // Mutation to create a new activity
   const createActivityMutation = useMutation({
     mutationFn: async (data: z.infer<typeof activityFormSchema>) => {
-      const supabase = getSupabaseClient();
-      
       const { data: areaData, error: areaError } = await supabase
         .from('development_areas')
         .select('id')
@@ -264,8 +260,6 @@ const ActivityCenter: React.FC = () => {
   const assignActivityMutation = useMutation({
     mutationFn: async (data: { activityId: string, childId: string, dates: Date[] }) => {
       if (!selectedActivity) throw new Error("No activity selected");
-      
-      const supabase = getSupabaseClient();
       
       // For each selected date, create an assigned activity
       const promises = data.dates.map(async (date) => {
