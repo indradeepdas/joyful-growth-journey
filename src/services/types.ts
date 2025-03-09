@@ -57,6 +57,14 @@ export interface SupabaseChildProgress {
   updated_at: string;
 }
 
+export interface SupabaseRedemption {
+  id: string;
+  child_id: string;
+  reward_id: string;
+  good_coins: number;
+  created_at: string;
+}
+
 export interface SupabaseReward {
   id: string;
   name: string;
