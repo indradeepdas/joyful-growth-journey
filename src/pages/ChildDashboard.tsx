@@ -44,8 +44,8 @@ const ChildDashboard: React.FC = () => {
           setActivities(childActivities);
           
           // Filter activities by completion status
-          const completed = childActivities.filter(activity => activity.completed);
-          const pending = childActivities.filter(activity => !activity.completed);
+          const completed = childActivities.filter(activity => activity.status === 'completed');
+          const pending = childActivities.filter(activity => activity.status === 'pending');
           
           setCompletedActivities(completed);
           setPendingActivities(pending);
@@ -67,13 +67,13 @@ const ChildDashboard: React.FC = () => {
   const handleCompleteTask = (activityId: string) => {
     // Update the activity status
     const updatedActivities = activities.map(activity => 
-      activity.id === activityId ? { ...activity, completed: true } : activity
+      activity.id === activityId ? { ...activity, status: 'completed' } : activity
     );
     
     // Update all state
     setActivities(updatedActivities);
-    const completed = updatedActivities.filter(activity => activity.completed);
-    const pending = updatedActivities.filter(activity => !activity.completed);
+    const completed = updatedActivities.filter(activity => activity.status === 'completed');
+    const pending = updatedActivities.filter(activity => activity.status === 'pending');
     setCompletedActivities(completed);
     setPendingActivities(pending);
     
@@ -83,10 +83,10 @@ const ChildDashboard: React.FC = () => {
       const newTransaction: Transaction = {
         id: `new-${Date.now()}`,
         childId: child?.id || '',
-        amount: activity.coinReward,
+        amount: activity.goodCoins,
         type: 'earned',
         description: `Completed "${activity.title}"`,
-        date: new Date().toISOString().split('T')[0]
+        createdAt: new Date().toISOString().split('T')[0]
       };
       
       setTransactions([newTransaction, ...transactions]);
@@ -95,7 +95,7 @@ const ChildDashboard: React.FC = () => {
       if (child) {
         setChild({
           ...child,
-          goodCoins: child.goodCoins + activity.coinReward
+          goodCoins: child.goodCoins + activity.goodCoins
         });
       }
     }
@@ -180,7 +180,7 @@ const ChildDashboard: React.FC = () => {
                     <CardFooter className="flex justify-between pt-2">
                       <div className="flex items-center gap-2">
                         <GoodCoinIcon className="w-5 h-5" />
-                        <span className="font-bold">{activity.coinReward} GoodCoins</span>
+                        <span className="font-bold">{activity.goodCoins} GoodCoins</span>
                       </div>
                       <Button 
                         onClick={() => handleCompleteTask(activity.id)}
@@ -225,7 +225,7 @@ const ChildDashboard: React.FC = () => {
                     <CardFooter className="pt-2">
                       <div className="flex items-center gap-2">
                         <GoodCoinIcon className="w-5 h-5" />
-                        <span className="font-bold">{activity.coinReward} GoodCoins earned</span>
+                        <span className="font-bold">{activity.goodCoins} GoodCoins earned</span>
                       </div>
                     </CardFooter>
                   </Card>
@@ -255,7 +255,7 @@ const ChildDashboard: React.FC = () => {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="font-medium">{transaction.description}</p>
-                            <p className="text-sm text-gray-500">{transaction.date}</p>
+                            <p className="text-sm text-gray-500">{transaction.createdAt}</p>
                           </div>
                           <div className="flex items-center text-red-500 font-bold">
                             <X className="h-4 w-4 mr-1" />
@@ -293,7 +293,7 @@ const ChildDashboard: React.FC = () => {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="font-medium">{transaction.description}</p>
-                            <p className="text-sm text-gray-500">{transaction.date}</p>
+                            <p className="text-sm text-gray-500">{transaction.createdAt}</p>
                           </div>
                           <div className="flex items-center text-blue-500 font-bold">
                             <GoodCoinIcon className="h-4 w-4 mr-1" />
