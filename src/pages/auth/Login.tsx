@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 
 // Define the form schema
 const loginSchema = z.object({
@@ -21,8 +22,10 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
+  const { login, isAuthenticated, isLoading: authLoading, profile } = useSupabaseAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -33,41 +36,39 @@ const Login: React.FC = () => {
     },
   });
 
+  // Redirect authenticated users
+  useEffect(() => {
+    if (isAuthenticated && profile) {
+      const redirectPath = profile.role === 'parent' ? '/parent-dashboard' : '/child-dashboard';
+      navigate(redirectPath);
+    }
+  }, [isAuthenticated, profile, navigate]);
+
   const onSubmit = async (data: LoginFormValues) => {
-    setIsLoading(true);
+    if (authLoading) return;
     
     try {
-      // Simulate API call for login
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // For demo: if email contains "parent", go to parent dashboard
-      // if it contains "child", go to child dashboard
-      let redirectPath = '/';
-      if (data.email.includes('parent')) {
-        redirectPath = '/parent-dashboard';
-      } else if (data.email.includes('child')) {
-        redirectPath = '/child-dashboard';
-      }
-
-      // Show success toast
-      toast({
-        title: "Success!",
-        description: "You've been logged in successfully.",
+      setIsLoading(true);
+      await login({
+        email: data.email,
+        password: data.password
       });
-
-      // Redirect to appropriate dashboard
-      window.location.href = redirectPath;
+      // The redirect is handled in the useEffect
     } catch (error) {
       console.error('Login error:', error);
-      toast({
-        title: "Login failed",
-        description: "Invalid email or password. Please try again.",
-        variant: "destructive",
-      });
+      // Error toast is shown in the login function
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-goodchild-background flex items-center justify-center p-4">

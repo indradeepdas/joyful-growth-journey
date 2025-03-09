@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 
 // Define the form schema
@@ -19,9 +20,11 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 const ForgotPassword: React.FC = () => {
+  const { resetPassword, isAuthenticated } = useSupabaseAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -30,28 +33,21 @@ const ForgotPassword: React.FC = () => {
     },
   });
 
+  // Redirect authenticated users
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
   const onSubmit = async (data: ForgotPasswordFormValues) => {
-    setIsLoading(true);
-    
     try {
-      // Simulate API call for reset password
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Set success state
+      setIsLoading(true);
+      await resetPassword(data.email);
       setIsSuccess(true);
-      
-      // Show success toast
-      toast({
-        title: "Reset email sent",
-        description: "Please check your email for password reset instructions.",
-      });
     } catch (error) {
       console.error('Forgot password error:', error);
-      toast({
-        title: "Failed to send reset email",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
+      // Error toast is shown in the resetPassword function
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,9 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 
 // Define the form schema
 const signupSchema = z.object({
+  firstName: z.string().min(1, { message: 'First name is required' }),
+  lastName: z.string().min(1, { message: 'Last name is required' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
   confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' }),
@@ -23,44 +26,56 @@ const signupSchema = z.object({
 type SignUpFormValues = z.infer<typeof signupSchema>;
 
 const SignUp: React.FC = () => {
+  const { signUp, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
+      firstName: '',
+      lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
     },
   });
 
+  // Redirect authenticated users
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/parent-dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
   const onSubmit = async (data: SignUpFormValues) => {
-    setIsLoading(true);
+    if (authLoading) return;
     
     try {
-      // Simulate API call for signup
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Show success toast
-      toast({
-        title: "Success!",
-        description: "Account created successfully. Please check your email for verification.",
+      setIsLoading(true);
+      await signUp({
+        email: data.email,
+        password: data.password,
+        firstName: data.firstName,
+        lastName: data.lastName
       });
-
-      // Redirect to login page
-      window.location.href = '/login';
+      // Redirect is handled in the signup function
     } catch (error) {
       console.error('Signup error:', error);
-      toast({
-        title: "Signup failed",
-        description: "This email may already be in use. Please try another.",
-        variant: "destructive",
-      });
+      // Error toast is shown in the signup function
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-goodchild-background flex items-center justify-center p-4">
@@ -82,6 +97,44 @@ const SignUp: React.FC = () => {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Enter first name" 
+                            {...field} 
+                            disabled={isLoading}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Enter last name" 
+                            {...field} 
+                            disabled={isLoading}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
                 <FormField
                   control={form.control}
                   name="email"

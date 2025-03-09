@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { cn } from '@/lib/utils';
-import { Menu, X, LogOut, Home } from 'lucide-react';
+import { Menu, X, LogOut, Home, User } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, profile } = useSupabaseAuth();
   const location = useLocation();
   
   const isActive = (path: string) => location.pathname === path;
@@ -20,12 +20,15 @@ const Navbar: React.FC = () => {
     closeMenu();
   };
   
+  const isParent = profile?.role === 'parent';
+  const isChild = profile?.role === 'child';
+  
   const navItems = [
     { name: 'Home', path: '/' },
-    { name: 'Parent Dashboard', path: '/parent-dashboard' },
-    { name: 'Child Dashboard', path: '/child-dashboard' },
-    { name: 'Activity Center', path: '/activity-center' },
-    { name: 'Rewards Hub', path: '/rewards-hub' },
+    ...(isParent ? [{ name: 'Parent Dashboard', path: '/parent-dashboard' }] : []),
+    ...(isChild ? [{ name: 'Child Dashboard', path: '/child-dashboard' }] : []),
+    { name: 'Activity Center', path: '/activities' },
+    { name: 'Rewards Hub', path: '/rewards' },
   ];
 
   return (
@@ -55,11 +58,10 @@ const Navbar: React.FC = () => {
           
           {isAuthenticated ? (
             <div className="flex items-center gap-4 ml-4">
-              {user?.role === 'parent' && (
-                <Link to="/" className="text-goodchild-text-secondary hover:text-goodchild-blue">
-                  <Home size={20} />
-                </Link>
-              )}
+              <div className="flex items-center gap-2 text-goodchild-text-secondary">
+                <User size={18} />
+                <span className="font-medium">{profile?.first_name || 'User'}</span>
+              </div>
               <button 
                 onClick={handleLogout}
                 className="flex items-center gap-2 bg-goodchild-red/10 text-goodchild-red px-4 py-2 rounded-full hover:bg-goodchild-red/20 transition-colors"
@@ -110,16 +112,10 @@ const Navbar: React.FC = () => {
             
             {isAuthenticated ? (
               <div className="flex flex-col gap-4 mt-4">
-                {user?.role === 'parent' && (
-                  <Link 
-                    to="/" 
-                    className="flex items-center gap-2 text-goodchild-text-secondary"
-                    onClick={closeMenu}
-                  >
-                    <Home size={20} />
-                    <span>Home</span>
-                  </Link>
-                )}
+                <div className="flex items-center gap-2 text-goodchild-text-secondary py-2">
+                  <User size={20} />
+                  <span className="font-medium">{profile?.first_name || 'User'}</span>
+                </div>
                 <button 
                   onClick={handleLogout}
                   className="flex items-center gap-2 bg-goodchild-red/10 text-goodchild-red px-4 py-3 rounded-full hover:bg-goodchild-red/20 transition-colors"

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { X } from 'lucide-react';
 
 interface ChildAccountFormProps {
@@ -12,11 +12,10 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
     name: '',
     surname: '',
     nickname: '',
-    email: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { createChildAccount } = useAuth();
+  const { createChildAccount } = useSupabaseAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,23 +27,17 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
     setError(null);
     
     // Simple validation
-    if (!formData.name || !formData.surname || !formData.email) {
+    if (!formData.name || !formData.surname) {
       setError('Please fill in all required fields.');
-      return;
-    }
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError('Please enter a valid email address.');
       return;
     }
     
     try {
       setIsSubmitting(true);
       await createChildAccount({
-        ...formData,
-        parentId: '' // This will be set by the auth context
+        name: formData.name,
+        surname: formData.surname,
+        nickname: formData.nickname || undefined
       });
       onClose(); // Close the form after successful submission
     } catch (err) {
@@ -125,25 +118,6 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-goodchild-blue focus:border-transparent transition-all"
                 placeholder="Nickname (optional)"
               />
-            </div>
-            
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-goodchild-text-secondary mb-1">
-                Email*
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-goodchild-blue focus:border-transparent transition-all"
-                placeholder="Email address"
-              />
-              <p className="text-xs text-goodchild-text-secondary mt-1">
-                A default password (test123) will be set. The child can reset it upon first login.
-              </p>
             </div>
           </div>
           
