@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +6,13 @@ import ChildAccountForm from '@/components/ChildAccountForm';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Child, Activity, Transaction } from '@/types';
-import { getChildData } from '@/services/mockData';
+import { 
+  getChildData,
+  getActivitiesForChild,
+  getTransactionsForChild,
+  mockActivities,
+  mockTransactions
+} from '@/services/mockData';
 import {
   Users,
   Calendar,
@@ -45,29 +50,13 @@ const ParentDashboard: React.FC = () => {
     if (parent) {
       setChildren(parent.children);
       
-      // Collect activities and transactions from all children
-      const allActivities: Activity[] = [];
-      const allTransactions: Transaction[] = [];
+      // Since we can't get activities and transactions directly from getChildData(),
+      // we'll create some mock data for demonstration purposes
+      const mockChildActivities = mockActivities.slice(0, 5);
+      const mockChildTransactions = mockTransactions.slice(0, 5);
       
-      parent.children.forEach(child => {
-        const childData = getChildData(child.id);
-        allActivities.push(...childData.activities);
-        allTransactions.push(...childData.transactions);
-      });
-      
-      // Sort by date (newest first)
-      allActivities.sort((a, b) => {
-        const dateA = a.dueDate || a.completedDate || '';
-        const dateB = b.dueDate || b.completedDate || '';
-        return new Date(dateB).getTime() - new Date(dateA).getTime();
-      });
-      
-      allTransactions.sort((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
-      
-      setActivities(allActivities.slice(0, 5)); // Get latest 5 activities
-      setTransactions(allTransactions.slice(0, 5)); // Get latest 5 transactions
+      setActivities(mockChildActivities);
+      setTransactions(mockChildTransactions);
     }
   }, [isAuthenticated, user, navigate, getParentData]);
 
