@@ -18,6 +18,7 @@ const childAccountSchema = z.object({
   surname: z.string().min(2, "Surname must be at least 2 characters"),
   nickname: z.string().optional(),
   email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type ChildAccountFormValues = z.infer<typeof childAccountSchema>;
@@ -38,6 +39,7 @@ const ChildAccountForm = () => {
       surname: '',
       nickname: '',
       email: '',
+      password: 'GoodChild123', // Default strong password
     },
   });
 
@@ -54,10 +56,12 @@ const ChildAccountForm = () => {
     setIsLoading(true);
     
     try {
+      console.log('Creating child account with data:', data);
+      
       // 1. Signup the child with Supabase Auth
       const { data: authData, error: signupError } = await supabase.auth.signUp({
         email: data.email,
-        password: 'test123', // Default password
+        password: data.password,
         options: {
           data: {
             first_name: data.name,
@@ -69,6 +73,8 @@ const ChildAccountForm = () => {
 
       if (signupError) throw signupError;
       if (!authData.user) throw new Error("Failed to create user account");
+
+      console.log('Child auth account created:', authData.user.id);
 
       // 2. Upload avatar if provided
       let avatarUrl = null;
@@ -86,27 +92,25 @@ const ChildAccountForm = () => {
           .getPublicUrl(fileName);
           
         avatarUrl = publicUrl;
+        console.log('Avatar uploaded, URL:', avatarUrl);
       }
       
       // 3. Create child profile in our database
       await createChildAccount({
         name: data.name,
         surname: data.surname,
-        nickname: data.nickname || null,
+        nickname: data.nickname || undefined,
         email: data.email,
         avatar: avatarUrl,
         userId: authData.user.id,
       });
       
-      // 4. Send password reset email to allow the child to set their own password
-      await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
+      console.log('Child profile created in database');
       
       // Success message
       toast({
         title: "Success!",
-        description: "Child account created successfully. A welcome email has been sent.",
+        description: "Child account created successfully. They can log in using the email and password you provided.",
       });
       
       // Close form and reset
@@ -140,7 +144,7 @@ const ChildAccountForm = () => {
         <DialogHeader>
           <DialogTitle>Create Child Account</DialogTitle>
           <DialogDescription>
-            Create a new account for your child. They'll receive an email to set their password.
+            Create a new account for your child. They'll be able to log in using the email and password you provide.
           </DialogDescription>
         </DialogHeader>
         
@@ -238,6 +242,27 @@ const ChildAccountForm = () => {
                   </FormControl>
                   <FormDescription>
                     This email will be used to log into the account.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="password"
+                      placeholder="••••••••" 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Must be at least 6 characters.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

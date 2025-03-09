@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -24,12 +25,17 @@ const RewardsHub: React.FC = () => {
   
   // Function to fetch rewards from Supabase
   const fetchRewards = async (): Promise<Reward[]> => {
+    console.log('Fetching rewards from Supabase');
     const { data, error } = await supabase
       .from('rewards')
       .select('*');
       
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching rewards:', error);
+      throw error;
+    }
     
+    console.log('Rewards fetched:', data);
     return (data as SupabaseReward[]).map(adaptSupabaseReward);
   };
   
@@ -232,7 +238,9 @@ const RewardsHub: React.FC = () => {
           
           {/* Rewards grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredRewards.length > 0 ? (
+            {isLoading ? (
+              <div className="col-span-full text-center py-12">Loading rewards...</div>
+            ) : filteredRewards.length > 0 ? (
               filteredRewards.map((reward) => (
                 <Card key={reward.id} className="overflow-hidden hover:shadow-md transition-shadow">
                   <div className="h-48 overflow-hidden bg-gray-100">
@@ -266,9 +274,9 @@ const RewardsHub: React.FC = () => {
                     <Button 
                       onClick={() => handleRedeem(reward.id)} 
                       className="w-full"
-                      disabled={profile?.role !== 'child' || redeemMutation.isPending}
+                      disabled={profile?.role !== 'child' || redeemMutation?.isPending}
                     >
-                      {redeemMutation.isPending && redeemMutation.variables === reward.id 
+                      {redeemMutation?.isPending && redeemMutation.variables === reward.id 
                         ? "Redeeming..." 
                         : "Redeem Reward"}
                     </Button>

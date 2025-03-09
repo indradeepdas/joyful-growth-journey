@@ -4,7 +4,7 @@ import { DevelopmentArea } from '@/types';
 export interface SupabaseActivity {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   development_area_id?: string | null;
   developmentAreaName?: string;
   coin_reward: number;
@@ -20,8 +20,8 @@ export interface SupabaseActivity {
 
 export interface SupabaseProfile {
   id: string;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
   nickname?: string | null;
   avatar_url?: string | null;
   role: string;
@@ -38,25 +38,27 @@ export interface SupabaseChild {
   avatar?: string | null;
   good_coins: number;
   created_at?: string;
+  updated_at?: string;
 }
 
 export interface SupabaseDevelopmentArea {
   id: string;
   name: DevelopmentArea;
-  description: string;
+  description: string | null;
   created_at?: string;
 }
 
 export interface SupabaseReward {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   image_url?: string | null;
   original_price?: number | null;
   discounted_price?: number | null;
   good_coins: number;
   created_at?: string;
   created_by?: string | null;
+  updated_at?: string;
 }
 
 export interface SupabaseTransaction {
@@ -87,4 +89,39 @@ export interface SupabaseRedemption {
   reward_id?: string | null;
   good_coins: number;
   created_at: string;
+}
+
+// Define types for the services
+export interface Activity {
+  id: string;
+  title: string;
+  description: string;
+  developmentArea: DevelopmentArea;
+  goodCoins: number;
+  status: 'pending' | 'completed';
+  childId: string;
+  dueDate?: string;
+  completedDate?: string;
+  estimatedTime?: string;
+}
+
+export interface ChildData {
+  id: string;
+  name: string;
+  surname: string;
+  nickname?: string;
+  avatar?: string;
+  goodCoins: number;
+  parentId: string;
+}
+
+export interface Transaction {
+  id: string;
+  childId: string;
+  activityId?: string;
+  rewardId?: string;
+  amount: number;
+  description: string;
+  createdAt: string;
+  type: 'earned' | 'spent' | 'penalty' | 'given';
 }

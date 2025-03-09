@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -146,18 +145,32 @@ const ActivityCenter: React.FC = () => {
   
   // Query to fetch activities from Supabase
   const fetchActivities = async (): Promise<Activity[]> => {
-    // Join with development_areas table to get the area name
-    const { data, error } = await supabase
-      .from('activities')
+    // First fetch activities from activity_masters
+    const { data: masterData, error: masterError } = await supabase
+      .from('activity_masters')
       .select(`
         *,
         development_areas (*)
       `);
       
-    if (error) throw error;
+    if (masterError) throw masterError;
+    
+    // Then fetch assigned activities
+    const { data: assignedData, error: assignedError } = await supabase
+      .from('activities')
+      .select(`
+        *,
+        development_areas (*)
+      `)
+      .eq(profile?.role === 'parent' ? 'created_by' : 'assigned_to', user?.id);
+      
+    if (assignedError) throw assignedError;
+    
+    // Combine both datasets
+    const combinedData = [...(masterData || []), ...(assignedData || [])];
     
     // Convert Supabase data to our Activity type
-    return data.map((item: any) => {
+    return combinedData.map((item: any) => {
       const { development_areas, ...activity } = item;
       return adaptSupabaseActivity({
         ...activity,
@@ -177,7 +190,7 @@ const ActivityCenter: React.FC = () => {
       .eq('parent_id', user.id);
       
     if (error) throw error;
-    return data;
+    return data || [];
   };
   
   // Query to fetch development areas
@@ -187,7 +200,12 @@ const ActivityCenter: React.FC = () => {
       .select('*');
       
     if (error) throw error;
-    return data;
+    
+    // Cast the data to the correct type
+    return (data || []).map(area => ({
+      ...area,
+      name: area.name as DevelopmentArea
+    }));
   };
   
   // Queries
@@ -219,15 +237,13 @@ const ActivityCenter: React.FC = () => {
       if (areaError) throw areaError;
       
       const { error } = await supabase
-        .from('activities')
+        .from('activity_masters')
         .insert({
           title: data.title,
           description: data.description,
           development_area_id: areaData.id,
-          coin_reward: data.goodCoins,
+          good_coins: data.goodCoins,
           created_by: user?.id,
-          due_date: null,
-          completed: false,
           estimated_time: data.estimatedTime,
         });
         
@@ -271,7 +287,7 @@ const ActivityCenter: React.FC = () => {
             title: selectedActivity.title,
             description: selectedActivity.description,
             development_area_id: selectedActivity.id, // Use the original activity's area
-            coin_reward: selectedActivity.goodCoins,
+            good_coins: selectedActivity.goodCoins,
             created_by: user?.id,
             assigned_to: data.childId,
             due_date: format(date, 'yyyy-MM-dd'),

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
@@ -234,10 +233,25 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  // Add the createChildAccount function
   const createChildAccount = async (data: CreateChildAccountParams) => {
     try {
-      // Insert the child record in the children table
+      console.log('Creating child account in database:', data);
+      
+      // First, insert the profile record
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.userId,
+          first_name: data.name,
+          last_name: data.surname,
+          nickname: data.nickname || null,
+          avatar_url: data.avatar || null,
+          role: 'child'
+        });
+        
+      if (profileError) throw profileError;
+      
+      // Then, insert the child record in the children table
       const { error } = await supabase
         .from('children')
         .insert({
