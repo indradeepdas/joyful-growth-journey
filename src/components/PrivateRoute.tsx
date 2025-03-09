@@ -31,11 +31,16 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
   }
   
   // If specific roles are required, check the user's role
-  if (allowedRoles && allowedRoles.length > 0 && profile && !allowedRoles.includes(profile.role)) {
-    console.log(`User role ${profile.role} not in allowed roles: ${allowedRoles.join(', ')}`);
-    // Redirect parents to parent dashboard, children to child dashboard
-    const redirectTo = profile.role === 'parent' ? '/parent-dashboard' : '/child-dashboard';
-    return <Navigate to={redirectTo} replace />;
+  if (allowedRoles && allowedRoles.length > 0 && profile) {
+    if (!allowedRoles.includes(profile.role)) {
+      console.log(`User role ${profile.role} not in allowed roles: ${allowedRoles.join(', ')}`);
+      // Redirect based on role
+      if (profile.role === 'parent') {
+        return <Navigate to="/parent-dashboard" replace />;
+      } else if (profile.role === 'child') {
+        return <Navigate to="/child-dashboard" replace />;
+      }
+    }
   }
   
   return <>{children || <Outlet />}</>;

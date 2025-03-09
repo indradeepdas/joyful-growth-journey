@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { 
   Card, 
   CardContent, 
@@ -11,97 +12,200 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GoodCoinIcon from '@/components/GoodCoinIcon';
-import { 
-  Activity, 
-  Transaction, 
-  ChildData, 
-  getChildById, 
-  getActivitiesForChild, 
-  getTransactionsForChild 
-} from '@/services/mockData';
 import { CheckCircle, Clock, X } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { SupabaseActivity, SupabaseChild, SupabaseTransaction } from '@/services/types';
+import { Activity, Transaction } from '@/types';
+import { adaptSupabaseActivity, adaptSupabaseTransaction } from '@/utils/typeAdapters';
 
 const ChildDashboard: React.FC = () => {
-  const [child, setChild] = useState<ChildData | null>(null);
+  const { user, profile, isAuthenticated, isLoading } = useSupabaseAuth();
+  const [childData, setChildData] = useState<SupabaseChild | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [completedActivities, setCompletedActivities] = useState<Activity[]>([]);
   const [pendingActivities, setPendingActivities] = useState<Activity[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchChildData = async () => {
       try {
-        // For demo purposes, we're using the first child (Emma)
-        const childId = '1';
-        const childData = await getChildById(childId);
+        if (!user || !profile || profile.role !== 'child') {
+          console.log('Not a child user or not authenticated');
+          return;
+        }
+
+        console.log('Fetching child data for user:', user.id);
         
-        if (childData) {
-          setChild(childData);
+        // Find child record in the children table
+        const { data: childRecord, error: childError } = await supabase
+          .from('children')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+          
+        if (childError) {
+          console.error('Error fetching child record:', childError);
+        } else if (childRecord) {
+          console.log('Child record found:', childRecord);
+          setChildData(childRecord);
           
           // Get activities for this child
-          const childActivities = await getActivitiesForChild(childId);
-          setActivities(childActivities);
-          
-          // Filter activities by completion status
-          const completed = childActivities.filter(activity => activity.completed);
-          const pending = childActivities.filter(activity => !activity.completed);
-          
-          setCompletedActivities(completed);
-          setPendingActivities(pending);
+          const { data: activitiesData, error: activitiesError } = await supabase
+            .from('activities')
+            .select('*')
+            .eq('assigned_to', user.id);
+            
+          if (activitiesError) {
+            console.error('Error fetching activities:', activitiesError);
+          } else if (activitiesData) {
+            console.log('Activities found:', activitiesData.length);
+            const formattedActivities = activitiesData.map(activity => adaptSupabaseActivity(activity));
+            setActivities(formattedActivities);
+            
+            // Filter activities by completion status
+            const completed = formattedActivities.filter(activity => activity.status === 'completed');
+            const pending = formattedActivities.filter(activity => activity.status === 'pending');
+            
+            setCompletedActivities(completed);
+            setPendingActivities(pending);
+          }
           
           // Get transactions for this child
-          const childTransactions = await getTransactionsForChild(childId);
-          setTransactions(childTransactions);
+          const { data: transactionsData, error: transactionsError } = await supabase
+            .from('transactions')
+            .select('*')
+            .eq('child_id', user.id)
+            .order('created_at', { ascending: false });
+            
+          if (transactionsError) {
+            console.error('Error fetching transactions:', transactionsError);
+          } else if (transactionsData) {
+            console.log('Transactions found:', transactionsData.length);
+            const formattedTransactions = transactionsData.map(transaction => {
+              const compatibleTransaction: SupabaseTransaction = {
+                id: transaction.id,
+                child_id: transaction.child_id,
+                amount: transaction.amount,
+                transaction_type: transaction.type === 'spend' ? 'spend' : 'earn',
+                type: transaction.type,
+                description: transaction.description,
+                created_by: transaction.created_by,
+                created_at: transaction.created_at
+              };
+              return adaptSupabaseTransaction(compatibleTransaction);
+            });
+            setTransactions(formattedTransactions);
+          }
         }
       } catch (error) {
-        console.error('Error fetching child data:', error);
+        console.error('Error in fetchChildData:', error);
+        toast({
+          title: "Error",
+          description: "Could not load dashboard data. Please try again.",
+          variant: "destructive",
+        });
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
     
-    fetchChildData();
-  }, []);
+    if (isAuthenticated && !isLoading) {
+      fetchChildData();
+    }
+  }, [isAuthenticated, isLoading, user, profile, toast]);
 
-  const handleCompleteTask = (activityId: string) => {
-    // Update the activity status
-    const updatedActivities = activities.map(activity => 
-      activity.id === activityId ? { ...activity, completed: true } : activity
-    );
+  const handleCompleteTask = async (activityId: string) => {
+    if (!user || !childData) return;
     
-    // Update all state
-    setActivities(updatedActivities);
-    const completed = updatedActivities.filter(activity => activity.completed);
-    const pending = updatedActivities.filter(activity => !activity.completed);
-    setCompletedActivities(completed);
-    setPendingActivities(pending);
-    
-    // Add a new transaction
-    const activity = activities.find(a => a.id === activityId);
-    if (activity) {
-      const newTransaction: Transaction = {
-        id: `new-${Date.now()}`,
-        childId: child?.id || '',
-        amount: activity.coinReward,
-        type: 'earned',
-        description: `Completed "${activity.title}"`,
-        date: new Date().toISOString().split('T')[0]
-      };
-      
-      setTransactions([newTransaction, ...transactions]);
-      
-      // Update GoodCoins balance
-      if (child) {
-        setChild({
-          ...child,
-          goodCoins: child.goodCoins + activity.coinReward
-        });
+    try {
+      // 1. Update the activity status in the database
+      const { error: updateError } = await supabase
+        .from('activities')
+        .update({ 
+          completed: true,
+          completed_date: new Date().toISOString() 
+        })
+        .eq('id', activityId);
+        
+      if (updateError) {
+        throw updateError;
       }
+      
+      // Get the activity details
+      const activity = activities.find(a => a.id === activityId);
+      if (!activity) return;
+      
+      toast({
+        title: "Activity Completed!",
+        description: `You earned ${activity.goodCoins} GoodCoins!`,
+      });
+      
+      // Refresh data
+      const { data: activitiesData } = await supabase
+        .from('activities')
+        .select('*')
+        .eq('assigned_to', user.id);
+        
+      if (activitiesData) {
+        const formattedActivities = activitiesData.map(activity => adaptSupabaseActivity(activity));
+        setActivities(formattedActivities);
+        
+        const completed = formattedActivities.filter(activity => activity.status === 'completed');
+        const pending = formattedActivities.filter(activity => activity.status === 'pending');
+        
+        setCompletedActivities(completed);
+        setPendingActivities(pending);
+      }
+      
+      // Refresh transactions
+      const { data: transactionsData } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('child_id', user.id)
+        .order('created_at', { ascending: false });
+        
+      if (transactionsData) {
+        const formattedTransactions = transactionsData.map(transaction => {
+          const compatibleTransaction: SupabaseTransaction = {
+            id: transaction.id,
+            child_id: transaction.child_id,
+            amount: transaction.amount,
+            transaction_type: transaction.type === 'spend' ? 'spend' : 'earn',
+            type: transaction.type,
+            description: transaction.description,
+            created_by: transaction.created_by,
+            created_at: transaction.created_at
+          };
+          return adaptSupabaseTransaction(compatibleTransaction);
+        });
+        setTransactions(formattedTransactions);
+      }
+      
+      // Update child's GoodCoins
+      const { data: updatedChild } = await supabase
+        .from('children')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (updatedChild) {
+        setChildData(updatedChild);
+      }
+      
+    } catch (error) {
+      console.error('Error completing task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete the activity. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
-  if (isLoading) {
+  if (isLoading || loading) {
     return (
       <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
         <div className="text-2xl text-goodchild-text-primary">Loading your dashboard...</div>
@@ -109,7 +213,15 @@ const ChildDashboard: React.FC = () => {
     );
   }
 
-  if (!child) {
+  if (!isAuthenticated || !profile || profile.role !== 'child') {
+    return (
+      <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
+        <div className="text-2xl text-goodchild-text-primary">Please log in as a child to view this dashboard</div>
+      </div>
+    );
+  }
+
+  if (!childData) {
     return (
       <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
         <div className="text-2xl text-goodchild-text-primary">Child data not found</div>
@@ -123,13 +235,15 @@ const ChildDashboard: React.FC = () => {
         {/* Header Section */}
         <div className="glass-card p-6 rounded-xl mb-6 text-center">
           <h1 className="text-4xl font-bold text-gradient mb-2">My Dashboard!</h1>
-          <p className="text-xl text-goodchild-text-secondary mb-4">Welcome back, {child.nickname || child.name}!</p>
+          <p className="text-xl text-goodchild-text-secondary mb-4">
+            Welcome back, {childData.nickname || childData.name}!
+          </p>
           
           {/* GoodCoin Balance */}
           <div className="good-coin-display animate-float mb-4 inline-block">
             <div className="bg-goodchild-card p-4 rounded-full flex items-center gap-2 shadow-glow">
               <GoodCoinIcon className="w-8 h-8" />
-              <span className="text-2xl font-bold">{child.goodCoins} GoodCoins</span>
+              <span className="text-2xl font-bold">{childData.good_coins} GoodCoins</span>
             </div>
           </div>
         </div>
@@ -180,7 +294,7 @@ const ChildDashboard: React.FC = () => {
                     <CardFooter className="flex justify-between pt-2">
                       <div className="flex items-center gap-2">
                         <GoodCoinIcon className="w-5 h-5" />
-                        <span className="font-bold">{activity.coinReward} GoodCoins</span>
+                        <span className="font-bold">{activity.goodCoins} GoodCoins</span>
                       </div>
                       <Button 
                         onClick={() => handleCompleteTask(activity.id)}
@@ -225,7 +339,7 @@ const ChildDashboard: React.FC = () => {
                     <CardFooter className="pt-2">
                       <div className="flex items-center gap-2">
                         <GoodCoinIcon className="w-5 h-5" />
-                        <span className="font-bold">{activity.coinReward} GoodCoins earned</span>
+                        <span className="font-bold">{activity.goodCoins} GoodCoins earned</span>
                       </div>
                     </CardFooter>
                   </Card>
@@ -255,7 +369,7 @@ const ChildDashboard: React.FC = () => {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="font-medium">{transaction.description}</p>
-                            <p className="text-sm text-gray-500">{transaction.date}</p>
+                            <p className="text-sm text-gray-500">{new Date(transaction.createdAt).toLocaleDateString()}</p>
                           </div>
                           <div className="flex items-center text-red-500 font-bold">
                             <X className="h-4 w-4 mr-1" />
@@ -293,7 +407,7 @@ const ChildDashboard: React.FC = () => {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="font-medium">{transaction.description}</p>
-                            <p className="text-sm text-gray-500">{transaction.date}</p>
+                            <p className="text-sm text-gray-500">{new Date(transaction.createdAt).toLocaleDateString()}</p>
                           </div>
                           <div className="flex items-center text-blue-500 font-bold">
                             <GoodCoinIcon className="h-4 w-4 mr-1" />

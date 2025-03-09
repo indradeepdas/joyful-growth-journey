@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@/types';
 import { SupabaseProfile, SupabaseChild } from '@/services/types';
@@ -57,35 +58,36 @@ export const signIn = async (email: string, password: string): Promise<void> => 
   console.log('authFunctions: Sign in successful');
 };
 
-export const signUp = async (email: string, password: string, firstName: string, lastName: string): Promise<string | null> => {
-  const { data, error } = await supabase.auth.signUp({
-    email: email,
-    password: password,
-    options: {
-      data: {
-        first_name: firstName,
-        last_name: lastName,
-        role: 'parent',
+export const signUp = async (email: string, password: string, firstName: string, lastName: string): Promise<void> => {
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          role: 'parent',
+        }
       }
-    }
-  });
-  
-  if (error) throw error;
+    });
+    
+    if (error) throw error;
 
-  if (data.user) {
-    await supabase
-      .from('profiles')
-      .insert({
-        id: data.user.id,
-        first_name: firstName,
-        last_name: lastName,
-        role: 'parent',
-      });
-      
-    return data.user.id;
+    if (data.user) {
+      await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          first_name: firstName,
+          last_name: lastName,
+          role: 'parent',
+        });
+    }
+  } catch (error) {
+    console.error("Error signing up:", error);
+    throw error;
   }
-  
-  return null;
 };
 
 export const signOut = async (): Promise<void> => {

@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
@@ -169,8 +170,10 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       
       // Refresh the child accounts list
       console.log('SupabaseAuthProvider: Refreshing child accounts');
-      const childData = await fetchChildAccounts(user?.id);
-      setChildAccounts(childData);
+      if (user) {
+        const childData = await fetchChildAccounts(user.id);
+        setChildAccounts(childData);
+      }
     } catch (error) {
       console.error("SupabaseAuthProvider: Error creating child account:", error);
       throw error;
@@ -194,10 +197,10 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         isAuthenticated: !!user && !!profile,
         isLoading,
         signIn,
-        signUp: authSignUp,
-        signOut: authSignOut,
-        resetPassword: authResetPassword,
-        updatePassword: authUpdatePassword,
+        signUp,
+        signOut,
+        resetPassword,
+        updatePassword,
         createChildAccount
       }}
     >

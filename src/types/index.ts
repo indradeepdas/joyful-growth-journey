@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   email: string;
@@ -31,6 +32,10 @@ export interface Activity {
   dueDate?: string;
   completedDate?: string;
   estimatedTime?: string;
+  // Add these fields to make it compatible with existing code
+  coinReward?: number;
+  completed?: boolean;
+  assignedTo?: string;
 }
 
 export interface Reward {
@@ -52,6 +57,8 @@ export interface Transaction {
   description: string;
   createdAt: string;
   type: 'earned' | 'spent' | 'penalty' | 'given';
+  // Add this for backwards compatibility
+  date?: string;
 }
 
 export interface Redemption {

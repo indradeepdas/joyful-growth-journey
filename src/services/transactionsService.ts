@@ -9,6 +9,7 @@ export const mockTransactions: Transaction[] = [
     amount: 15,
     type: 'earned',
     description: 'Completed "Practice Math Problems"',
+    createdAt: '2023-07-10',
     date: '2023-07-10'
   },
   {
@@ -17,6 +18,7 @@ export const mockTransactions: Transaction[] = [
     amount: 10,
     type: 'earned',
     description: 'Completed "Help with Dinner"',
+    createdAt: '2023-07-11',
     date: '2023-07-11'
   },
   {
@@ -25,6 +27,7 @@ export const mockTransactions: Transaction[] = [
     amount: 30,
     type: 'spent',
     description: 'Redeemed "Digital Game Voucher"',
+    createdAt: '2023-07-08',
     date: '2023-07-08'
   },
   {
@@ -33,6 +36,7 @@ export const mockTransactions: Transaction[] = [
     amount: 5,
     type: 'penalty',
     description: 'Missed homework deadline',
+    createdAt: '2023-07-07',
     date: '2023-07-07'
   },
   {
@@ -41,6 +45,7 @@ export const mockTransactions: Transaction[] = [
     amount: 20,
     type: 'given',
     description: 'Birthday bonus',
+    createdAt: '2023-07-05',
     date: '2023-07-05'
   }
 ];
@@ -61,7 +66,7 @@ export const getRecentTransactions = async (limit = 5): Promise<Transaction[]> =
     setTimeout(() => {
       // Sort by date descending and take the first 'limit' transactions
       const sorted = [...mockTransactions].sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
+        new Date(b.date || b.createdAt).getTime() - new Date(a.date || a.createdAt).getTime()
       );
       resolve(sorted.slice(0, limit));
     }, 500);

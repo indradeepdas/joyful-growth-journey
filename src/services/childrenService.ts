@@ -9,6 +9,7 @@ export const mockChildren: ChildData[] = [
     nickname: 'Em',
     avatar: 'https://placehold.co/200x200/FFD166/073B4C?text=Emma',
     goodCoins: 120,
+    parentId: 'parent-1',
     developmentAreas: [
       { name: 'Health & Mind', progress: 70 },
       { name: 'Effective Communication', progress: 85 },
@@ -25,6 +26,7 @@ export const mockChildren: ChildData[] = [
     nickname: 'No',
     avatar: 'https://placehold.co/200x200/06D6A0/073B4C?text=Noah',
     goodCoins: 85,
+    parentId: 'parent-1',
     developmentAreas: [
       { name: 'Health & Mind', progress: 60 },
       { name: 'Effective Communication', progress: 70 },

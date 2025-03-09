@@ -48,6 +48,21 @@ export interface SupabaseDevelopmentArea {
   created_at?: string;
 }
 
+export interface SupabaseChildProgress {
+  id: string;
+  child_id: string;
+  development_area_id: string;
+  progress: number;
+  created_at: string;
+  updated_at: string;
+  development_areas?: {
+    created_at: string;
+    description: string;
+    id: string;
+    name: string;
+  };
+}
+
 export interface SupabaseReward {
   id: string;
   name: string;
@@ -74,15 +89,6 @@ export interface SupabaseTransaction {
   created_by?: string | null;
 }
 
-export interface SupabaseChildProgress {
-  id: string;
-  child_id: string;
-  development_area_id: string;
-  progress: number;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface SupabaseRedemption {
   id: string;
   child_id: string;
@@ -98,8 +104,11 @@ export interface Activity {
   description: string;
   developmentArea: DevelopmentArea;
   goodCoins: number;
+  coinReward?: number;
   status: 'pending' | 'completed';
+  completed?: boolean;
   childId: string;
+  assignedTo?: string;
   dueDate?: string;
   completedDate?: string;
   estimatedTime?: string;
@@ -113,6 +122,10 @@ export interface ChildData {
   avatar?: string;
   goodCoins: number;
   parentId: string;
+  developmentAreas?: Array<{
+    name: string;
+    progress: number;
+  }>;
 }
 
 export interface Transaction {
@@ -124,4 +137,5 @@ export interface Transaction {
   description: string;
   createdAt: string;
   type: 'earned' | 'spent' | 'penalty' | 'given';
+  date?: string;
 }
