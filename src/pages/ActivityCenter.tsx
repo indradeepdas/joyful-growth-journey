@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -263,14 +262,20 @@ const ActivityCenter: React.FC = () => {
       
       // For each selected date, create an assigned activity
       const promises = data.dates.map(async (date) => {
+        // Using activities table instead of assigned_activities
+        // We'll add the assignment data directly to the activities table
         const { error } = await supabase
-          .from('assigned_activities')
+          .from('activities')
           .insert({
-            activity_id: data.activityId,
-            child_id: data.childId,
+            title: selectedActivity.title,
+            description: selectedActivity.description,
+            development_area_id: selectedActivity.id, // Use the original activity's area
+            coin_reward: selectedActivity.goodCoins,
+            created_by: user?.id,
+            assigned_to: data.childId,
             due_date: format(date, 'yyyy-MM-dd'),
-            assigned_by: user?.id,
             completed: false,
+            estimated_time: selectedActivity.estimatedTime,
           });
           
         if (error) throw error;
@@ -627,7 +632,7 @@ const ActivityCenter: React.FC = () => {
                     </SelectContent>
                   </Select>
                   
-                  {profile?.role === 'parent' && (
+                  {profile?.role === 'parent' && (\
                     <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
                       <DialogTrigger asChild>
                         <Button className="whitespace-nowrap">
