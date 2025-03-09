@@ -1,68 +1,90 @@
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, AuthContext } from './contexts/AuthContext';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { SupabaseAuthProvider } from "./contexts/SupabaseAuthContext";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import RewardsHub from "./pages/RewardsHub";
-import ParentDashboard from "./pages/ParentDashboard";
-import ChildDashboard from "./pages/ChildDashboard";
-import Login from "./pages/auth/Login";
-import SignUp from "./pages/auth/SignUp";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import ActivityCenter from "./pages/ActivityCenter";
-import PrivateRoute from "./components/PrivateRoute";
-import ResetPassword from "./pages/auth/ResetPassword";
-import PublicDashboard from './pages/PublicDashboard';
-import PublicActivityCenter from './pages/PublicActivityCenter';
-import PublicRewardsHub from './pages/PublicRewardsHub';
-import { useEffect } from "react";
-import { seedRewards, seedDevelopmentAreas, seedSampleActivities } from "./utils/seedData";
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ParentDashboard from './pages/ParentDashboard';
+import TeacherDashboard from './pages/TeacherDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import NotFound from './pages/NotFound';
 
-const queryClient = new QueryClient();
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  allowedRoles?: string[];
+}
+
+// Protected route component
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
+  const { currentUser, userRole, loading } = useContext(AuthContext);
+  
+  if (loading) return <div>Loading...</div>;
+  
+  if (!currentUser) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
+    // Redirect to appropriate dashboard based on role
+    if (userRole === 'parent') return <Navigate to="/parent" />;
+    if (userRole === 'teacher') return <Navigate to="/teacher" />;
+    if (userRole === 'admin') return <Navigate to="/admin" />;
+    return <Navigate to="/login" />;
+  }
+  
+  return <>{children}</>;
+};
 
 function AppRoutes() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    // Seed data when the app initializes
-    const initializeData = async () => {
-      await seedDevelopmentAreas();
-      await seedRewards();
-      await seedSampleActivities();
-    };
-
-    initializeData();
-  }, []);
-
+  const { currentUser, userRole } = useContext(AuthContext);
+  
+  // Helper function to redirect logged-in users to their dashboard
+  const redirectToDashboard = () => {
+    if (!currentUser) return null;
+    
+    switch(userRole) {
+      case 'parent':
+        return <Navigate to="/parent" />;
+      case 'teacher':
+        return <Navigate to="/teacher" />;
+      case 'admin':
+        return <Navigate to="/admin" />;
+      default:
+        return <Navigate to="/parent" />; // Default to parent dashboard
+    }
+  };
+  
   return (
     <Routes>
-      <Route path="/" element={<Index />} />
+      <Route path="/login" element={
+        currentUser ? redirectToDashboard() : <Login />
+      } />
+      <Route path="/register" element={
+        currentUser ? redirectToDashboard() : <Register />
+      } />
       
-      {/* Auth routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/parent" element={
+        <ProtectedRoute allowedRoles={['parent', 'admin']}>
+          <ParentDashboard />
+        </ProtectedRoute>
+      } />
       
-      {/* Public versions of dashboard pages */}
-      <Route path="/public/dashboard" element={<PublicDashboard />} />
-      <Route path="/public/activities" element={<PublicActivityCenter />} />
-      <Route path="/public/rewards" element={<PublicRewardsHub />} />
+      <Route path="/teacher" element={
+        <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+          <TeacherDashboard />
+        </ProtectedRoute>
+      } />
       
-      {/* Protected routes */}
-      <Route element={<PrivateRoute allowedRoles={['parent', 'child']} />}>
-        <Route path="/parent-dashboard" element={<ParentDashboard />} />
-        <Route path="/child-dashboard" element={<ChildDashboard />} />
-        <Route path="/activities" element={<ActivityCenter />} />
-        <Route path="/rewards" element={<RewardsHub />} />
-      </Route>
+      <Route path="/admin" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
       
-      {/* 404 route */}
+      <Route path="/" element={
+        currentUser ? redirectToDashboard() : <Navigate to="/login" />
+      } />
+      
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
@@ -70,17 +92,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <SupabaseAuthProvider>
-            <Toaster />
-            <Sonner />
-            <AppRoutes />
-          </SupabaseAuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <Router>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </Router>
   );
 }
 
