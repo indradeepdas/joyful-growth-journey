@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Menu, X } from 'lucide-react';
 import GoodCoinIcon from '@/components/GoodCoinIcon';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, profile, isLoading, signOut } = useSupabaseAuth();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [showMenu, setShowMenu] = useState(false);
 
   const handleSignOut = async () => {
@@ -19,10 +19,8 @@ const Navbar: React.FC = () => {
     }
   };
 
-  // Determine if we should show auth links or dashboard links
   const isAuthenticated = !!user && !!profile;
   
-  // Helper function to get the correct route based on authentication status
   const getRouteForLink = (authenticatedRoute: string, publicRoute: string) => {
     return isAuthenticated ? authenticatedRoute : publicRoute;
   };
@@ -35,7 +33,6 @@ const Navbar: React.FC = () => {
           <GoodCoinIcon className="ml-2 w-6 h-6" />
         </Link>
         
-        {/* Desktop navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           <Link 
             to={getRouteForLink('/parent-dashboard', '/public/dashboard')} 
@@ -74,7 +71,6 @@ const Navbar: React.FC = () => {
           )}
         </nav>
         
-        {/* Mobile menu button */}
         <button
           onClick={() => setShowMenu(true)}
           className="md:hidden text-goodchild-text-primary focus:outline-none"
@@ -84,7 +80,6 @@ const Navbar: React.FC = () => {
         </button>
       </div>
       
-      {/* Mobile navigation menu */}
       {showMenu && (
         <div className="md:hidden fixed inset-0 bg-black/50 z-50">
           <div className="h-full w-64 bg-white p-5 flex flex-col animate-slide-in-right">

@@ -1,14 +1,14 @@
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 
 interface PrivateRouteProps {
-  children: React.ReactNode;
-  role?: 'parent' | 'child';
+  children?: React.ReactNode;
+  allowedRoles?: string[];
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, role }) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
   const { isAuthenticated, isLoading, profile } = useSupabaseAuth();
   
   if (isLoading) {
@@ -23,14 +23,14 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, role }) => {
     return <Navigate to="/login" replace />;
   }
   
-  // If a specific role is required, check the user's role
-  if (role && profile && profile.role !== role) {
+  // If specific roles are required, check the user's role
+  if (allowedRoles && allowedRoles.length > 0 && profile && !allowedRoles.includes(profile.role)) {
     // Redirect parents to parent dashboard, children to child dashboard
     const redirectTo = profile.role === 'parent' ? '/parent-dashboard' : '/child-dashboard';
     return <Navigate to={redirectTo} replace />;
   }
   
-  return <>{children}</>;
+  return <>{children || <Outlet />}</>;
 };
 
 export default PrivateRoute;
