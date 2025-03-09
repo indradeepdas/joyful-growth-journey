@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
@@ -36,72 +35,79 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [childAccounts, setChildAccounts] = useState<SupabaseChild[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const updateUserState = async (session: Session | null) => {
+    console.log('SupabaseAuthProvider: Updating user state, session exists:', !!session);
+    
+    if (session?.user) {
+      // Convert Supabase user to our User type
+      setUser({
+        id: session.user.id,
+        email: session.user.email || '',
+        role: 'parent', // Default, will be overridden by profile data
+        createdAt: new Date().toISOString(), // Default, will be overridden by profile data
+      });
+      
+      // Fetch profile data
+      const profileData = await fetchProfile(session.user.id);
+      console.log('SupabaseAuthProvider: Profile data fetched:', profileData);
+      
+      if (profileData) {
+        setProfile(profileData);
+        // Update the user with correct role
+        setUser(prev => prev ? {
+          ...prev,
+          role: profileData.role as 'parent' | 'child',
+          createdAt: profileData.created_at,
+        } : null);
+      } else {
+        console.warn('SupabaseAuthProvider: No profile found for user:', session.user.id);
+      }
+      
+      // Fetch child accounts if the user is a parent
+      if (profileData && profileData.role === 'parent') {
+        const childData = await fetchChildAccounts(session.user.id);
+        console.log('SupabaseAuthProvider: Child accounts fetched:', childData);
+        setChildAccounts(childData);
+      } else {
+        setChildAccounts([]);
+      }
+    } else {
+      console.log('SupabaseAuthProvider: No session, clearing user state');
+      setUser(null);
+      setProfile(null);
+      setChildAccounts([]);
+    }
+    
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     const getSession = async () => {
+      console.log('SupabaseAuthProvider: Getting initial session');
       const { data: { session } } = await supabase.auth.getSession();
-
-      if (session?.user) {
-        // Convert Supabase user to our User type
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          role: 'parent', // Default, will be overridden by profile data
-          createdAt: new Date().toISOString(), // Default, will be overridden by profile data
-        });
-        const profileData = await fetchProfile(session.user.id);
-        if (profileData) {
-          setProfile(profileData);
-          // Update the user with correct role
-          setUser(prev => prev ? {
-            ...prev,
-            role: profileData.role as 'parent' | 'child',
-            createdAt: profileData.created_at,
-          } : null);
-        }
-        const childData = await fetchChildAccounts(session.user.id);
-        setChildAccounts(childData);
-      }
-      setIsLoading(false);
+      await updateUserState(session);
     }
 
     getSession();
 
-    supabase.auth.onAuthStateChange(async (_event, session: Session | null) => {
-      if (session?.user) {
-        // Convert Supabase user to our User type
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          role: 'parent', // Default, will be overridden by profile data
-          createdAt: new Date().toISOString(), // Default, will be overridden by profile data
-        });
-        const profileData = await fetchProfile(session.user.id);
-        if (profileData) {
-          setProfile(profileData);
-          // Update the user with correct role
-          setUser(prev => prev ? {
-            ...prev,
-            role: profileData.role as 'parent' | 'child',
-            createdAt: profileData.created_at,
-          } : null);
-        }
-        const childData = await fetchChildAccounts(session.user.id);
-        setChildAccounts(childData);
-      } else {
-        setUser(null);
-        setProfile(null);
-        setChildAccounts([]);
-      }
-      setIsLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log('SupabaseAuthProvider: Auth state changed, event:', _event);
+      await updateUserState(session);
     });
+
+    return () => {
+      console.log('SupabaseAuthProvider: Cleaning up auth subscription');
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('SupabaseAuthProvider: Signing in', email);
       setIsLoading(true);
       await authSignIn(email, password);
     } catch (error) {
-      console.error("Error signing in:", error);
+      console.error("SupabaseAuthProvider: Error signing in:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -113,7 +119,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setIsLoading(true);
       await authSignUp(email, password, firstName, lastName);
     } catch (error) {
-      console.error("Error signing up:", error);
+      console.error("SupabaseAuthProvider: Error signing up:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -125,7 +131,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setIsLoading(true);
       await authSignOut();
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error("SupabaseAuthProvider: Error signing out:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -137,7 +143,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setIsLoading(true);
       await authResetPassword(email);
     } catch (error) {
-      console.error("Error resetting password:", error);
+      console.error("SupabaseAuthProvider: Error resetting password:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -149,7 +155,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setIsLoading(true);
       await authUpdatePassword(newPassword);
     } catch (error) {
-      console.error("Error updating password:", error);
+      console.error("SupabaseAuthProvider: Error updating password:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -158,15 +164,26 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const createChildAccount = async (data: CreateChildAccountParams) => {
     try {
+      console.log('SupabaseAuthProvider: Creating child account', data);
       await authCreateChildAccount(data, user?.id);
+      
       // Refresh the child accounts list
+      console.log('SupabaseAuthProvider: Refreshing child accounts');
       const childData = await fetchChildAccounts(user?.id);
       setChildAccounts(childData);
     } catch (error) {
-      console.error("Error creating child account:", error);
+      console.error("SupabaseAuthProvider: Error creating child account:", error);
       throw error;
     }
   };
+
+  console.log('SupabaseAuthProvider: Current state:', { 
+    isAuthenticated: !!user && !!profile,
+    isLoading, 
+    userExists: !!user, 
+    profileExists: !!profile,
+    numChildAccounts: childAccounts.length
+  });
 
   return (
     <SupabaseAuthContext.Provider
@@ -177,10 +194,10 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         isAuthenticated: !!user && !!profile,
         isLoading,
         signIn,
-        signUp,
-        signOut,
-        resetPassword,
-        updatePassword,
+        signUp: authSignUp,
+        signOut: authSignOut,
+        resetPassword: authResetPassword,
+        updatePassword: authUpdatePassword,
         createChildAccount
       }}
     >

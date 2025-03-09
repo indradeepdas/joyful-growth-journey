@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@/types';
 import { SupabaseProfile, SupabaseChild } from '@/services/types';
@@ -49,8 +48,13 @@ export const fetchChildAccounts = async (parentId: string | undefined): Promise<
 };
 
 export const signIn = async (email: string, password: string): Promise<void> => {
+  console.log('authFunctions: Signing in with email', email);
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) throw error;
+  if (error) {
+    console.error('authFunctions: Sign in error', error);
+    throw error;
+  }
+  console.log('authFunctions: Sign in successful');
 };
 
 export const signUp = async (email: string, password: string, firstName: string, lastName: string): Promise<string | null> => {
@@ -69,7 +73,6 @@ export const signUp = async (email: string, password: string, firstName: string,
   if (error) throw error;
 
   if (data.user) {
-    // Create a profile for the user
     await supabase
       .from('profiles')
       .insert({
@@ -104,23 +107,56 @@ export const updatePassword = async (newPassword: string): Promise<void> => {
 
 export const createChildAccount = async (data: CreateChildAccountParams, parentId: string | undefined): Promise<void> => {
   try {
-    console.log('Creating child account in database:', data);
+    if (!parentId) {
+      throw new Error("Parent ID is required to create a child account");
+    }
     
-    // First, insert the profile record
-    const { error: profileError } = await supabase
+    console.log('Creating child account in database:', { ...data, parentId });
+    
+    // First, check if the profile already exists
+    const { data: existingProfile, error: profileCheckError } = await supabase
       .from('profiles')
-      .insert({
-        id: data.userId,
-        first_name: data.name,
-        last_name: data.surname,
-        nickname: data.nickname || null,
-        avatar_url: data.avatar || null,
-        role: 'child'
-      });
+      .select('id')
+      .eq('id', data.userId)
+      .single();
       
-    if (profileError) throw profileError;
+    if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+      console.error("Error checking existing profile:", profileCheckError);
+      throw profileCheckError;
+    }
+    
+    // Only insert profile if it doesn't exist
+    if (!existingProfile) {
+      console.log('Creating new profile record');
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.userId,
+          first_name: data.name,
+          last_name: data.surname,
+          nickname: data.nickname || null,
+          avatar_url: data.avatar || null,
+          role: 'child'
+        });
+        
+      if (profileError) {
+        console.error("Error creating profile:", profileError);
+        throw profileError;
+      }
+    } else {
+      console.log('Profile already exists, skipping profile creation');
+    }
     
     // Then, insert the child record in the children table
+    console.log('Creating children record with data:', {
+      id: data.userId,
+      parent_id: parentId,
+      name: data.name,
+      surname: data.surname,
+      nickname: data.nickname,
+      avatar: data.avatar
+    });
+    
     const { error } = await supabase
       .from('children')
       .insert({
@@ -133,7 +169,12 @@ export const createChildAccount = async (data: CreateChildAccountParams, parentI
         good_coins: 0
       });
       
-    if (error) throw error;
+    if (error) {
+      console.error("Error creating child record:", error);
+      throw error;
+    }
+    
+    console.log('Child account created successfully');
     
   } catch (error) {
     console.error("Error creating child account:", error);

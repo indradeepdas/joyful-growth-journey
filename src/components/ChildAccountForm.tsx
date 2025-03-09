@@ -85,11 +85,32 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
       let avatarUrl = null;
       if (avatarFile) {
         const fileName = `${Date.now()}-${avatarFile.name}`;
+        
+        // Check if storage bucket exists, create it if not
+        const { data: buckets } = await supabase.storage.listBuckets();
+        const avatarBucketExists = buckets?.some(b => b.name === 'avatars');
+        
+        if (!avatarBucketExists) {
+          console.log('Creating avatars bucket');
+          const { error: bucketError } = await supabase.storage.createBucket('avatars', {
+            public: true
+          });
+          
+          if (bucketError) {
+            console.error('Error creating bucket:', bucketError);
+            throw bucketError;
+          }
+        }
+        
+        console.log('Uploading avatar:', fileName);
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('avatars')
           .upload(fileName, avatarFile);
           
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Avatar upload error:', uploadError);
+          throw uploadError;
+        }
         
         // Get public URL for the avatar
         const { data: { publicUrl } } = supabase.storage
@@ -101,32 +122,37 @@ const ChildAccountForm: React.FC<ChildAccountFormProps> = ({ onClose }) => {
       }
       
       // 3. Create child profile in our database
-      await createChildAccount({
-        name: data.name,
-        surname: data.surname,
-        nickname: data.nickname || undefined,
-        email: data.email,
-        avatar: avatarUrl,
-        userId: authData.user.id,
-      });
-      
-      console.log('Child profile created in database');
-      
-      // Success message
-      toast({
-        title: "Success!",
-        description: "Child account created successfully. They can log in using the email and password you provided.",
-      });
-      
-      // Close form and reset
-      setOpen(false);
-      form.reset();
-      setAvatarFile(null);
-      setAvatarPreview(null);
-      
-      // Call onClose if provided
-      if (onClose) {
-        onClose();
+      try {
+        await createChildAccount({
+          name: data.name,
+          surname: data.surname,
+          nickname: data.nickname || undefined,
+          email: data.email,
+          avatar: avatarUrl,
+          userId: authData.user.id,
+        });
+        
+        console.log('Child profile created in database');
+        
+        // Success message
+        toast({
+          title: "Success!",
+          description: "Child account created successfully. They can log in using the email and password you provided.",
+        });
+        
+        // Close form and reset
+        setOpen(false);
+        form.reset();
+        setAvatarFile(null);
+        setAvatarPreview(null);
+        
+        // Call onClose if provided
+        if (onClose) {
+          onClose();
+        }
+      } catch (profileError) {
+        console.error("Error creating profile:", profileError);
+        throw new Error(`Failed to create child account: ${profileError instanceof Error ? profileError.message : 'Unknown error'}`);
       }
       
     } catch (err) {

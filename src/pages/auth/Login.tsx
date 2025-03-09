@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
@@ -13,9 +12,11 @@ const Login: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Add effect to handle redirect after login
   useEffect(() => {
+    console.log('Login - Auth state changed:', { isAuthenticated, profile });
+    
     if (isAuthenticated && profile) {
+      console.log(`User authenticated with role: ${profile.role}, redirecting...`);
       const route = profile.role === 'parent' ? '/parent-dashboard' : '/child-dashboard';
       navigate(route, { replace: true });
     }
@@ -32,13 +33,16 @@ const Login: React.FC = () => {
     
     try {
       setIsLoading(true);
+      console.log('Attempting sign in with:', email);
       await signIn(email, password);
+      
       toast({
         title: "Success!",
         description: "You have successfully logged in.",
       });
       // Redirect will happen in the useEffect
     } catch (error) {
+      console.error('Login error:', error);
       if (error instanceof Error) {
         setErrorMessage(error.message);
       } else {
