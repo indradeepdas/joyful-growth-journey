@@ -1,784 +1,857 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Calendar } from '@/components/ui/calendar';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import GoodCoinIcon from '@/components/GoodCoinIcon';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Activity, DevelopmentArea } from '@/types';
-import { adaptSupabaseActivity } from '@/utils/typeAdapters';
-import { supabase } from '@/integrations/supabase/client';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { Calendar as CalendarIcon, Search, Clock, Tag, ChevronLeft, Plus, Save, Calendar as CalendarComponent, AlertCircle, CheckCircle, Brain, MessageSquare, User, Lightbulb, Heart, Zap, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Brain, 
-  MessageSquare, 
-  User, 
-  Lightbulb, 
-  Heart, 
-  Zap, 
-  Users, 
-  Search, 
-  Filter, 
-  Plus, 
-  Calendar, 
-  Clock, 
-  Award, 
-  X, 
-  Check, 
-  ArrowLeft 
-} from 'lucide-react';
-import GoodCoinIcon from '@/components/GoodCoinIcon';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { SupabaseActivity, SupabaseDevelopmentArea } from '@/services/types';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { getSupabaseClient } from '@/integrations/supabase/client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Activity, DevelopmentArea } from '@/types';
+import { SupabaseActivity, SupabaseChild, SupabaseDevelopmentArea } from '@/services/types';
+import { adaptSupabaseActivity } from '@/utils/typeAdapters';
 
-// Development areas
-const developmentAreas: { id: string; name: DevelopmentArea; description: string; color: string; icon: React.ReactNode }[] = [
-  { 
-    id: '1', 
-    name: 'Health & Mind', 
-    description: 'Activities promoting physical health, wellness, and cognitive development.',
-    color: 'bg-blue-100 text-blue-600',
-    icon: <Brain className="text-blue-600" size={24} />
+// Development areas with icons and colors
+const developmentAreas = [
+  {
+    id: 'health-mind',
+    name: 'Health & Mind' as DevelopmentArea,
+    icon: <Brain className="text-blue-500" />,
+    description: "Activities that promote physical health, mental well-being, and cognitive development.",
+    color: 'blue',
+    bgColor: 'bg-blue-100'
   },
-  { 
-    id: '2', 
-    name: 'Effective Communication', 
-    description: 'Activities focused on verbal, written, and emotional communication skills.',
-    color: 'bg-green-100 text-green-600',
-    icon: <MessageSquare className="text-green-600" size={24} />
+  {
+    id: 'communication',
+    name: 'Effective Communication' as DevelopmentArea,
+    icon: <MessageSquare className="text-green-500" />,
+    description: "Activities to improve verbal, written, and non-verbal communication skills.",
+    color: 'green',
+    bgColor: 'bg-green-100'
   },
-  { 
-    id: '3', 
-    name: 'Personal Enrichment', 
-    description: 'Activities for self-improvement, life skills, and personal growth.',
-    color: 'bg-purple-100 text-purple-600',
-    icon: <User className="text-purple-600" size={24} />
+  {
+    id: 'enrichment',
+    name: 'Personal Enrichment' as DevelopmentArea,
+    icon: <User className="text-purple-500" />,
+    description: "Activities focused on personal growth, learning, and developing new skills.",
+    color: 'purple',
+    bgColor: 'bg-purple-100'
   },
-  { 
-    id: '4', 
-    name: 'Creativity', 
-    description: 'Activities encouraging artistic expression, innovation, and creative thinking.',
-    color: 'bg-yellow-100 text-yellow-600',
-    icon: <Lightbulb className="text-yellow-600" size={24} />
+  {
+    id: 'creativity',
+    name: 'Creativity' as DevelopmentArea,
+    icon: <Lightbulb className="text-yellow-500" />,
+    description: "Activities that foster creative thinking, artistic expression, and innovation.",
+    color: 'yellow',
+    bgColor: 'bg-yellow-100'
   },
-  { 
-    id: '5', 
-    name: 'Deeper Family Bonds', 
-    description: 'Activities to strengthen family relationships and shared experiences.',
-    color: 'bg-red-100 text-red-600',
-    icon: <Heart className="text-red-600" size={24} />
+  {
+    id: 'family',
+    name: 'Deeper Family Bonds' as DevelopmentArea,
+    icon: <Heart className="text-red-500" />,
+    description: "Activities designed to strengthen family relationships and create meaningful memories.",
+    color: 'red',
+    bgColor: 'bg-red-100'
   },
-  { 
-    id: '6', 
-    name: 'Emotional Intelligence', 
-    description: 'Activities focused on recognizing and managing emotions effectively.',
-    color: 'bg-indigo-100 text-indigo-600',
-    icon: <Zap className="text-indigo-600" size={24} />
+  {
+    id: 'emotional',
+    name: 'Emotional Intelligence' as DevelopmentArea,
+    icon: <Zap className="text-orange-500" />,
+    description: "Activities to help understand, express, and manage emotions effectively.",
+    color: 'orange',
+    bgColor: 'bg-orange-100'
   },
-  { 
-    id: '7', 
-    name: 'Social Skills', 
-    description: 'Activities developing social competence, teamwork, and community engagement.',
-    color: 'bg-teal-100 text-teal-600',
-    icon: <Users className="text-teal-600" size={24} />
+  {
+    id: 'social',
+    name: 'Social Skills' as DevelopmentArea,
+    icon: <Users className="text-indigo-500" />,
+    description: "Activities to develop interaction, cooperation, and positive peer relationships.",
+    color: 'indigo',
+    bgColor: 'bg-indigo-100'
   }
 ];
 
+// Schema for activity creation form
+const activityFormSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  developmentArea: z.string().min(1, "Please select a development area"),
+  estimatedTime: z.string().min(1, "Please provide an estimated time"),
+  goodCoins: z.coerce.number().min(1, "Reward must be at least 1 GoodCoin").max(100, "Reward cannot exceed 100 GoodCoins"),
+});
+
+// Schema for assigning an activity
+const assignActivitySchema = z.object({
+  childId: z.string().min(1, "Please select a child"),
+  dates: z.array(z.date()).min(1, "Please select at least one date"),
+});
+
 const ActivityCenter: React.FC = () => {
-  const { user, childAccounts, isAuthenticated, profile } = useSupabaseAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('title');
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'title' | 'goodCoins' | 'time'>('title');
   const [showDetail, setShowDetail] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-  const [selectedChild, setSelectedChild] = useState<string>('');
-  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
-  const [supabaseDevelopmentAreas, setSupabaseDevelopmentAreas] = useState<SupabaseDevelopmentArea[]>([]);
-  
-  // Form states for creating custom activity
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [activityTitle, setActivityTitle] = useState('');
-  const [activityDescription, setActivityDescription] = useState('');
-  const [activityArea, setActivityArea] = useState('');
-  const [activityTime, setActivityTime] = useState('30');
-  const [activityReward, setActivityReward] = useState('10');
-  const [activityImageUrl, setActivityImageUrl] = useState('');
-
+  const { toast } = useToast();
+  const { user, profile, isLoading: authLoading } = useSupabaseAuth();
+  const queryClient = useQueryClient();
+  
+  // Reset UI state when navigating away
   useEffect(() => {
-    if (!isAuthenticated || (profile?.role !== 'parent' && profile?.role !== 'child')) {
-      navigate('/login');
-      return;
-    }
-
-    const fetchDevelopmentAreas = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('development_areas')
-          .select('*');
-        
-        if (error) {
-          console.error('Error fetching development areas:', error);
-        } else if (data) {
-          setSupabaseDevelopmentAreas(data);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
+    return () => {
+      setShowDetail(false);
+      setSelectedActivity(null);
+      setShowCreateForm(false);
     };
-
-    const fetchActivities = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('activities')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) {
-          console.error('Error fetching activities:', error);
-        } else if (data) {
-          const formattedActivities = data.map(activity => adaptSupabaseActivity(activity));
-          setActivities(formattedActivities);
-          setFilteredActivities(formattedActivities);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    };
-
-    fetchDevelopmentAreas();
-    fetchActivities();
-  }, [isAuthenticated, navigate, profile, user]);
-
-  // Filter activities by development area
-  const filterByArea = (areaId: string | null) => {
-    setSelectedArea(areaId);
+  }, []);
+  
+  // Form for creating a new activity
+  const createActivityForm = useForm<z.infer<typeof activityFormSchema>>({
+    resolver: zodResolver(activityFormSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      developmentArea: '',
+      estimatedTime: '',
+      goodCoins: 10,
+    },
+  });
+  
+  // Form for assigning an activity
+  const assignActivityForm = useForm<z.infer<typeof assignActivitySchema>>({
+    resolver: zodResolver(assignActivitySchema),
+    defaultValues: {
+      childId: '',
+      dates: [],
+    },
+  });
+  
+  // Query to fetch activities from Supabase
+  const fetchActivities = async (): Promise<Activity[]> => {
+    const supabase = getSupabaseClient();
     
-    if (!areaId) {
-      // Clear filter
-      const filtered = activities.filter(activity => 
-        activity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        activity.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredActivities(filtered);
-    } else {
-      // Apply filter
-      const filtered = activities.filter(activity => {
-        const matchesArea = activity.developmentArea === developmentAreas.find(area => area.id === areaId)?.name;
-        const matchesSearch = 
-          activity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          activity.description.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        return matchesArea && matchesSearch;
+    // Join with development_areas table to get the area name
+    const { data, error } = await supabase
+      .from('activities')
+      .select(`
+        *,
+        development_areas (*)
+      `);
+      
+    if (error) throw error;
+    
+    // Convert Supabase data to our Activity type
+    return data.map((item: any) => {
+      const { development_areas, ...activity } = item;
+      return adaptSupabaseActivity({
+        ...activity,
+        development_area_id: development_areas?.id || null,
+        developmentAreaName: development_areas?.name || null,
       });
-      setFilteredActivities(filtered);
-    }
-  };
-
-  // Search activities
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    
-    if (!term) {
-      // If no search term, just apply area filter if present
-      if (selectedArea) {
-        filterByArea(selectedArea);
-      } else {
-        setFilteredActivities(activities);
-      }
-      return;
-    }
-    
-    // Apply both search and area filter if present
-    const filtered = activities.filter(activity => {
-      const matchesSearch = 
-        activity.title.toLowerCase().includes(term.toLowerCase()) ||
-        activity.description.toLowerCase().includes(term.toLowerCase());
-      
-      if (selectedArea) {
-        const matchesArea = activity.developmentArea === developmentAreas.find(area => area.id === selectedArea)?.name;
-        return matchesSearch && matchesArea;
-      }
-      
-      return matchesSearch;
     });
+  };
+  
+  // Query to fetch children for the parent
+  const fetchChildren = async (): Promise<SupabaseChild[]> => {
+    if (!user || profile?.role !== 'parent') return [];
     
-    setFilteredActivities(filtered);
-  };
-
-  // Sort activities
-  const handleSort = (sortType: 'title' | 'goodCoins' | 'time') => {
-    setSortBy(sortType);
-    
-    const sorted = [...filteredActivities];
-    
-    switch (sortType) {
-      case 'title':
-        sorted.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case 'goodCoins':
-        sorted.sort((a, b) => b.goodCoins - a.goodCoins);
-        break;
-      case 'time':
-        // For this example, we're just using the length of the description as a proxy for time
-        // In a real app, you'd have a dedicated "estimatedTime" field
-        sorted.sort((a, b) => a.description.length - b.description.length);
-        break;
-    }
-    
-    setFilteredActivities(sorted);
-  };
-
-  const viewActivityDetail = (activity: Activity) => {
-    setSelectedActivity(activity);
-    setShowDetail(true);
-  };
-
-  const closeActivityDetail = () => {
-    setShowDetail(false);
-    setSelectedActivity(null);
-    setSelectedChild('');
-    setSelectedDates([]);
-  };
-
-  const assignActivity = async () => {
-    if (!selectedActivity || !selectedChild || selectedDates.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please select a child and at least one date",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      // Create an activity assignment for each selected date
-      for (const date of selectedDates) {
-        const { error } = await supabase
-          .from('activities')
-          .insert([
-            {
-              title: selectedActivity.title,
-              description: selectedActivity.description,
-              development_area_id: supabaseDevelopmentAreas.find(
-                area => area.name === selectedActivity.developmentArea
-              )?.id,
-              coin_reward: selectedActivity.goodCoins,
-              assigned_to: selectedChild,
-              created_by: user?.id,
-              due_date: date.toISOString(),
-              completed: false
-            }
-          ]);
-        
-        if (error) {
-          console.error('Error assigning activity:', error);
-          toast({
-            title: "Error",
-            description: "Failed to assign activity: " + error.message,
-            variant: "destructive",
-          });
-          return;
-        }
-      }
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from('children')
+      .select('*')
+      .eq('parent_id', user.id);
       
-      toast({
-        title: "Activity Assigned",
-        description: `Successfully assigned "${selectedActivity.title}" to ${
-          childAccounts.find(child => child.id === selectedChild)?.name
-        } on ${selectedDates.length} date(s)`,
-      });
-      
-      closeActivityDetail();
-      
-      // Refresh activities list
-      const { data, error } = await supabase
-        .from('activities')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (!error && data) {
-        const formattedActivities = data.map(activity => adaptSupabaseActivity(activity));
-        setActivities(formattedActivities);
-        setFilteredActivities(formattedActivities);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-    }
+    if (error) throw error;
+    return data;
   };
-
-  const createCustomActivity = async () => {
-    if (!activityTitle || !activityDescription || !activityArea || !activityReward) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
+  
+  // Query to fetch development areas
+  const fetchDevelopmentAreas = async (): Promise<SupabaseDevelopmentArea[]> => {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from('development_areas')
+      .select('*');
+      
+    if (error) throw error;
+    return data;
+  };
+  
+  // Queries
+  const { data: activities = [], isLoading: activitiesLoading } = useQuery({
+    queryKey: ['activities'],
+    queryFn: fetchActivities,
+  });
+  
+  const { data: children = [], isLoading: childrenLoading } = useQuery({
+    queryKey: ['children'],
+    queryFn: fetchChildren,
+    enabled: !!user && profile?.role === 'parent',
+  });
+  
+  const { data: dbDevelopmentAreas = [], isLoading: areasLoading } = useQuery({
+    queryKey: ['developmentAreas'],
+    queryFn: fetchDevelopmentAreas,
+  });
+  
+  // Mutation to create a new activity
+  const createActivityMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof activityFormSchema>) => {
+      const supabase = getSupabaseClient();
+      
+      const { data: areaData, error: areaError } = await supabase
+        .from('development_areas')
+        .select('id')
+        .eq('name', data.developmentArea)
+        .single();
+      
+      if (areaError) throw areaError;
+      
       const { error } = await supabase
         .from('activities')
-        .insert([
-          {
-            title: activityTitle,
-            description: activityDescription,
-            development_area_id: activityArea,
-            coin_reward: parseInt(activityReward),
-            created_by: user?.id,
-            completed: false
-          }
-        ]);
-      
-      if (error) {
-        console.error('Error creating activity:', error);
-        toast({
-          title: "Error",
-          description: "Failed to create activity: " + error.message,
-          variant: "destructive",
+        .insert({
+          title: data.title,
+          description: data.description,
+          development_area_id: areaData.id,
+          coin_reward: data.goodCoins,
+          created_by: user?.id,
+          due_date: null,
+          completed: false,
         });
-        return;
-      }
+        
+      if (error) throw error;
       
+      return data;
+    },
+    onSuccess: () => {
       toast({
         title: "Activity Created",
-        description: `Successfully created "${activityTitle}"`,
+        description: "Your new activity has been created successfully.",
+        variant: "default",
       });
       
-      // Reset form
-      setActivityTitle('');
-      setActivityDescription('');
-      setActivityArea('');
-      setActivityTime('30');
-      setActivityReward('10');
-      setActivityImageUrl('');
+      // Close the form and refresh activities
       setShowCreateForm(false);
-      
-      // Refresh activities list
-      const { data, error: fetchError } = await supabase
-        .from('activities')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (!fetchError && data) {
-        const formattedActivities = data.map(activity => adaptSupabaseActivity(activity));
-        setActivities(formattedActivities);
-        setFilteredActivities(formattedActivities);
-      }
-    } catch (error) {
-      console.error('Error:', error);
+      createActivityForm.reset();
+      queryClient.invalidateQueries({ queryKey: ['activities'] });
+    },
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: error.message || "Failed to create activity. Please try again.",
         variant: "destructive",
       });
     }
-  };
-
-  const toggleDateSelection = (date: Date) => {
-    const formattedDate = new Date(date.setHours(0, 0, 0, 0));
-    
-    // Check if date is already selected
-    const dateAlreadySelected = selectedDates.some(
-      d => new Date(d.setHours(0, 0, 0, 0)).getTime() === formattedDate.getTime()
-    );
-    
-    if (dateAlreadySelected) {
-      // Remove date
-      setSelectedDates(selectedDates.filter(
-        d => new Date(d.setHours(0, 0, 0, 0)).getTime() !== formattedDate.getTime()
-      ));
-    } else {
-      // Add date
-      setSelectedDates([...selectedDates, formattedDate]);
+  });
+  
+  // Mutation to assign an activity
+  const assignActivityMutation = useMutation({
+    mutationFn: async (data: { activityId: string, childId: string, dates: Date[] }) => {
+      if (!selectedActivity) throw new Error("No activity selected");
+      
+      const supabase = getSupabaseClient();
+      
+      // For each selected date, create an assigned activity
+      const promises = data.dates.map(async (date) => {
+        const { error } = await supabase
+          .from('assigned_activities')
+          .insert({
+            activity_id: data.activityId,
+            child_id: data.childId,
+            due_date: format(date, 'yyyy-MM-dd'),
+            assigned_by: user?.id,
+            completed: false,
+          });
+          
+        if (error) throw error;
+      });
+      
+      await Promise.all(promises);
+      
+      return { activityTitle: selectedActivity.title, dates: data.dates.length };
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Activity Assigned",
+        description: `"${data.activityTitle}" has been assigned successfully to ${data.dates} date(s).`,
+        variant: "default",
+      });
+      
+      // Reset the form and go back to activity list
+      assignActivityForm.reset();
+      setShowDetail(false);
+      setSelectedActivity(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to assign activity. Please try again.",
+        variant: "destructive",
+      });
     }
+  });
+  
+  // Handle activity creation form submission
+  const onCreateActivitySubmit = (data: z.infer<typeof activityFormSchema>) => {
+    createActivityMutation.mutate(data);
   };
-
-  const getAreaIcon = (areaName: string) => {
-    const area = developmentAreas.find(a => a.name === areaName);
-    return area ? area.icon : <Brain size={24} />;
+  
+  // Handle activity assignment form submission
+  const onAssignActivitySubmit = (data: z.infer<typeof assignActivitySchema>) => {
+    if (!selectedActivity) return;
+    
+    assignActivityMutation.mutate({
+      activityId: selectedActivity.id,
+      childId: data.childId,
+      dates: data.dates,
+    });
   };
-
-  const getAreaColor = (areaName: string) => {
-    const area = developmentAreas.find(a => a.name === areaName);
-    return area ? area.color : 'bg-blue-100 text-blue-600';
+  
+  // Filter and sort activities
+  const filteredActivities = activities.filter(activity => {
+    // Filter by search query
+    const matchesSearch = 
+      activity.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      activity.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filter by development area
+    const matchesArea = !selectedArea || activity.developmentArea === selectedArea;
+    
+    return matchesSearch && matchesArea;
+  }).sort((a, b) => {
+    // Sort based on selected sort option
+    switch (sortBy) {
+      case 'title':
+        return a.title.localeCompare(b.title);
+      case 'coins':
+        return b.goodCoins - a.goodCoins;
+      case 'area':
+        return a.developmentArea.localeCompare(b.developmentArea);
+      default:
+        return 0;
+    }
+  });
+  
+  // Handle viewing activity details
+  const handleViewActivity = (activity: Activity) => {
+    setSelectedActivity(activity);
+    setShowDetail(true);
+    
+    // Reset the form values
+    assignActivityForm.reset({
+      childId: '',
+      dates: [],
+    });
   };
+  
+  // Function to get the development area object
+  const getDevelopmentArea = (name: DevelopmentArea) => {
+    return developmentAreas.find(area => area.name === name) || developmentAreas[0];
+  };
+  
+  // Back to activity list
+  const handleBackToList = () => {
+    setShowDetail(false);
+    setSelectedActivity(null);
+  };
+  
+  // Clear filters
+  const handleClearFilters = () => {
+    setSelectedArea(null);
+    setSearchQuery('');
+    setSortBy('title');
+  };
+  
+  if (authLoading || activitiesLoading) {
+    return (
+      <div className="min-h-screen bg-goodchild-background flex flex-col font-sassoon">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-pulse text-xl">Loading Activities...</div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-goodchild-background font-sassoon">
+    <div className="min-h-screen bg-goodchild-background flex flex-col font-sassoon">
       <Navbar />
       
-      <main className="flex-grow px-6 py-10">
-        <div className="max-w-7xl mx-auto">
-          <header className="text-center mb-12">
-            <h1 className="text-3xl md:text-4xl font-bold text-goodchild-text-primary mb-3">
+      <main className="flex-1 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          {/* Page header */}
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-bold text-goodchild-text-primary mb-4">
               Activity Center: Empower Your Child's Growth
             </h1>
-            <p className="text-goodchild-text-secondary max-w-3xl mx-auto">
+            <p className="text-xl text-goodchild-text-secondary max-w-3xl mx-auto">
               Assign activities that promote development across 7 key areas. Browse pre-designed activity packages and create custom activities.
             </p>
-          </header>
+          </div>
           
-          {/* Development Area Tiles */}
-          <section className="mb-12">
-            <h2 className="text-xl font-bold text-goodchild-text-primary mb-6">Development Areas</h2>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-              {developmentAreas.map((area) => (
-                <div 
-                  key={area.id}
-                  className={`development-area-tile ${selectedArea === area.id ? 'active' : ''}`}
-                  onClick={() => filterByArea(selectedArea === area.id ? null : area.id)}
-                >
-                  <div className={`development-area-icon ${area.color}`}>
-                    {area.icon}
+          {showDetail ? (
+            /* Detailed activity view with assignment */
+            <div className="glass-card p-6 rounded-xl animate-fade-in">
+              <Button 
+                variant="ghost" 
+                className="mb-4 flex items-center gap-2" 
+                onClick={handleBackToList}
+              >
+                <ChevronLeft size={16} /> Back to Activities
+              </Button>
+              
+              {selectedActivity && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-4 text-goodchild-text-primary">{selectedActivity.title}</h2>
+                    
+                    <div className="flex flex-wrap gap-3 mb-6">
+                      {/* Development area tag */}
+                      <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-${getDevelopmentArea(selectedActivity.developmentArea).color}-100 text-${getDevelopmentArea(selectedActivity.developmentArea).color}-700`}>
+                        {getDevelopmentArea(selectedActivity.developmentArea).icon}
+                        <span>{selectedActivity.developmentArea}</span>
+                      </div>
+                      
+                      {/* GoodCoin reward */}
+                      <div className="flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
+                        <GoodCoinIcon className="h-4 w-4" />
+                        <span>{selectedActivity.goodCoins} GoodCoins</span>
+                      </div>
+                      
+                      {/* Estimated time if available */}
+                      {selectedActivity.estimatedTime && (
+                        <div className="flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                          <Clock size={14} />
+                          <span>{selectedActivity.estimatedTime}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="mb-8">
+                      <h3 className="text-lg font-semibold mb-2">Description</h3>
+                      <p className="text-goodchild-text-primary">{selectedActivity.description}</p>
+                    </div>
+                    
+                    {/* Sample image - in a real app, this would come from the activity data */}
+                    <div className="mb-6 rounded-lg overflow-hidden border border-gray-200">
+                      <img 
+                        src={`https://placehold.co/800x400/${getDevelopmentArea(selectedActivity.developmentArea).color.slice(0, 6)}/FFFFFF?text=${selectedActivity.title}`} 
+                        alt={selectedActivity.title} 
+                        className="w-full h-auto"
+                      />
+                    </div>
                   </div>
-                  <h3 className="text-center text-sm font-medium">{area.name}</h3>
+                  
+                  <div>
+                    <div className="glass-card p-6 rounded-xl">
+                      <h3 className="text-xl font-bold mb-4">Assign Activity to Child</h3>
+                      
+                      {profile?.role === 'parent' ? (
+                        <Form {...assignActivityForm}>
+                          <form onSubmit={assignActivityForm.handleSubmit(onAssignActivitySubmit)} className="space-y-6">
+                            <FormField
+                              control={assignActivityForm.control}
+                              name="childId"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Select Child</FormLabel>
+                                  <Select 
+                                    onValueChange={field.onChange} 
+                                    value={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select a child" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {children.length > 0 ? (
+                                        children.map((child) => (
+                                          <SelectItem key={child.id} value={child.id}>
+                                            {child.name} {child.surname}
+                                          </SelectItem>
+                                        ))
+                                      ) : (
+                                        <SelectItem value="no-children" disabled>
+                                          No children found
+                                        </SelectItem>
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={assignActivityForm.control}
+                              name="dates"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                  <FormLabel>Select Dates</FormLabel>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant="outline"
+                                          className={cn(
+                                            "w-full pl-3 text-left font-normal",
+                                            !field.value.length && "text-muted-foreground"
+                                          )}
+                                        >
+                                          {field.value.length > 0 ? (
+                                            field.value.length === 1 
+                                              ? format(field.value[0], "PPP") 
+                                              : `${field.value.length} dates selected`
+                                          ) : (
+                                            <span>Select dates</span>
+                                          )}
+                                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                      <Calendar
+                                        mode="multiple"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        initialFocus
+                                      />
+                                    </PopoverContent>
+                                  </Popover>
+                                  <FormDescription>
+                                    You can select multiple dates to schedule this activity.
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <Button 
+                              type="submit" 
+                              className="w-full" 
+                              disabled={assignActivityMutation.isPending}
+                            >
+                              {assignActivityMutation.isPending ? "Assigning..." : "Assign Activity"}
+                            </Button>
+                          </form>
+                        </Form>
+                      ) : (
+                        <div className="text-center py-6">
+                          <AlertCircle className="h-12 w-12 mx-auto text-goodchild-yellow mb-3" />
+                          <h4 className="text-lg font-semibold mb-2">Parent Account Required</h4>
+                          <p className="text-goodchild-text-secondary mb-4">
+                            Only parent accounts can assign activities to children.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              ))}
+              )}
             </div>
-            
-            {selectedArea && (
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={() => filterByArea(null)}
-                  className="text-sm text-goodchild-text-secondary hover:text-goodchild-blue flex items-center gap-1"
-                >
-                  <X size={14} />
-                  <span>Clear Filter</span>
-                </button>
-              </div>
-            )}
-          </section>
-          
-          {/* Search and Filters */}
-          <section className="mb-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="relative w-full md:w-1/2">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-goodchild-text-secondary" size={18} />
-                <Input
-                  type="text"
-                  placeholder="Search activities..."
-                  className="pl-10 w-full"
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
-                />
+          ) : (
+            /* Activity list view */
+            <>
+              {/* Development areas filter tiles */}
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-goodchild-text-primary">Development Areas</h2>
+                  {selectedArea && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={handleClearFilters}
+                      className="text-sm"
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                  {developmentAreas.map((area) => (
+                    <div 
+                      key={area.id} 
+                      className={`development-area-tile ${selectedArea === area.name ? 'active' : ''}`}
+                      onClick={() => setSelectedArea(selectedArea === area.name ? null : area.name)}
+                    >
+                      <div className={`development-area-icon ${area.bgColor} relative w-16 h-16 rounded-2xl shadow-sm`}>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          {area.icon}
+                        </div>
+                        {/* Small icon at bottom right */}
+                        <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-${area.color}-500 flex items-center justify-center shadow-md border-2 border-white`}>
+                          {area.icon && React.cloneElement(area.icon, { size: 12, className: "text-white" })}
+                        </div>
+                      </div>
+                      <h3 className="font-medium text-center mt-2 text-sm">{area.name}</h3>
+                    </div>
+                  ))}
+                </div>
               </div>
               
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="flex items-center gap-2">
-                  <Filter size={18} className="text-goodchild-text-secondary" />
-                  <Select
-                    value={sortBy}
-                    onValueChange={(value) => handleSort(value as 'title' | 'goodCoins' | 'time')}
-                  >
+              {/* Search & sort bar */}
+              <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <div className="relative flex-1">
+                  <Input
+                    type="text"
+                    placeholder="Search activities..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-goodchild-text-secondary h-4 w-4" />
+                </div>
+                
+                <div className="flex gap-4">
+                  <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="title">Title</SelectItem>
-                      <SelectItem value="goodCoins">GoodCoin Reward</SelectItem>
-                      <SelectItem value="time">Estimated Time</SelectItem>
+                      <SelectItem value="title">Sort by Title</SelectItem>
+                      <SelectItem value="coins">Sort by Reward</SelectItem>
+                      <SelectItem value="area">Sort by Area</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                
-                <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-                  <DialogTrigger asChild>
-                    <Button className="btn-primary">
-                      <Plus size={18} className="mr-1" /> Create Activity
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[500px]">
-                    <DialogHeader>
-                      <DialogTitle>Create Custom Activity</DialogTitle>
-                      <DialogDescription>
-                        Design a new activity for your children to complete
-                      </DialogDescription>
-                    </DialogHeader>
-                    
-                    <div className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <label htmlFor="title" className="text-sm font-medium">
-                          Activity Title
-                        </label>
-                        <Input
-                          id="title"
-                          placeholder="Enter a title"
-                          value={activityTitle}
-                          onChange={(e) => setActivityTitle(e.target.value)}
-                        />
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <label htmlFor="description" className="text-sm font-medium">
-                          Description
-                        </label>
-                        <Textarea
-                          id="description"
-                          placeholder="Explain the activity in detail"
-                          rows={4}
-                          value={activityDescription}
-                          onChange={(e) => setActivityDescription(e.target.value)}
-                        />
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <label htmlFor="area" className="text-sm font-medium">
-                          Development Area
-                        </label>
-                        <Select
-                          value={activityArea}
-                          onValueChange={setActivityArea}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select an area" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {supabaseDevelopmentAreas.map((area) => (
-                              <SelectItem key={area.id} value={area.id}>
-                                {area.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="grid gap-2">
-                          <label htmlFor="time" className="text-sm font-medium">
-                            Estimated Time (minutes)
-                          </label>
-                          <Input
-                            id="time"
-                            type="number"
-                            min="5"
-                            max="120"
-                            placeholder="30"
-                            value={activityTime}
-                            onChange={(e) => setActivityTime(e.target.value)}
-                          />
-                        </div>
-                        
-                        <div className="grid gap-2">
-                          <label htmlFor="reward" className="text-sm font-medium">
-                            GoodCoin Reward
-                          </label>
-                          <Input
-                            id="reward"
-                            type="number"
-                            min="1"
-                            max="100"
-                            placeholder="10"
-                            value={activityReward}
-                            onChange={(e) => setActivityReward(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <label htmlFor="imageUrl" className="text-sm font-medium">
-                          Image URL (optional)
-                        </label>
-                        <Input
-                          id="imageUrl"
-                          placeholder="https://example.com/image.jpg"
-                          value={activityImageUrl}
-                          onChange={(e) => setActivityImageUrl(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setShowCreateForm(false)}>
-                        Cancel
-                      </Button>
-                      <Button onClick={createCustomActivity}>
-                        Create Activity
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-          </section>
-          
-          {/* Activity List */}
-          <section className="mb-12">
-            <h2 className="text-xl font-bold text-goodchild-text-primary mb-6">Activities</h2>
-            
-            {filteredActivities.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-soft p-8 text-center">
-                <p className="text-goodchild-text-secondary mb-4">
-                  No activities found. Try clearing filters or creating a new activity.
-                </p>
-                <Button className="btn-primary" onClick={() => setShowCreateForm(true)}>
-                  <Plus size={18} className="mr-1" /> Create Activity
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredActivities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="bg-white rounded-xl shadow-soft overflow-hidden hover:shadow-medium transition-shadow cursor-pointer"
-                    onClick={() => viewActivityDetail(activity)}
-                  >
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="font-semibold text-goodchild-text-primary">{activity.title}</h3>
-                        <div className="good-coin">
-                          <GoodCoinIcon className="w-5 h-5" />
-                          <span>{activity.goodCoins}</span>
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm text-goodchild-text-secondary mb-4 line-clamp-3">
-                        {activity.description}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className={`text-xs px-3 py-1 rounded-full flex items-center gap-1 ${getAreaColor(activity.developmentArea)}`}>
-                          {getAreaIcon(activity.developmentArea)}
-                          <span>{activity.developmentArea}</span>
-                        </div>
-                        
-                        <div className="text-xs text-goodchild-text-secondary flex items-center gap-1">
-                          <Clock size={14} />
-                          <span>{Math.floor(activity.description.length / 10) + 5} mins</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-          
-          {/* Activity Detail Dialog */}
-          <Dialog open={showDetail} onOpenChange={setShowDetail}>
-            <DialogContent className="sm:max-w-[700px]">
-              {selectedActivity && (
-                <>
-                  <DialogHeader>
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={closeActivityDetail}
-                        className="p-1 rounded-full hover:bg-gray-100"
-                      >
-                        <ArrowLeft size={18} />
-                      </button>
-                      <DialogTitle>{selectedActivity.title}</DialogTitle>
-                    </div>
-                  </DialogHeader>
                   
-                  <div className="grid gap-6 py-4">
-                    <div className="flex justify-between items-center">
-                      <div className={`text-sm px-3 py-1 rounded-full flex items-center gap-1 ${getAreaColor(selectedActivity.developmentArea)}`}>
-                        {getAreaIcon(selectedActivity.developmentArea)}
-                        <span>{selectedActivity.developmentArea}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-4">
-                        <div className="text-sm text-goodchild-text-secondary flex items-center gap-1">
-                          <Clock size={16} />
-                          <span>{Math.floor(selectedActivity.description.length / 10) + 5} mins</span>
-                        </div>
+                  {profile?.role === 'parent' && (
+                    <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
+                      <DialogTrigger asChild>
+                        <Button className="whitespace-nowrap">
+                          <Plus className="mr-2 h-4 w-4" /> Create Activity
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[550px]">
+                        <DialogHeader>
+                          <DialogTitle>Create New Activity</DialogTitle>
+                          <DialogDescription>
+                            Design a custom activity for your children. Fill out the details below.
+                          </DialogDescription>
+                        </DialogHeader>
                         
-                        <div className="good-coin">
-                          <GoodCoinIcon className="w-5 h-5" />
-                          <span>{selectedActivity.goodCoins}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-sm font-semibold mb-2">Activity Description</h3>
-                      <p className="text-goodchild-text-secondary whitespace-pre-line">
-                        {selectedActivity.description}
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-sm font-semibold mb-4">Assign Activity to Child</h3>
-                      
-                      <div className="grid gap-4">
-                        <div>
-                          <label htmlFor="childSelect" className="text-sm text-goodchild-text-secondary mb-1 block">
-                            Select Child
-                          </label>
-                          <Select
-                            value={selectedChild}
-                            onValueChange={setSelectedChild}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Choose a child" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {childAccounts.map((child) => (
-                                <SelectItem key={child.id} value={child.id}>
-                                  {child.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div>
-                          <label className="text-sm text-goodchild-text-secondary mb-1 block">
-                            Select Date(s)
-                          </label>
-                          <div className="border rounded-md p-3">
-                            <CalendarComponent
-                              mode="multiple"
-                              selected={selectedDates}
-                              onSelect={(dates) => {
-                                if (dates && dates.length > 0) {
-                                  setSelectedDates(dates);
-                                }
-                              }}
-                              className="rounded-md"
-                              disabled={(date) => date < new Date()}
+                        <Form {...createActivityForm}>
+                          <form onSubmit={createActivityForm.handleSubmit(onCreateActivitySubmit)} className="space-y-6">
+                            <FormField
+                              control={createActivityForm.control}
+                              name="title"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Activity Title</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="E.g., Morning Yoga Routine" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
                             />
-                          </div>
-                          
-                          {selectedDates.length > 0 && (
-                            <div className="mt-2 text-sm text-goodchild-text-secondary">
-                              Selected {selectedDates.length} date(s)
+                            
+                            <FormField
+                              control={createActivityForm.control}
+                              name="description"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Description</FormLabel>
+                                  <FormControl>
+                                    <Textarea 
+                                      placeholder="Describe the activity, its goals, and instructions..." 
+                                      className="min-h-[100px]" 
+                                      {...field} 
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <FormField
+                                control={createActivityForm.control}
+                                name="developmentArea"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Development Area</FormLabel>
+                                    <Select 
+                                      onValueChange={field.onChange} 
+                                      value={field.value}
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select area" />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        {developmentAreas.map((area) => (
+                                          <SelectItem key={area.id} value={area.name}>
+                                            {area.name}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={createActivityForm.control}
+                                name="estimatedTime"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Estimated Time</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="E.g., 15 minutes" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
                             </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                            
+                            <FormField
+                              control={createActivityForm.control}
+                              name="goodCoins"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>GoodCoin Reward</FormLabel>
+                                  <FormControl>
+                                    <div className="flex items-center">
+                                      <GoodCoinIcon className="mr-2 h-5 w-5" />
+                                      <Input 
+                                        type="number" 
+                                        min={1}
+                                        max={100}
+                                        {...field}
+                                      />
+                                    </div>
+                                  </FormControl>
+                                  <FormDescription>
+                                    How many GoodCoins will be rewarded for completing this activity?
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <DialogFooter>
+                              <Button 
+                                type="submit" 
+                                disabled={createActivityMutation.isPending}
+                                className="w-full sm:w-auto"
+                              >
+                                {createActivityMutation.isPending ? (
+                                  "Creating..."
+                                ) : (
+                                  <>
+                                    <Save className="mr-2 h-4 w-4" /> Create Activity
+                                  </>
+                                )}
+                              </Button>
+                            </DialogFooter>
+                          </form>
+                        </Form>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
+              </div>
+              
+              {/* Activities grid */}
+              {filteredActivities.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                  {filteredActivities.map((activity) => {
+                    const areaData = getDevelopmentArea(activity.developmentArea);
+                    
+                    return (
+                      <Card 
+                        key={activity.id} 
+                        className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => handleViewActivity(activity)}
+                      >
+                        <div className={`h-3 ${areaData ? `bg-${areaData.color}-500` : 'bg-gray-500'}`} />
+                        <CardHeader className="pb-2">
+                          <div className="flex justify-between items-start">
+                            <CardTitle className="text-xl">{activity.title}</CardTitle>
+                            <div className={`w-8 h-8 rounded-full ${areaData ? areaData.bgColor : 'bg-gray-100'} flex items-center justify-center`}>
+                              {areaData && areaData.icon}
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-goodchild-text-secondary line-clamp-3 mb-4">
+                            {activity.description}
+                          </p>
+                          
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${areaData ? `bg-${areaData.color}-100 text-${areaData.color}-700` : 'bg-gray-100 text-gray-700'}`}>
+                              {areaData && React.cloneElement(areaData.icon, { size: 12 })}
+                              <span>{activity.developmentArea}</span>
+                            </div>
+                            
+                            <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                              <GoodCoinIcon className="h-3 w-3" />
+                              <span>{activity.goodCoins}</span>
+                            </div>
+                            
+                            {activity.estimatedTime && (
+                              <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                <Clock size={12} />
+                                <span>{activity.estimatedTime}</span>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                        <CardFooter className="pt-0">
+                          <Button 
+                            variant="ghost" 
+                            className="w-full justify-center text-goodchild-blue hover:text-goodchild-blue/80 hover:bg-goodchild-blue/10"
+                          >
+                            View Details
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="mb-4">
+                    <Search className="h-12 w-12 mx-auto text-goodchild-text-secondary opacity-60" />
                   </div>
-                  
-                  <DialogFooter>
-                    <Button variant="outline" onClick={closeActivityDetail}>
-                      Cancel
+                  <h3 className="text-xl font-medium mb-2">No activities found</h3>
+                  <p className="text-goodchild-text-secondary mb-4">
+                    {searchQuery || selectedArea ? 
+                      "Try adjusting your search filters." : 
+                      "No activities are available right now."}
+                  </p>
+                  {profile?.role === 'parent' && (
+                    <Button onClick={() => setShowCreateForm(true)}>
+                      <Plus className="mr-2 h-4 w-4" /> Create an Activity
                     </Button>
-                    <Button onClick={assignActivity} className="btn-primary">
-                      Assign Activity
-                    </Button>
-                  </DialogFooter>
-                </>
+                  )}
+                </div>
               )}
-            </DialogContent>
-          </Dialog>
+            </>
+          )}
         </div>
       </main>
       

@@ -31,43 +31,57 @@ const Index = () => {
       name: "Health & Mind",
       icon: <Brain className="text-blue-500" size={32} />,
       description: "Activities that promote physical health, mental well-being, and cognitive development.",
-      examples: ["Daily exercise routines", "Mindfulness sessions", "Brain teasers and puzzles"]
+      examples: ["Daily exercise routines", "Mindfulness sessions", "Brain teasers and puzzles"],
+      color: "blue",
+      bgColor: "bg-blue-100"
     },
     {
       name: "Effective Communication",
       icon: <MessageSquare className="text-green-500" size={32} />,
       description: "Activities to improve verbal, written, and non-verbal communication skills.",
-      examples: ["Family discussion topics", "Letter writing", "Active listening exercises"]
+      examples: ["Family discussion topics", "Letter writing", "Active listening exercises"],
+      color: "green",
+      bgColor: "bg-green-100"
     },
     {
       name: "Personal Enrichment",
       icon: <User className="text-purple-500" size={32} />,
       description: "Activities focused on personal growth, learning, and developing new skills.",
-      examples: ["Reading challenges", "Skill development tasks", "Educational games"]
+      examples: ["Reading challenges", "Skill development tasks", "Educational games"],
+      color: "purple",
+      bgColor: "bg-purple-100"
     },
     {
       name: "Creativity",
       icon: <Lightbulb className="text-yellow-500" size={32} />,
       description: "Activities that foster creative thinking, artistic expression, and innovation.",
-      examples: ["Art projects", "Creative writing prompts", "DIY crafts"]
+      examples: ["Art projects", "Creative writing prompts", "DIY crafts"],
+      color: "yellow",
+      bgColor: "bg-yellow-100"
     },
     {
       name: "Deeper Family Bonds",
       icon: <Heart className="text-red-500" size={32} />,
       description: "Activities designed to strengthen family relationships and create meaningful memories.",
-      examples: ["Family game nights", "Shared cooking experiences", "Collaborative projects"]
+      examples: ["Family game nights", "Shared cooking experiences", "Collaborative projects"],
+      color: "red", 
+      bgColor: "bg-red-100"
     },
     {
       name: "Emotional Intelligence",
       icon: <Zap className="text-orange-500" size={32} />,
       description: "Activities to help understand, express, and manage emotions effectively.",
-      examples: ["Emotion journaling", "Empathy exercises", "Conflict resolution practice"]
+      examples: ["Emotion journaling", "Empathy exercises", "Conflict resolution practice"],
+      color: "orange",
+      bgColor: "bg-orange-100"
     },
     {
       name: "Social Skills",
       icon: <Users className="text-indigo-500" size={32} />,
       description: "Activities to develop interaction, cooperation, and positive peer relationships.",
-      examples: ["Group activities", "Turn-taking games", "Community service projects"]
+      examples: ["Group activities", "Turn-taking games", "Community service projects"],
+      color: "indigo",
+      bgColor: "bg-indigo-100"
     }
   ];
   
@@ -250,10 +264,22 @@ const Index = () => {
                 className={`development-area-tile ${selectedArea === area.name ? 'active' : ''}`}
                 onClick={() => setSelectedArea(selectedArea === area.name ? null : area.name)}
               >
-                <div className={`development-area-icon bg-${area.name === 'Health & Mind' ? 'blue' : area.name === 'Effective Communication' ? 'green' : area.name === 'Personal Enrichment' ? 'purple' : area.name === 'Creativity' ? 'yellow' : area.name === 'Deeper Family Bonds' ? 'red' : area.name === 'Emotional Intelligence' ? 'orange' : 'indigo'}-100`}>
-                  {area.icon}
+                <div className={`development-area-icon ${area.bgColor} relative w-20 h-20 rounded-2xl shadow-sm`}>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {area.icon}
+                  </div>
+                  {/* Small icon at bottom right */}
+                  <div className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-${area.color}-500 flex items-center justify-center shadow-md border-2 border-white`}>
+                    {area.name === 'Health & Mind' ? <Brain className="text-white" size={16} /> : 
+                     area.name === 'Effective Communication' ? <MessageSquare className="text-white" size={16} /> :
+                     area.name === 'Personal Enrichment' ? <User className="text-white" size={16} /> :
+                     area.name === 'Creativity' ? <Lightbulb className="text-white" size={16} /> :
+                     area.name === 'Deeper Family Bonds' ? <Heart className="text-white" size={16} /> :
+                     area.name === 'Emotional Intelligence' ? <Zap className="text-white" size={16} /> :
+                     <Users className="text-white" size={16} />}
+                  </div>
                 </div>
-                <h3 className="font-medium text-goodchild-text-primary text-center">{area.name}</h3>
+                <h3 className="font-medium text-goodchild-text-primary text-center mt-3">{area.name}</h3>
               </div>
             ))}
           </div>
