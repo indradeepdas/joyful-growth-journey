@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -72,7 +73,12 @@ const ParentDashboard: React.FC = () => {
           if (transactionsError) {
             console.error('Error fetching transactions:', transactionsError);
           } else if (transactionsData) {
-            const formattedTransactions = transactionsData.map(transaction => adaptSupabaseTransaction(transaction));
+            const formattedTransactions = transactionsData.map(transaction => 
+              adaptSupabaseTransaction({
+                ...transaction,
+                type: transaction.type as 'earned' | 'spent' | 'penalty' | 'given'
+              })
+            );
             setTransactions(formattedTransactions);
           }
         }
@@ -125,7 +131,7 @@ const ParentDashboard: React.FC = () => {
           {
             child_id: childId,
             amount: -10,
-            type: 'penalty',
+            type: 'penalty' as 'penalty',
             description: 'Penalty applied',
             created_by: user?.id
           }
@@ -153,7 +159,12 @@ const ParentDashboard: React.FC = () => {
         .limit(5);
         
       if (!transactionsError && transactionsData) {
-        const formattedTransactions = transactionsData.map(transaction => adaptSupabaseTransaction(transaction));
+        const formattedTransactions = transactionsData.map(transaction => 
+          adaptSupabaseTransaction({
+            ...transaction,
+            type: transaction.type as 'earned' | 'spent' | 'penalty' | 'given'
+          })
+        );
         setTransactions(formattedTransactions);
       }
     } catch (error) {
@@ -174,7 +185,7 @@ const ParentDashboard: React.FC = () => {
           {
             child_id: childId,
             amount: 20,
-            type: 'given',
+            type: 'given' as 'given',
             description: 'GoodCoins added by parent',
             created_by: user?.id
           }
@@ -202,7 +213,12 @@ const ParentDashboard: React.FC = () => {
         .limit(5);
         
       if (!transactionsError && transactionsData) {
-        const formattedTransactions = transactionsData.map(transaction => adaptSupabaseTransaction(transaction));
+        const formattedTransactions = transactionsData.map(transaction => 
+          adaptSupabaseTransaction({
+            ...transaction,
+            type: transaction.type as 'earned' | 'spent' | 'penalty' | 'given'
+          })
+        );
         setTransactions(formattedTransactions);
       }
     } catch (error) {
