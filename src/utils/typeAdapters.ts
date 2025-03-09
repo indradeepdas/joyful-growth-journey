@@ -1,16 +1,25 @@
 
 import { SupabaseActivity, SupabaseTransaction, SupabaseReward, SupabaseChild } from "@/services/types";
-import { Activity, Transaction, Reward, Child } from "@/types";
+import { Activity, Transaction, Reward, Child, DevelopmentArea } from "@/types";
 
 /**
  * Converts Supabase Activity format to our app Activity format
  */
 export function adaptSupabaseActivity(activity: SupabaseActivity): Activity {
+  // Map development area to a valid DevelopmentArea type value
+  let developmentArea: DevelopmentArea = "Personal Enrichment";
+  
+  // If we have development_area_id, we could map it to the corresponding area
+  // For now, default to "Personal Enrichment" if we have an ID, otherwise empty string
+  if (!activity.development_area_id) {
+    developmentArea = "Personal Enrichment";
+  }
+  
   return {
     id: activity.id,
     title: activity.title,
     description: activity.description || "",
-    developmentArea: activity.development_area_id ? "Personal Enrichment" : "", // This would need to be fetched from development_areas table
+    developmentArea: developmentArea,
     goodCoins: activity.coin_reward,
     status: activity.completed ? "completed" : "pending",
     childId: activity.assigned_to || "",
@@ -23,11 +32,27 @@ export function adaptSupabaseActivity(activity: SupabaseActivity): Activity {
  * Converts Supabase Transaction format to our app Transaction format
  */
 export function adaptSupabaseTransaction(transaction: SupabaseTransaction): Transaction {
+  // Ensure the transaction type is one of the allowed values
+  let validType: "earned" | "spent" | "penalty" | "given" = "earned";
+  
+  if (transaction.type === "earned" || 
+      transaction.type === "spent" || 
+      transaction.type === "penalty" || 
+      transaction.type === "given") {
+    validType = transaction.type;
+  } else if (transaction.amount < 0) {
+    // If negative amount and type is not recognized, default to "penalty"
+    validType = "penalty";
+  } else {
+    // If positive amount and type is not recognized, default to "earned"
+    validType = "earned";
+  }
+  
   return {
     id: transaction.id,
     childId: transaction.child_id,
     amount: transaction.amount,
-    type: transaction.type,
+    type: validType,
     description: transaction.description || "",
     createdAt: transaction.created_at
   };

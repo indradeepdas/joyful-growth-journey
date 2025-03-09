@@ -142,7 +142,7 @@
   }
   
   .development-area-tile.active {
-    @apply border-goodchild-primary;
+    @apply border-goodchild-blue;
   }
   
   .development-area-icon {
