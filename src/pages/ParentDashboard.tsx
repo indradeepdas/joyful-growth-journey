@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
 import GoodCoinIcon from '@/components/GoodCoinIcon';
 import ChildAccountForm from '@/components/ChildAccountForm';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Child, Activity, Transaction } from '@/types';
-import { 
-  getChildData,
-  getActivitiesForChild,
-  getTransactionsForChild,
-  mockActivities,
-  mockTransactions
-} from '@/services/mockData';
+import { Activity, Transaction } from '@/types';
+import { adaptSupabaseActivity, adaptSupabaseTransaction } from '@/utils/typeAdapters';
 import {
   Users,
   Calendar,
@@ -30,35 +24,65 @@ import {
   MinusCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { SupabaseChild } from '@/services/types';
 
 const ParentDashboard: React.FC = () => {
-  const { user, isAuthenticated, getParentData } = useAuth();
+  const { user, profile, childAccounts, isAuthenticated } = useSupabaseAuth();
   const [showChildForm, setShowChildForm] = useState(false);
-  const [children, setChildren] = useState<Child[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'parent') {
+    if (!isAuthenticated || profile?.role !== 'parent') {
       navigate('/login');
       return;
     }
     
-    const parent = getParentData();
-    if (parent) {
-      setChildren(parent.children);
+    const fetchActivitiesAndTransactions = async () => {
+      if (!user) return;
       
-      // Since we can't get activities and transactions directly from getChildData(),
-      // we'll create some mock data for demonstration purposes
-      const mockChildActivities = mockActivities.slice(0, 5);
-      const mockChildTransactions = mockTransactions.slice(0, 5);
-      
-      setActivities(mockChildActivities);
-      setTransactions(mockChildTransactions);
-    }
-  }, [isAuthenticated, user, navigate, getParentData]);
+      try {
+        const { data: activitiesData, error: activitiesError } = await supabase
+          .from('activities')
+          .select('*')
+          .eq('created_by', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+          
+        if (activitiesError) {
+          console.error('Error fetching activities:', activitiesError);
+        } else if (activitiesData) {
+          const formattedActivities = activitiesData.map(activity => adaptSupabaseActivity(activity));
+          setActivities(formattedActivities);
+        }
+        
+        if (childAccounts && childAccounts.length > 0) {
+          const childIds = childAccounts.map(child => child.id);
+          
+          const { data: transactionsData, error: transactionsError } = await supabase
+            .from('transactions')
+            .select('*')
+            .in('child_id', childIds)
+            .order('created_at', { ascending: false })
+            .limit(5);
+            
+          if (transactionsError) {
+            console.error('Error fetching transactions:', transactionsError);
+          } else if (transactionsData) {
+            const formattedTransactions = transactionsData.map(transaction => adaptSupabaseTransaction(transaction));
+            setTransactions(formattedTransactions);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    
+    fetchActivitiesAndTransactions();
+  }, [isAuthenticated, user, profile, childAccounts, navigate]);
 
   const getAreaIcon = (area: string) => {
     switch (area) {
@@ -93,24 +117,106 @@ const ParentDashboard: React.FC = () => {
     }
   };
 
-  const handleAddPenalty = (childId: string) => {
-    // In a real app, this would open a form or modal
-    toast({
-      title: "Penalty Applied",
-      description: "A penalty of 10 GoodCoins has been applied.",
-    });
+  const handleAddPenalty = async (childId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert([
+          {
+            child_id: childId,
+            amount: -10,
+            type: 'penalty',
+            description: 'Penalty applied',
+            created_by: user?.id
+          }
+        ]);
+        
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to apply penalty: " + error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Penalty Applied",
+        description: "A penalty of 10 GoodCoins has been applied.",
+      });
+      
+      const { data: transactionsData, error: transactionsError } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('child_id', childId)
+        .order('created_at', { ascending: false })
+        .limit(5);
+        
+      if (!transactionsError && transactionsData) {
+        const formattedTransactions = transactionsData.map(transaction => adaptSupabaseTransaction(transaction));
+        setTransactions(formattedTransactions);
+      }
+    } catch (error) {
+      console.error('Error applying penalty:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleAddGoodCoin = (childId: string) => {
-    // In a real app, this would open a form or modal
-    toast({
-      title: "GoodCoins Added",
-      description: "20 GoodCoins have been added to the child's balance.",
-    });
+  const handleAddGoodCoin = async (childId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert([
+          {
+            child_id: childId,
+            amount: 20,
+            type: 'given',
+            description: 'GoodCoins added by parent',
+            created_by: user?.id
+          }
+        ]);
+        
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to add GoodCoins: " + error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "GoodCoins Added",
+        description: "20 GoodCoins have been added to the child's balance.",
+      });
+      
+      const { data: transactionsData, error: transactionsError } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('child_id', childId)
+        .order('created_at', { ascending: false })
+        .limit(5);
+        
+      if (!transactionsError && transactionsData) {
+        const formattedTransactions = transactionsData.map(transaction => adaptSupabaseTransaction(transaction));
+        setTransactions(formattedTransactions);
+      }
+    } catch (error) {
+      console.error('Error adding GoodCoins:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-goodchild-background">
+    <div className="min-h-screen flex flex-col bg-goodchild-background font-sassoon">
       <Navbar />
       
       <main className="flex-grow px-6 py-10">
@@ -134,7 +240,6 @@ const ParentDashboard: React.FC = () => {
             </button>
           </header>
           
-          {/* Children's Progress Overview Section */}
           <section className="mb-10">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-goodchild-text-primary flex items-center gap-2">
@@ -147,7 +252,7 @@ const ParentDashboard: React.FC = () => {
               </button>
             </div>
             
-            {children.length === 0 ? (
+            {childAccounts.length === 0 ? (
               <div className="bg-white rounded-xl shadow-soft p-8 text-center">
                 <p className="text-goodchild-text-secondary mb-4">
                   You haven't added any children yet.
@@ -162,7 +267,7 @@ const ParentDashboard: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {children.map((child) => (
+                {childAccounts.map((child) => (
                   <div key={child.id} className="bg-white rounded-xl shadow-soft overflow-hidden">
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-4">
@@ -176,7 +281,10 @@ const ParentDashboard: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex items-center">
-                          <GoodCoinIcon value={child.goodCoins} />
+                          <div className="good-coin">
+                            <GoodCoinIcon className="w-5 h-5" />
+                            <span>{child.good_coins}</span>
+                          </div>
                         </div>
                       </div>
                       
@@ -225,14 +333,16 @@ const ParentDashboard: React.FC = () => {
             )}
           </section>
           
-          {/* Activity Management Summary */}
           <section className="mb-10">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-goodchild-text-primary flex items-center gap-2">
                 <Calendar size={24} />
                 <span>Activity Management</span>
               </h2>
-              <button className="text-goodchild-blue hover:underline inline-flex items-center gap-1 text-sm">
+              <button 
+                onClick={() => navigate('/activities')}
+                className="text-goodchild-blue hover:underline inline-flex items-center gap-1 text-sm"
+              >
                 <span>Manage Activities</span>
                 <ArrowRight size={16} />
               </button>
@@ -240,7 +350,10 @@ const ParentDashboard: React.FC = () => {
             
             <div className="bg-white rounded-xl shadow-soft p-6">
               <div className="flex justify-end mb-4">
-                <button className="btn-outline text-sm px-4 py-2 inline-flex items-center gap-1">
+                <button 
+                  onClick={() => navigate('/activities')}
+                  className="btn-outline text-sm px-4 py-2 inline-flex items-center gap-1"
+                >
                   <Plus size={16} />
                   <span>Create Activity</span>
                 </button>
@@ -256,7 +369,7 @@ const ParentDashboard: React.FC = () => {
               ) : (
                 <div className="space-y-4">
                   {activities.map((activity) => {
-                    const childName = children.find(c => c.id === activity.childId)?.name || 'Unknown Child';
+                    const childName = childAccounts.find(c => c.id === activity.childId)?.name || 'Unknown Child';
                     return (
                       <div key={activity.id} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
                         <div className="flex items-center gap-3">
@@ -269,7 +382,10 @@ const ParentDashboard: React.FC = () => {
                               <span className="text-goodchild-text-secondary">Assigned to:</span>
                               <span className="font-medium">{childName}</span>
                               <span className="text-goodchild-blue">
-                                <GoodCoinIcon size="sm" value={activity.goodCoins} />
+                                <div className="good-coin text-sm">
+                                  <GoodCoinIcon className="w-4 h-4" />
+                                  <span>{activity.goodCoins}</span>
+                                </div>
                               </span>
                             </div>
                           </div>
@@ -294,7 +410,6 @@ const ParentDashboard: React.FC = () => {
             </div>
           </section>
           
-          {/* GoodCoin Management Overview */}
           <section className="mb-10">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-goodchild-text-primary flex items-center gap-2">
@@ -308,7 +423,6 @@ const ParentDashboard: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Recent Transactions */}
               <div className="bg-white rounded-xl shadow-soft p-6">
                 <h3 className="font-semibold text-goodchild-text-primary mb-4 flex items-center gap-2">
                   <Award size={20} />
@@ -325,7 +439,7 @@ const ParentDashboard: React.FC = () => {
                 ) : (
                   <div className="space-y-3">
                     {transactions.map((transaction) => {
-                      const childName = children.find(c => c.id === transaction.childId)?.name || 'Unknown Child';
+                      const childName = childAccounts.find(c => c.id === transaction.childId)?.name || 'Unknown Child';
                       return (
                         <div key={transaction.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg">
                           <div>
@@ -338,7 +452,7 @@ const ParentDashboard: React.FC = () => {
                           </div>
                           <div className={`font-bold ${getTransactionColor(transaction.type)}`}>
                             {getTransactionPrefix(transaction.type)}{transaction.amount}
-                            <GoodCoinIcon size="sm" className="ml-1" />
+                            <GoodCoinIcon className="ml-1 w-4 h-4 inline-block" />
                           </div>
                         </div>
                       );
@@ -347,14 +461,13 @@ const ParentDashboard: React.FC = () => {
                 )}
               </div>
               
-              {/* Penalties Section */}
               <div className="bg-white rounded-xl shadow-soft p-6">
                 <h3 className="font-semibold text-goodchild-text-primary mb-4 flex items-center gap-2">
                   <MinusCircle size={20} />
                   <span>Apply Penalties</span>
                 </h3>
                 
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
                   <div>
                     <label htmlFor="childSelect" className="block text-sm font-medium text-goodchild-text-secondary mb-1">
                       Select Child
@@ -364,7 +477,7 @@ const ParentDashboard: React.FC = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-goodchild-blue focus:border-transparent transition-all"
                     >
                       <option value="">Select a child</option>
-                      {children.map((child) => (
+                      {childAccounts.map((child) => (
                         <option key={child.id} value={child.id}>
                           {child.name} {child.surname}
                         </option>
@@ -401,6 +514,18 @@ const ParentDashboard: React.FC = () => {
                     <button
                       type="button"
                       className="bg-goodchild-red text-white px-4 py-2 rounded-lg hover:bg-goodchild-red/90 transition-colors"
+                      onClick={() => {
+                        const childSelect = document.getElementById('childSelect') as HTMLSelectElement;
+                        if (childSelect && childSelect.value) {
+                          handleAddPenalty(childSelect.value);
+                        } else {
+                          toast({
+                            title: "Error",
+                            description: "Please select a child",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
                     >
                       Apply Penalty
                     </button>
@@ -414,7 +539,6 @@ const ParentDashboard: React.FC = () => {
       
       <Footer />
       
-      {/* Child Account Creation Modal */}
       {showChildForm && <ChildAccountForm onClose={() => setShowChildForm(false)} />}
     </div>
   );

@@ -4,6 +4,7 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/sassoon-infant');
 
 @layer base {
   :root {
@@ -85,11 +86,11 @@
 
   body {
     @apply bg-goodchild-background text-goodchild-text-primary antialiased;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Sassoon Infant', 'Poppins', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Quicksand', sans-serif;
+    font-family: 'Sassoon Infant', 'Quicksand', sans-serif;
     @apply font-bold leading-tight;
   }
 
@@ -130,6 +131,27 @@
       hover:bg-goodchild-blue/10 transition-all duration-300 focus:outline-none focus:ring-2 
       focus:ring-goodchild-blue/50 active:scale-[0.98];
   }
+  
+  .font-sassoon {
+    font-family: 'Sassoon Infant', 'Poppins', sans-serif;
+  }
+  
+  .development-area-tile {
+    @apply flex flex-col items-center justify-center p-6 bg-white rounded-2xl shadow-soft hover:shadow-md transition-all cursor-pointer border-2 border-transparent;
+    aspect-ratio: 1/1;
+  }
+  
+  .development-area-tile.active {
+    @apply border-goodchild-primary;
+  }
+  
+  .development-area-icon {
+    @apply w-12 h-12 p-2 rounded-full flex items-center justify-center mb-2;
+  }
+  
+  .testimonial-card {
+    @apply bg-white/90 p-6 rounded-xl shadow-soft border border-white/30;
+  }
 }
 
 @layer utilities {
@@ -143,5 +165,9 @@
   
   .text-gradient {
     @apply bg-gradient-to-r from-goodchild-blue to-goodchild-green bg-clip-text text-transparent;
+  }
+  
+  .hover-lift {
+    @apply transition-transform hover:-translate-y-1;
   }
 }

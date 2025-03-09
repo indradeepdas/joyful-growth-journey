@@ -1,13 +1,14 @@
 
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss"
+import { fontFamily } from "tailwindcss/defaultTheme"
 
-export default {
+const config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
   prefix: "",
   theme: {
@@ -54,31 +55,41 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
+          background: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
+          border: "hsl(var(--sidebar-border))",
           primary: "hsl(var(--sidebar-primary))",
           "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
           accent: "hsl(var(--sidebar-accent))",
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
         },
         goodchild: {
-          yellow: "#FFD166",
-          blue: "#118AB2",
-          green: "#06D6A0",
-          red: "#EF476F",
-          purple: "#8A63D2",
-          background: "#F8F9FA",
-          "background-alt": "#EFF1F3",
-          "text-primary": "#073B4C",
-          "text-secondary": "#495057",
-        },
+          background: "#f9f9fa", // Light background
+          "background-alt": "#f0f3f8", // Alternate background
+          "background-dark": "#1a2236", // Dark background for footer etc.
+          "text-primary": "#2d3748", // Primary text color
+          "text-secondary": "#718096", // Secondary/muted text
+          blue: "#33a6b8", // Primary blue
+          yellow: "#FFD166", // Accent yellow
+          green: "#06D6A0", // Success green
+          red: "#EF476F", // Error/alert red
+          purple: "#8B5CF6", // Highlight purple
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      fontFamily: {
+        sans: ["var(--font-sans)", ...fontFamily.sans],
+        sassoon: ['Sassoon Infant', ...fontFamily.sans],
+      },
+      boxShadow: {
+        'soft': '0 4px 20px rgba(0, 0, 0, 0.05)',
+        'medium': '0 4px 25px rgba(0, 0, 0, 0.1)',
+        'glow-yellow': '0 0 15px rgba(255, 209, 102, 0.6)',
+        'glow-blue': '0 0 15px rgba(51, 166, 184, 0.6)',
       },
       keyframes: {
         "accordion-down": {
@@ -93,9 +104,13 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
-        "pulse-gentle": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.8" },
+        "coin-spin": {
+          "0%": { transform: "rotateY(0deg)" },
+          "100%": { transform: "rotateY(360deg)" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
         "slide-up": {
           "0%": { transform: "translateY(20px)", opacity: "0" },
@@ -105,37 +120,24 @@ export default {
           "0%": { transform: "translateY(-20px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
-        "slide-in-right": {
-          "0%": { transform: "translateX(20px)", opacity: "0" },
-          "100%": { transform: "translateX(0)", opacity: "1" },
-        },
-        "fade-in": {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
-        },
-        "coin-spin": {
-          "0%": { transform: "rotateY(0deg)" },
-          "100%": { transform: "rotateY(360deg)" },
+        "pulse-gentle": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.7" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 6s ease-in-out infinite",
-        "pulse-gentle": "pulse-gentle 3s ease-in-out infinite",
-        "slide-up": "slide-up 0.6s ease-out",
-        "slide-down": "slide-down 0.6s ease-out",
-        "slide-in-right": "slide-in-right 0.6s ease-out",
-        "fade-in": "fade-in 0.8s ease-out",
-        "coin-spin": "coin-spin 1.2s ease-out",
-      },
-      boxShadow: {
-        'soft': '0 10px 25px -5px rgba(0, 0, 0, 0.05)',
-        'medium': '0 10px 30px -5px rgba(0, 0, 0, 0.1)',
-        'glow': '0 0 20px rgba(6, 214, 160, 0.2)',
-        'glow-yellow': '0 0 20px rgba(255, 209, 102, 0.3)',
+        "coin-spin": "coin-spin 1s ease-in-out infinite",
+        "fade-in": "fade-in 0.5s ease-out",
+        "slide-up": "slide-up 0.5s ease-out",
+        "slide-down": "slide-down 0.5s ease-out",
+        "pulse-gentle": "pulse-gentle 2s ease-in-out infinite",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+} satisfies Config
+
+export default config
