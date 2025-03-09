@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import Footer from '@/components/Footer';
 import LandingHeader from '@/components/landing/LandingHeader';
@@ -7,13 +8,9 @@ import ActivityCenterShowcase from '@/components/landing/ActivityCenterShowcase'
 import RewardsHubShowcase from '@/components/landing/RewardsHubShowcase';
 import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import { useNavigate } from 'react-router-dom';
-import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
-import Card from '@/components/ui/Card';
-import CardHeader from '@/components/ui/CardHeader';
-import CardTitle from '@/components/ui/CardTitle';
-import CardContent from '@/components/ui/CardContent';
-import CardFooter from '@/components/ui/CardFooter';
-import Button from '@/components/ui/Button';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
 
 const Index: React.FC = () => {
   const navigate = useNavigate();

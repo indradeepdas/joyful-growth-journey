@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -44,7 +45,7 @@ function App() {
               <Route path="/public/rewards" element={<PublicRewardsHub />} />
               
               {/* Protected routes */}
-              <Route element={<PrivateRoute />}>
+              <Route element={<PrivateRoute allowedRoles={['parent', 'child']} />}>
                 <Route path="/parent-dashboard" element={<ParentDashboard />} />
                 <Route path="/child-dashboard" element={<ChildDashboard />} />
                 <Route path="/activities" element={<ActivityCenter />} />

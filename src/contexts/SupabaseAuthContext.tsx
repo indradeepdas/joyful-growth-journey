@@ -1,8 +1,10 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 import { User } from '@/types';
 import { SupabaseProfile, SupabaseChild } from '@/services/types';
+import { toast } from '@/hooks/use-toast';
 
 // Add the new types for creating a child account
 type CreateChildAccountParams = {
@@ -55,8 +57,14 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
 
-      setUser(session?.user || null);
       if (session?.user) {
+        // Convert Supabase user to our User type
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          role: 'parent', // Default, will be overridden by profile data
+          createdAt: new Date().toISOString(), // Default, will be overridden by profile data
+        });
         fetchProfile(session.user.id);
         fetchChildAccounts();
       } else {
@@ -67,11 +75,18 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     getSession();
 
     supabase.auth.onAuthStateChange(async (_event, session: Session | null) => {
-      setUser(session?.user || null);
       if (session?.user) {
+        // Convert Supabase user to our User type
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          role: 'parent', // Default, will be overridden by profile data
+          createdAt: new Date().toISOString(), // Default, will be overridden by profile data
+        });
         fetchProfile(session.user.id);
         fetchChildAccounts();
       } else {
+        setUser(null);
         setProfile(null);
         setChildAccounts([]);
         setIsLoading(false);
@@ -99,6 +114,15 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         created_at: profileData.created_at,
         updated_at: profileData.updated_at,
       });
+
+      // Update the user with correct role
+      if (user) {
+        setUser({
+          ...user,
+          role: profileData.role as 'parent' | 'child',
+          createdAt: profileData.created_at,
+        });
+      }
     } catch (error) {
       console.error("Error fetching profile:", error);
     } finally {
