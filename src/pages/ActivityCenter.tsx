@@ -1,91 +1,30 @@
+
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Calendar } from '@/components/ui/calendar';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import GoodCoinIcon from '@/components/GoodCoinIcon';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { Plus } from 'lucide-react';
+import { Dialog } from '@/components/ui/dialog';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { Calendar as CalendarIcon, Search, Clock, Tag, ChevronLeft, Plus, Save, Calendar as CalendarComponent, AlertCircle, CheckCircle, Brain, MessageSquare, User, Lightbulb, Heart, Zap, Users } from 'lucide-react';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Activity, DevelopmentArea } from '@/types';
-import { SupabaseActivity, SupabaseChild, SupabaseDevelopmentArea } from '@/services/types';
+import { Activity } from '@/types';
+import { SupabaseActivity, SupabaseChild } from '@/services/types';
 import { adaptSupabaseActivity } from '@/utils/typeAdapters';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
-// Development areas with icons and colors
-const developmentAreas = [
-  {
-    id: 'health-mind',
-    name: 'Health & Mind' as DevelopmentArea,
-    icon: <Brain className="text-blue-500" />,
-    description: "Activities that promote physical health, mental well-being, and cognitive development.",
-    color: 'blue',
-    bgColor: 'bg-blue-100'
-  },
-  {
-    id: 'communication',
-    name: 'Effective Communication' as DevelopmentArea,
-    icon: <MessageSquare className="text-green-500" />,
-    description: "Activities to improve verbal, written, and non-verbal communication skills.",
-    color: 'green',
-    bgColor: 'bg-green-100'
-  },
-  {
-    id: 'enrichment',
-    name: 'Personal Enrichment' as DevelopmentArea,
-    icon: <User className="text-purple-500" />,
-    description: "Activities focused on personal growth, learning, and developing new skills.",
-    color: 'purple',
-    bgColor: 'bg-purple-100'
-  },
-  {
-    id: 'creativity',
-    name: 'Creativity' as DevelopmentArea,
-    icon: <Lightbulb className="text-yellow-500" />,
-    description: "Activities that foster creative thinking, artistic expression, and innovation.",
-    color: 'yellow',
-    bgColor: 'bg-yellow-100'
-  },
-  {
-    id: 'family',
-    name: 'Deeper Family Bonds' as DevelopmentArea,
-    icon: <Heart className="text-red-500" />,
-    description: "Activities designed to strengthen family relationships and create meaningful memories.",
-    color: 'red',
-    bgColor: 'bg-red-100'
-  },
-  {
-    id: 'emotional',
-    name: 'Emotional Intelligence' as DevelopmentArea,
-    icon: <Zap className="text-orange-500" />,
-    description: "Activities to help understand, express, and manage emotions effectively.",
-    color: 'orange',
-    bgColor: 'bg-orange-100'
-  },
-  {
-    id: 'social',
-    name: 'Social Skills' as DevelopmentArea,
-    icon: <Users className="text-indigo-500" />,
-    description: "Activities to develop interaction, cooperation, and positive peer relationships.",
-    color: 'indigo',
-    bgColor: 'bg-indigo-100'
-  }
-];
+// Import components
+import { 
+  ActivityFilters, 
+  ActivityList, 
+  ActivityDetail, 
+  ActivityCreateForm, 
+  developmentAreas 
+} from '@/components/activity-center';
 
 // Schema for activity creation form
 const activityFormSchema = z.object({
@@ -194,18 +133,13 @@ const ActivityCenter: React.FC = () => {
   };
   
   // Query to fetch development areas
-  const fetchDevelopmentAreas = async (): Promise<SupabaseDevelopmentArea[]> => {
+  const fetchDevelopmentAreas = async () => {
     const { data, error } = await supabase
       .from('development_areas')
       .select('*');
       
     if (error) throw error;
-    
-    // Cast the data to the correct type
-    return (data || []).map(area => ({
-      ...area,
-      name: area.name as DevelopmentArea
-    }));
+    return data || [];
   };
   
   // Queries
@@ -274,7 +208,7 @@ const ActivityCenter: React.FC = () => {
   
   // Mutation to assign an activity
   const assignActivityMutation = useMutation({
-    mutationFn: async (data: { activityId: string, childId: string, dates: Date[] }) => {
+    mutationFn: async (data: { childId: string, dates: Date[] }) => {
       if (!selectedActivity) throw new Error("No activity selected");
       
       // For each selected date, create an assigned activity
@@ -333,7 +267,6 @@ const ActivityCenter: React.FC = () => {
     if (!selectedActivity) return;
     
     assignActivityMutation.mutate({
-      activityId: selectedActivity.id,
       childId: data.childId,
       dates: data.dates,
     });
@@ -374,11 +307,6 @@ const ActivityCenter: React.FC = () => {
       childId: '',
       dates: [],
     });
-  };
-  
-  // Function to get the development area object
-  const getDevelopmentArea = (name: DevelopmentArea) => {
-    return developmentAreas.find(area => area.name === name) || developmentAreas[0];
   };
   
   // Back to activity list
@@ -422,453 +350,50 @@ const ActivityCenter: React.FC = () => {
             </p>
           </div>
           
-          {showDetail ? (
+          {showDetail && selectedActivity ? (
             /* Detailed activity view with assignment */
-            <div className="glass-card p-6 rounded-xl animate-fade-in">
-              <Button 
-                variant="ghost" 
-                className="mb-4 flex items-center gap-2" 
-                onClick={handleBackToList}
-              >
-                <ChevronLeft size={16} /> Back to Activities
-              </Button>
-              
-              {selectedActivity && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-4 text-goodchild-text-primary">{selectedActivity.title}</h2>
-                    
-                    <div className="flex flex-wrap gap-3 mb-6">
-                      {/* Development area tag */}
-                      <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-${getDevelopmentArea(selectedActivity.developmentArea).color}-100 text-${getDevelopmentArea(selectedActivity.developmentArea).color}-700`}>
-                        {getDevelopmentArea(selectedActivity.developmentArea).icon}
-                        <span>{selectedActivity.developmentArea}</span>
-                      </div>
-                      
-                      {/* GoodCoin reward */}
-                      <div className="flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
-                        <GoodCoinIcon className="h-4 w-4" />
-                        <span>{selectedActivity.goodCoins} GoodCoins</span>
-                      </div>
-                      
-                      {/* Estimated time if available */}
-                      {selectedActivity.estimatedTime && (
-                        <div className="flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
-                          <Clock size={14} />
-                          <span>{selectedActivity.estimatedTime}</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="mb-8">
-                      <h3 className="text-lg font-semibold mb-2">Description</h3>
-                      <p className="text-goodchild-text-primary">{selectedActivity.description}</p>
-                    </div>
-                    
-                    {/* Sample image - in a real app, this would come from the activity data */}
-                    <div className="mb-6 rounded-lg overflow-hidden border border-gray-200">
-                      <img 
-                        src={`https://placehold.co/800x400/${getDevelopmentArea(selectedActivity.developmentArea).color.slice(0, 6)}/FFFFFF?text=${selectedActivity.title}`} 
-                        alt={selectedActivity.title} 
-                        className="w-full h-auto"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="glass-card p-6 rounded-xl">
-                      <h3 className="text-xl font-bold mb-4">Assign Activity to Child</h3>
-                      
-                      {profile?.role === 'parent' ? (
-                        <Form {...assignActivityForm}>
-                          <form onSubmit={assignActivityForm.handleSubmit(onAssignActivitySubmit)} className="space-y-6">
-                            <FormField
-                              control={assignActivityForm.control}
-                              name="childId"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Select Child</FormLabel>
-                                  <Select 
-                                    onValueChange={field.onChange} 
-                                    value={field.value}
-                                  >
-                                    <FormControl>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Select a child" />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      {children.length > 0 ? (
-                                        children.map((child) => (
-                                          <SelectItem key={child.id} value={child.id}>
-                                            {child.name} {child.surname}
-                                          </SelectItem>
-                                        ))
-                                      ) : (
-                                        <SelectItem value="no-children" disabled>
-                                          No children found
-                                        </SelectItem>
-                                      )}
-                                    </SelectContent>
-                                  </Select>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <FormField
-                              control={assignActivityForm.control}
-                              name="dates"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                  <FormLabel>Select Dates</FormLabel>
-                                  <Popover>
-                                    <PopoverTrigger asChild>
-                                      <FormControl>
-                                        <Button
-                                          variant="outline"
-                                          className={cn(
-                                            "w-full pl-3 text-left font-normal",
-                                            !field.value.length && "text-muted-foreground"
-                                          )}
-                                        >
-                                          {field.value.length > 0 ? (
-                                            field.value.length === 1 
-                                              ? format(field.value[0], "PPP") 
-                                              : `${field.value.length} dates selected`
-                                          ) : (
-                                            <span>Select dates</span>
-                                          )}
-                                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                        </Button>
-                                      </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                      <Calendar
-                                        mode="multiple"
-                                        selected={field.value}
-                                        onSelect={field.onChange}
-                                        initialFocus
-                                      />
-                                    </PopoverContent>
-                                  </Popover>
-                                  <FormDescription>
-                                    You can select multiple dates to schedule this activity.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <Button 
-                              type="submit" 
-                              className="w-full" 
-                              disabled={assignActivityMutation.isPending}
-                            >
-                              {assignActivityMutation.isPending ? "Assigning..." : "Assign Activity"}
-                            </Button>
-                          </form>
-                        </Form>
-                      ) : (
-                        <div className="text-center py-6">
-                          <AlertCircle className="h-12 w-12 mx-auto text-goodchild-yellow mb-3" />
-                          <h4 className="text-lg font-semibold mb-2">Parent Account Required</h4>
-                          <p className="text-goodchild-text-secondary mb-4">
-                            Only parent accounts can assign activities to children.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <ActivityDetail
+              activity={selectedActivity}
+              onBack={handleBackToList}
+              children={children}
+              assignForm={assignActivityForm}
+              onAssignActivity={onAssignActivitySubmit}
+              isParent={profile?.role === 'parent'}
+              isAssigning={assignActivityMutation.isPending}
+            />
           ) : (
             /* Activity list view */
             <>
-              {/* Development areas filter tiles */}
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-goodchild-text-primary">Development Areas</h2>
-                  {selectedArea && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={handleClearFilters}
-                      className="text-sm"
-                    >
-                      Clear Filters
-                    </Button>
-                  )}
-                </div>
-                
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-                  {developmentAreas.map((area) => (
-                    <div 
-                      key={area.id} 
-                      className={`development-area-tile ${selectedArea === area.name ? 'active' : ''}`}
-                      onClick={() => setSelectedArea(selectedArea === area.name ? null : area.name)}
-                    >
-                      <div className={`development-area-icon ${area.bgColor} relative w-16 h-16 rounded-2xl shadow-sm`}>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          {area.icon}
-                        </div>
-                        {/* Small icon at bottom right */}
-                        <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-${area.color}-500 flex items-center justify-center shadow-md border-2 border-white`}>
-                          {area.icon && React.cloneElement(area.icon, { size: 12, className: "text-white" })}
-                        </div>
-                      </div>
-                      <h3 className="font-medium text-center mt-2 text-sm">{area.name}</h3>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <ActivityFilters
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                selectedArea={selectedArea}
+                setSelectedArea={setSelectedArea}
+                handleClearFilters={handleClearFilters}
+                showCreateForm={showCreateForm}
+                setShowCreateForm={setShowCreateForm}
+                isParent={profile?.role === 'parent'}
+              />
               
-              {/* Search & sort bar */}
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Input
-                    type="text"
-                    placeholder="Search activities..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-goodchild-text-secondary h-4 w-4" />
-                </div>
-                
-                <div className="flex gap-4">
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="title">Sort by Title</SelectItem>
-                      <SelectItem value="coins">Sort by Reward</SelectItem>
-                      <SelectItem value="area">Sort by Area</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  {profile?.role === 'parent' && (
-                    <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-                      <DialogTrigger asChild>
-                        <Button className="whitespace-nowrap">
-                          <Plus className="mr-2 h-4 w-4" /> Create Activity
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[550px]">
-                        <DialogHeader>
-                          <DialogTitle>Create New Activity</DialogTitle>
-                          <DialogDescription>
-                            Design a custom activity for your children. Fill out the details below.
-                          </DialogDescription>
-                        </DialogHeader>
-                        
-                        <Form {...createActivityForm}>
-                          <form onSubmit={createActivityForm.handleSubmit(onCreateActivitySubmit)} className="space-y-6">
-                            <FormField
-                              control={createActivityForm.control}
-                              name="title"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Activity Title</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder="E.g., Morning Yoga Routine" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <FormField
-                              control={createActivityForm.control}
-                              name="description"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Description</FormLabel>
-                                  <FormControl>
-                                    <Textarea 
-                                      placeholder="Describe the activity, its goals, and instructions..." 
-                                      className="min-h-[100px]" 
-                                      {...field} 
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <FormField
-                                control={createActivityForm.control}
-                                name="developmentArea"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Development Area</FormLabel>
-                                    <Select 
-                                      onValueChange={field.onChange} 
-                                      value={field.value}
-                                    >
-                                      <FormControl>
-                                        <SelectTrigger>
-                                          <SelectValue placeholder="Select area" />
-                                        </SelectTrigger>
-                                      </FormControl>
-                                      <SelectContent>
-                                        {developmentAreas.map((area) => (
-                                          <SelectItem key={area.id} value={area.name}>
-                                            {area.name}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              
-                              <FormField
-                                control={createActivityForm.control}
-                                name="estimatedTime"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Estimated Time</FormLabel>
-                                    <FormControl>
-                                      <Input placeholder="E.g., 15 minutes" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                            </div>
-                            
-                            <FormField
-                              control={createActivityForm.control}
-                              name="goodCoins"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>GoodCoin Reward</FormLabel>
-                                  <FormControl>
-                                    <div className="flex items-center">
-                                      <GoodCoinIcon className="mr-2 h-5 w-5" />
-                                      <Input 
-                                        type="number" 
-                                        min={1}
-                                        max={100}
-                                        {...field}
-                                      />
-                                    </div>
-                                  </FormControl>
-                                  <FormDescription>
-                                    How many GoodCoins will be rewarded for completing this activity?
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <DialogFooter>
-                              <Button 
-                                type="submit" 
-                                disabled={createActivityMutation.isPending}
-                                className="w-full sm:w-auto"
-                              >
-                                {createActivityMutation.isPending ? (
-                                  "Creating..."
-                                ) : (
-                                  <>
-                                    <Save className="mr-2 h-4 w-4" /> Create Activity
-                                  </>
-                                )}
-                              </Button>
-                            </DialogFooter>
-                          </form>
-                        </Form>
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </div>
-              </div>
-              
-              {/* Activities grid */}
-              {filteredActivities.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                  {filteredActivities.map((activity) => {
-                    const areaData = getDevelopmentArea(activity.developmentArea);
-                    
-                    return (
-                      <Card 
-                        key={activity.id} 
-                        className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                        onClick={() => handleViewActivity(activity)}
-                      >
-                        <div className={`h-3 ${areaData ? `bg-${areaData.color}-500` : 'bg-gray-500'}`} />
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-start">
-                            <CardTitle className="text-xl">{activity.title}</CardTitle>
-                            <div className={`w-8 h-8 rounded-full ${areaData ? areaData.bgColor : 'bg-gray-100'} flex items-center justify-center`}>
-                              {areaData && areaData.icon}
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-goodchild-text-secondary line-clamp-3 mb-4">
-                            {activity.description}
-                          </p>
-                          
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${areaData ? `bg-${areaData.color}-100 text-${areaData.color}-700` : 'bg-gray-100 text-gray-700'}`}>
-                              {areaData && React.cloneElement(areaData.icon, { size: 12 })}
-                              <span>{activity.developmentArea}</span>
-                            </div>
-                            
-                            <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
-                              <GoodCoinIcon className="h-3 w-3" />
-                              <span>{activity.goodCoins}</span>
-                            </div>
-                            
-                            {activity.estimatedTime && (
-                              <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                                <Clock size={12} />
-                                <span>{activity.estimatedTime}</span>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                        <CardFooter className="pt-0">
-                          <Button 
-                            variant="ghost" 
-                            className="w-full justify-center text-goodchild-blue hover:text-goodchild-blue/80 hover:bg-goodchild-blue/10"
-                          >
-                            View Details
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="mb-4">
-                    <Search className="h-12 w-12 mx-auto text-goodchild-text-secondary opacity-60" />
-                  </div>
-                  <h3 className="text-xl font-medium mb-2">No activities found</h3>
-                  <p className="text-goodchild-text-secondary mb-4">
-                    {searchQuery || selectedArea ? 
-                      "Try adjusting your search filters." : 
-                      "No activities are available right now."}
-                  </p>
-                  {profile?.role === 'parent' && (
-                    <Button onClick={() => setShowCreateForm(true)}>
-                      <Plus className="mr-2 h-4 w-4" /> Create an Activity
-                    </Button>
-                  )}
-                </div>
-              )}
+              <ActivityList 
+                activities={filteredActivities}
+                onViewActivity={handleViewActivity}
+              />
             </>
           )}
         </div>
       </main>
+      
+      {/* Create activity dialog */}
+      <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
+        <ActivityCreateForm
+          form={createActivityForm}
+          onSubmit={onCreateActivitySubmit}
+          isCreating={createActivityMutation.isPending}
+        />
+      </Dialog>
       
       <Footer />
     </div>
