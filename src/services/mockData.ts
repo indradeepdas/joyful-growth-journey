@@ -1,7 +1,7 @@
 
 // Re-export everything from the individual service files for backward compatibility
 
-export { ChildData, Activity, Transaction } from './types';
+export type { ChildData, Activity, Transaction } from './types';
 export { 
   mockChildren, 
   getChildData, 
@@ -20,8 +20,8 @@ export {
   getRecentTransactions 
 } from './transactionsService';
 
+export type { Reward } from './rewardsService';
 export { 
-  Reward, 
   mockRewards, 
   getRewards, 
   getRewardById, 

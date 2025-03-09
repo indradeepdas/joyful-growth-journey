@@ -28,7 +28,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: SupabaseProfile | null;
-  children: SupabaseChild[];
+  childAccounts: SupabaseChild[];
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (data: LoginData) => Promise<void>;
@@ -46,7 +46,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<SupabaseProfile | null>(null);
-  const [children, setChildren] = useState<SupabaseChild[]>([]);
+  const [childAccounts, setChildAccounts] = useState<SupabaseChild[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -78,7 +78,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
           // If user is a parent, fetch their children
           if (profile && profile.role === 'parent') {
             const children = await getChildren();
-            setChildren(children);
+            setChildAccounts(children);
           }
         }
       } catch (error) {
@@ -106,11 +106,11 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
           // If user is a parent, fetch their children
           if (profile && profile.role === 'parent') {
             const children = await getChildren();
-            setChildren(children);
+            setChildAccounts(children);
           }
         } else {
           setProfile(null);
-          setChildren([]);
+          setChildAccounts([]);
         }
         
         setIsLoading(false);
@@ -235,7 +235,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         // If user is a parent, fetch their children
         if (profile.role === 'parent') {
           const children = await getChildren();
-          setChildren(children);
+          setChildAccounts(children);
           
           // Navigate to the parent dashboard
           navigate('/parent-dashboard');
@@ -275,7 +275,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setUser(null);
       setSession(null);
       setProfile(null);
-      setChildren([]);
+      setChildAccounts([]);
       
       toast({
         title: "Logged out",
@@ -353,7 +353,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       
       // Add the new child to the state
       if (data && data.length > 0) {
-        setChildren([...children, data[0] as SupabaseChild]);
+        setChildAccounts([...childAccounts, data[0] as SupabaseChild]);
         
         toast({
           title: "Child account created",
@@ -373,7 +373,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       user,
       session,
       profile,
-      children,
+      childAccounts,
       isLoading,
       isAuthenticated: !!user,
       login,
