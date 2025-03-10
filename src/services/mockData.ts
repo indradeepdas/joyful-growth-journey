@@ -6,12 +6,12 @@ import { Activity, Child, DevelopmentArea, Reward, Transaction } from '@/types';
 // Sample development areas
 export const developmentAreas: DevelopmentArea[] = [
   'Health & Mind',
-  'Academic Excellence',
-  'Creative Expression',
-  'Problem Solving',
-  'Financial Literacy',
-  'Social Responsibility',
-  'Tech Skills'
+  'Effective Communication',
+  'Personal Enrichment',
+  'Creativity',
+  'Deeper Family Bonds',
+  'Emotional Intelligence',
+  'Social Skills'
 ];
 
 // Sample activities
@@ -20,7 +20,7 @@ export const mockActivities: Activity[] = [
     id: '1',
     title: 'Read a book for 30 minutes',
     description: 'Find a book you enjoy and read it for at least 30 minutes.',
-    developmentArea: 'Academic Excellence',
+    developmentArea: 'Personal Enrichment',
     goodCoins: 15,
     status: 'pending',
     childId: '1',
@@ -31,7 +31,7 @@ export const mockActivities: Activity[] = [
     id: '2',
     title: 'Practice an instrument',
     description: 'Spend 20 minutes practicing your favorite instrument.',
-    developmentArea: 'Creative Expression',
+    developmentArea: 'Creativity',
     goodCoins: 10,
     status: 'completed',
     childId: '1',
@@ -42,7 +42,7 @@ export const mockActivities: Activity[] = [
     id: '3',
     title: 'Solve 5 math problems',
     description: 'Complete 5 math problems from your homework.',
-    developmentArea: 'Problem Solving',
+    developmentArea: 'Health & Mind',
     goodCoins: 20,
     status: 'pending',
     childId: '1',
@@ -120,21 +120,27 @@ export const mockRewards: Reward[] = [
     name: '30 minutes of screen time',
     description: 'Earn 30 minutes of additional screen time',
     goodCoins: 20,
-    imageUrl: '/placeholder.svg'
+    imageUrl: '/placeholder.svg',
+    originalPrice: 0,
+    discountedPrice: 0
   },
   {
     id: '2',
     name: 'Trip to the park',
     description: 'A fun day at the local park',
     goodCoins: 40,
-    imageUrl: '/placeholder.svg'
+    imageUrl: '/placeholder.svg',
+    originalPrice: 0,
+    discountedPrice: 0
   },
   {
     id: '3',
     name: 'Special dessert',
     description: 'Choose your favorite dessert for after dinner',
     goodCoins: 15,
-    imageUrl: '/placeholder.svg'
+    imageUrl: '/placeholder.svg',
+    originalPrice: 0,
+    discountedPrice: 0
   },
   {
     id: '4',
