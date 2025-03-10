@@ -19,6 +19,7 @@ import PublicDashboard from './pages/PublicDashboard';
 import PublicActivityCenter from './pages/PublicActivityCenter';
 import PublicRewardsHub from './pages/PublicRewardsHub';
 import NotFound from './pages/NotFound';
+import AddChild from './pages/AddChild';
 
 function App() {
   return (
@@ -71,6 +72,13 @@ function App() {
           <Route path="/rewards-hub" element={
             <PrivateRoute allowedRoles={['parent', 'admin', 'child']}>
               <RewardsHub />
+            </PrivateRoute>
+          } />
+          
+          {/* Add Child Route */}
+          <Route path="/add-child" element={
+            <PrivateRoute allowedRoles={['parent', 'admin']}>
+              <AddChild />
             </PrivateRoute>
           } />
           

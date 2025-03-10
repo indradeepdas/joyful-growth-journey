@@ -70,7 +70,7 @@ function ParentDashboard() {
             <h2 className="text-2xl font-bold text-goodchild-text-primary">Your Children</h2>
             <Button 
               onClick={handleAddChild}
-              className="bg-goodchild-primary hover:bg-goodchild-primary/80"
+              className="bg-goodchild-blue text-white hover:bg-goodchild-blue/90"
             >
               Add Child
             </Button>
@@ -81,7 +81,7 @@ function ParentDashboard() {
               <p className="text-goodchild-text-secondary mb-4">You haven't added any children yet.</p>
               <Button 
                 onClick={handleAddChild}
-                className="bg-goodchild-secondary hover:bg-goodchild-secondary/80"
+                className="bg-goodchild-yellow text-goodchild-text-primary hover:bg-goodchild-yellow/90"
               >
                 Add Your First Child
               </Button>
@@ -105,6 +105,7 @@ function ParentDashboard() {
                         onClick={() => handleViewChildDashboard(child.id)}
                         size="sm"
                         variant="outline"
+                        className="border-goodchild-blue text-goodchild-blue hover:bg-goodchild-blue/10"
                       >
                         View Dashboard
                       </Button>
@@ -124,7 +125,7 @@ function ParentDashboard() {
             </p>
             <Button 
               onClick={() => navigate('/activity-center')}
-              className="w-full bg-goodchild-accent hover:bg-goodchild-accent/80"
+              className="w-full bg-goodchild-green text-white hover:bg-goodchild-green/90"
             >
               Go to Activity Center
             </Button>
@@ -137,7 +138,7 @@ function ParentDashboard() {
             </p>
             <Button 
               onClick={() => navigate('/rewards-hub')}
-              className="w-full bg-goodchild-accent hover:bg-goodchild-accent/80"
+              className="w-full bg-goodchild-green text-white hover:bg-goodchild-green/90"
             >
               Go to Rewards Hub
             </Button>

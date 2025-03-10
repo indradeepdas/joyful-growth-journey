@@ -26,6 +26,10 @@ function Login() {
         navigate('/parent-dashboard');
       } else if (profile.role === 'child') {
         navigate('/child-dashboard');
+      } else if (profile.role === 'teacher') {
+        navigate('/teacher-dashboard');
+      } else if (profile.role === 'admin') {
+        navigate('/admin-dashboard');
       } else {
         // Default fallback
         navigate('/');
@@ -88,7 +92,7 @@ function Login() {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-goodchild-primary hover:bg-goodchild-primary/90"
+              className="w-full bg-goodchild-blue text-white hover:bg-goodchild-blue/90"
               disabled={loading}
             >
               {loading ? "Signing in..." : "Sign In"}
@@ -97,10 +101,10 @@ function Login() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-center text-sm">
-            Don't have an account? <a href="/signup" className="text-goodchild-primary hover:underline">Sign up</a>
+            Don't have an account? <a href="/signup" className="text-goodchild-blue hover:underline">Sign up</a>
           </div>
           <div className="text-center text-sm">
-            <a href="/forgot-password" className="text-goodchild-primary hover:underline">Forgot password?</a>
+            <a href="/forgot-password" className="text-goodchild-blue hover:underline">Forgot password?</a>
           </div>
         </CardFooter>
       </Card>
