@@ -255,44 +255,31 @@ export const getTransactions = async (childId: string): Promise<SupabaseTransact
   return data as SupabaseTransaction[];
 };
 
-const addTransactions = async (transactions) => {
-  // Ensure each transaction has the required 'type' field (not optional)
-  const formattedTransactions = transactions.map(transaction => ({
-    child_id: transaction.child_id,
-    amount: transaction.amount,
-    type: transaction.type || 'earned', // Ensure type is always provided
-    description: transaction.description || null,
-    created_by: transaction.created_by,
-    // Don't include transaction_type as it's not in the schema
-    // Only include reward_id and activity_id if they're in the schema
-    ...(transaction.reward_id ? { reward_id: transaction.reward_id } : {}),
-    ...(transaction.activity_id ? { activity_id: transaction.activity_id } : {})
-  }));
-
-  const { data, error } = await supabase
-    .from('transactions')
-    .insert(formattedTransactions);
-
-  if (error) throw error;
-  return data;
-};
-
-export const createTransaction = async (
-  userId: string,
-  transactionData: Omit<SupabaseTransaction, 'id' | 'created_by' | 'created_at'>
-): Promise<SupabaseTransaction | null> => {
-  const { data, error } = await supabase
-    .from('transactions')
-    .insert([{ ...transactionData, created_by: userId }])
-    .select()
-    .single();
-  
-  if (error) {
+export const createTransaction = async (transactions: TransactionInput | TransactionInput[]): Promise<void> => {
+  try {
+    const transactionsArray = Array.isArray(transactions) ? transactions : [transactions];
+    
+    // Prepare the data to match the database schema
+    const formattedTransactions = transactionsArray.map(transaction => ({
+      amount: transaction.amount,
+      child_id: transaction.child_id,
+      reward_id: transaction.reward_id || null,
+      activity_id: transaction.activity_id || null,
+      description: transaction.description || null,
+      created_by: transaction.created_by,
+      // Ensure type is not optional and matches expected format
+      type: transaction.type || (transaction.transaction_type === 'spend' ? 'spent' : 'earned')
+    }));
+    
+    const { error } = await supabase
+      .from('transactions')
+      .insert(formattedTransactions);
+      
+    if (error) throw error;
+  } catch (error) {
     console.error('Error creating transaction:', error);
-    return null;
+    throw error;
   }
-  
-  return data as SupabaseTransaction;
 };
 
 // Rewards
@@ -390,4 +377,16 @@ export const createRedemption = async (redemptionData: Omit<SupabaseRedemption, 
   }
   
   return data as SupabaseRedemption;
+};
+
+type TransactionInput = {
+  amount: number;
+  child_id: string;
+  reward_id?: string | null;
+  activity_id?: string | null;
+  description?: string | null;
+  created_by: string;
+  // Make type optional but ensure it's one of the allowed values when present
+  type?: 'earned' | 'spent' | 'penalty' | 'given';
+  transaction_type?: 'earn' | 'spend';
 };

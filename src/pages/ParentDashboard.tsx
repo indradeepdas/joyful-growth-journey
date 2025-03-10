@@ -1,70 +1,149 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
-import { collection, query, where, getDocs, DocumentData } from 'firebase/firestore';
-import { db } from '../firebase';
 
-interface ChildData {
-  id: string;
-  name: string;
-  age: number;
-  // Add other child properties as needed
-  [key: string]: any;
-}
+import React, { useState, useEffect } from 'react';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { SupabaseChild } from '@/services/types';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 function ParentDashboard() {
-  const { currentUser } = useContext(AuthContext);
-  const [children, setChildren] = useState<ChildData[]>([]);
+  const { profile, childAccounts } = useSupabaseAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
-    const fetchChildren = async () => {
-      if (!currentUser) return;
-      
+    const loadDashboard = async () => {
       try {
-        const childrenQuery = query(
-          collection(db, 'children'),
-          where('parentId', '==', currentUser.uid)
-        );
-        
-        const querySnapshot = await getDocs(childrenQuery);
-        const childrenData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as ChildData[];
-        
-        setChildren(childrenData);
-      } catch (err) {
-        console.error("Error fetching children:", err);
-        setError("Failed to load children data. Please refresh the page.");
-      } finally {
+        setLoading(false);
+      } catch (err: any) {
+        console.error("Error loading dashboard:", err);
+        setError("Failed to load dashboard data. Please refresh the page.");
         setLoading(false);
       }
     };
     
-    fetchChildren();
-  }, [currentUser]);
+    loadDashboard();
+  }, []);
 
-  if (loading) return <div>Loading your dashboard...</div>;
-  if (error) return <div>Error: {error}</div>;
+  const handleAddChild = () => {
+    navigate('/add-child');
+  };
+
+  const handleViewChildDashboard = (childId: string) => {
+    // This would typically navigate to a child-specific view
+    toast({
+      title: "Feature in Development",
+      description: "Viewing individual child dashboards will be available soon.",
+    });
+  };
+
+  if (loading) return (
+    <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
+      <div className="text-xl">Loading your dashboard...</div>
+    </div>
+  );
   
-  // Keep the rest of your ParentDashboard component UI code...
+  if (error) return (
+    <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
+      <div className="text-xl text-red-500">{error}</div>
+    </div>
+  );
+  
   return (
-    <div>
-      <h1>Parent Dashboard</h1>
-      <h2>Your Children</h2>
-      {children.length === 0 ? (
-        <p>No children found. Please add a child to get started.</p>
-      ) : (
-        <ul>
-          {children.map(child => (
-            <li key={child.id}>
-              {child.name} - {child.age} years old
-              {/* Display other child information */}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="min-h-screen bg-goodchild-background p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="glass-card p-6 rounded-xl mb-6">
+          <h1 className="text-3xl font-bold text-goodchild-text-primary mb-2">
+            Parent Dashboard
+          </h1>
+          <p className="text-xl text-goodchild-text-secondary">
+            Welcome, {profile?.first_name || 'Parent'}!
+          </p>
+        </div>
+
+        <div className="glass-card p-6 rounded-xl mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-goodchild-text-primary">Your Children</h2>
+            <Button 
+              onClick={handleAddChild}
+              className="bg-goodchild-primary hover:bg-goodchild-primary/80"
+            >
+              Add Child
+            </Button>
+          </div>
+
+          {childAccounts.length === 0 ? (
+            <div className="text-center p-8 bg-gray-50 rounded-lg">
+              <p className="text-goodchild-text-secondary mb-4">You haven't added any children yet.</p>
+              <Button 
+                onClick={handleAddChild}
+                className="bg-goodchild-secondary hover:bg-goodchild-secondary/80"
+              >
+                Add Your First Child
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {childAccounts.map((child) => (
+                <Card key={child.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-2">
+                    <CardTitle>{child.name} {child.surname}</CardTitle>
+                    <CardDescription>
+                      {child.nickname ? `"${child.nickname}"` : ''}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between items-center">
+                      <div className="font-semibold">
+                        GoodCoins: {child.good_coins}
+                      </div>
+                      <Button 
+                        onClick={() => handleViewChildDashboard(child.id)}
+                        size="sm"
+                        variant="outline"
+                      >
+                        View Dashboard
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="glass-card p-6 rounded-xl">
+            <h2 className="text-2xl font-bold text-goodchild-text-primary mb-4">Activity Center</h2>
+            <p className="text-goodchild-text-secondary mb-4">
+              Create and assign activities for your children to complete.
+            </p>
+            <Button 
+              onClick={() => navigate('/activity-center')}
+              className="w-full bg-goodchild-accent hover:bg-goodchild-accent/80"
+            >
+              Go to Activity Center
+            </Button>
+          </div>
+
+          <div className="glass-card p-6 rounded-xl">
+            <h2 className="text-2xl font-bold text-goodchild-text-primary mb-4">Rewards Hub</h2>
+            <p className="text-goodchild-text-secondary mb-4">
+              Browse and create rewards that your children can earn with GoodCoins.
+            </p>
+            <Button 
+              onClick={() => navigate('/rewards-hub')}
+              className="w-full bg-goodchild-accent hover:bg-goodchild-accent/80"
+            >
+              Go to Rewards Hub
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

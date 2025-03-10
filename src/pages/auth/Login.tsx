@@ -1,100 +1,109 @@
-import React, { useState, useContext, useEffect } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { AuthContext } from '../contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { currentUser } = useContext(AuthContext);
+  const { signIn, isAuthenticated, profile } = useSupabaseAuth();
+  const { toast } = useToast();
   
-  // If user is already logged in, redirect to appropriate dashboard
   useEffect(() => {
-    if (currentUser) {
-      redirectBasedOnRole(currentUser);
-    }
-  }, [currentUser]);
-  
-  const redirectBasedOnRole = async (user: any) => {
-    try {
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        switch(userData.role) {
-          case 'parent':
-            navigate('/parent');
-            break;
-          case 'teacher':
-            navigate('/teacher');
-            break;
-          case 'admin':
-            navigate('/admin');
-            break;
-          default:
-            navigate('/parent'); // Default to parent dashboard
-        }
+    console.log('Login page - Auth state changed:', { isAuthenticated, profileRole: profile?.role });
+    
+    if (isAuthenticated && profile) {
+      // Redirect based on user role
+      console.log('Redirecting based on role:', profile.role);
+      if (profile.role === 'parent') {
+        navigate('/parent-dashboard');
+      } else if (profile.role === 'child') {
+        navigate('/child-dashboard');
       } else {
-        // If no role is set, default to parent
-        navigate('/parent');
+        // Default fallback
+        navigate('/');
       }
-    } catch (err) {
-      console.error("Error checking user role:", err);
-      setError("An error occurred. Please try again.");
     }
-  };
+  }, [isAuthenticated, profile, navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      setError('');
       setLoading(true);
-      
-      await signInWithEmailAndPassword(auth, email, password);
-      // Authentication is successful
-      // The redirection will be handled by the useEffect above when currentUser updates
-      
-    } catch (err: any) {
-      console.error("Login error:", err);
-      setError("Failed to log in. Please check your credentials.");
+      console.log('Attempting login with email:', email);
+      await signIn(email, password);
+      // Redirection will be handled by the useEffect
+    } catch (error: any) {
+      console.error('Login error:', error.message);
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid credentials. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
   
-  // Keep the rest of your Login component UI code...
   return (
-    <div>
-      <h2>Login</h2>
-      {error && <div className="error">{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
-          <input 
-            type="email" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Password</label>
-          <input 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button disabled={loading} type="submit">
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-goodchild-background p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+          <CardDescription className="text-center">
+            Enter your email and password to sign in
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full bg-goodchild-primary hover:bg-goodchild-primary/90"
+              disabled={loading}
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-2">
+          <div className="text-center text-sm">
+            Don't have an account? <a href="/signup" className="text-goodchild-primary hover:underline">Sign up</a>
+          </div>
+          <div className="text-center text-sm">
+            <a href="/forgot-password" className="text-goodchild-primary hover:underline">Forgot password?</a>
+          </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
