@@ -10,6 +10,7 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
   const { isAuthenticated, isLoading, profile } = useSupabaseAuth();
+  const navigate = useNavigate();
   
   // Debug logs to track authentication state
   useEffect(() => {

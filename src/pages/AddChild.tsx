@@ -16,6 +16,7 @@ function AddChild() {
     surname: string;
     nickname?: string;
     email: string;
+    password: string;
     avatar?: string;
   }) => {
     try {
@@ -24,9 +25,12 @@ function AddChild() {
       
       // Create the child account
       await createChildAccount({
-        ...formData,
-        userId,
-        avatar: formData.avatar || null
+        name: formData.name,
+        surname: formData.surname,
+        nickname: formData.nickname,
+        email: formData.email,
+        avatar: formData.avatar || null,
+        userId
       });
       
       toast({
@@ -59,7 +63,7 @@ function AddChild() {
         </div>
         
         <div className="glass-card p-6 rounded-xl">
-          <ChildAccountForm onSubmit={handleCreateChild} />
+          <ChildAccountForm />
         </div>
         
         <div className="mt-4 text-center">
