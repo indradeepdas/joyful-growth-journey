@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,32 +13,45 @@ function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn, isAuthenticated, profile } = useSupabaseAuth();
+  const location = useLocation();
+  const { signIn, isAuthenticated, profile, isLoading } = useSupabaseAuth();
   const { toast } = useToast();
   
+  // Get the intended destination from location state, if available
+  const from = location.state?.from?.pathname || '/';
+  
   useEffect(() => {
-    console.log('Login page - Auth state changed:', { isAuthenticated, profileRole: profile?.role });
-    
-    if (isAuthenticated && profile) {
+    // Only redirect if authentication is confirmed (not loading) and user is authenticated
+    if (!isLoading && isAuthenticated && profile) {
+      console.log('Login page - Redirecting authenticated user to appropriate dashboard');
+      
       // Redirect based on user role
-      console.log('Redirecting based on role:', profile.role);
       if (profile.role === 'parent') {
-        navigate('/parent-dashboard');
+        navigate('/parent-dashboard', { replace: true });
       } else if (profile.role === 'child') {
-        navigate('/child-dashboard');
+        navigate('/child-dashboard', { replace: true });
       } else if (profile.role === 'teacher') {
-        navigate('/teacher-dashboard');
+        navigate('/teacher-dashboard', { replace: true });
       } else if (profile.role === 'admin') {
-        navigate('/admin-dashboard');
+        navigate('/admin-dashboard', { replace: true });
       } else {
         // Default fallback
-        navigate('/');
+        navigate(from, { replace: true });
       }
     }
-  }, [isAuthenticated, profile, navigate]);
+  }, [isAuthenticated, isLoading, profile, navigate, from]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both email and password.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       setLoading(true);
@@ -52,10 +65,27 @@ function Login() {
         description: error.message || "Invalid credentials. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+      setLoading(false); // Reset loading state on error
     }
   };
+  
+  // If authentication is currently being determined, show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-goodchild-background">
+        <div className="animate-pulse text-lg">Checking authentication status...</div>
+      </div>
+    );
+  }
+  
+  // If already authenticated, show a loading state while redirect happens
+  if (isAuthenticated && profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-goodchild-background">
+        <div className="animate-pulse text-lg">Redirecting to dashboard...</div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-goodchild-background p-4">

@@ -1,6 +1,6 @@
 
-import React, { useEffect } from 'react';
-import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 
 interface PrivateRouteProps {
@@ -10,13 +10,9 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
   const { isAuthenticated, isLoading, profile } = useSupabaseAuth();
-  const navigate = useNavigate();
+  const location = useLocation();
   
-  // Debug logs to track authentication state
-  useEffect(() => {
-    console.log('PrivateRoute - Auth State:', { isAuthenticated, isLoading, profile });
-  }, [isAuthenticated, isLoading, profile]);
-  
+  // Show loading state while authentication is being determined
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -25,9 +21,10 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
     );
   }
   
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     console.log('Not authenticated, redirecting to login');
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
   // If specific roles are required, check the user's role
@@ -51,7 +48,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
     }
   }
   
-  return <>{children || <Outlet />}</>;
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default PrivateRoute;

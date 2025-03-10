@@ -7,16 +7,22 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 function ParentDashboard() {
-  const { profile, childAccounts } = useSupabaseAuth();
-  const [loading, setLoading] = useState(false);
+  const { profile, childAccounts, isLoading: authLoading } = useSupabaseAuth();
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
+    // Simple function to load dashboard data
     const loadDashboard = async () => {
       try {
-        setLoading(false);
+        // Wait a moment to ensure profile and childAccounts are loaded
+        if (!authLoading) {
+          console.log("Dashboard loaded with profile:", profile?.first_name);
+          console.log("Child accounts loaded:", childAccounts.length);
+          setLoading(false);
+        }
       } catch (err: any) {
         console.error("Error loading dashboard:", err);
         setError("Failed to load dashboard data. Please refresh the page.");
@@ -25,7 +31,7 @@ function ParentDashboard() {
     };
     
     loadDashboard();
-  }, []);
+  }, [authLoading, profile, childAccounts]);
 
   const handleAddChild = () => {
     navigate('/add-child');
@@ -39,17 +45,23 @@ function ParentDashboard() {
     });
   };
 
-  if (loading) return (
-    <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
-      <div className="text-xl">Loading your dashboard...</div>
-    </div>
-  );
+  // Show loading state while authentication is loading or dashboard data is loading
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
+        <div className="text-xl">Loading your dashboard...</div>
+      </div>
+    );
+  }
   
-  if (error) return (
-    <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
-      <div className="text-xl text-red-500">{error}</div>
-    </div>
-  );
+  // Show error state if dashboard failed to load
+  if (error) {
+    return (
+      <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
+        <div className="text-xl text-red-500">{error}</div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-goodchild-background p-4 md:p-8">
@@ -74,7 +86,7 @@ function ParentDashboard() {
             </Button>
           </div>
 
-          {childAccounts.length === 0 ? (
+          {!childAccounts || childAccounts.length === 0 ? (
             <div className="text-center p-8 bg-gray-50 rounded-lg">
               <p className="text-goodchild-text-secondary mb-4">You haven't added any children yet.</p>
               <Button 
@@ -97,7 +109,7 @@ function ParentDashboard() {
                   <CardContent>
                     <div className="flex justify-between items-center">
                       <div className="font-semibold">
-                        GoodCoins: {child.good_coins}
+                        GoodCoins: {child.good_coins || 0}
                       </div>
                       <Button 
                         onClick={() => handleViewChildDashboard(child.id)}

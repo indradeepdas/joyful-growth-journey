@@ -15,26 +15,25 @@ import GoodCoinIcon from '@/components/GoodCoinIcon';
 import { CheckCircle, Clock, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { SupabaseActivity, SupabaseChild, SupabaseTransaction } from '@/services/types';
 import { Activity, Transaction } from '@/types';
 import { adaptSupabaseActivity, adaptSupabaseTransaction } from '@/utils/typeAdapters';
 
 const ChildDashboard: React.FC = () => {
   const { user, profile, isAuthenticated, isLoading } = useSupabaseAuth();
-  const [childData, setChildData] = useState<SupabaseChild | null>(null);
+  const [childData, setChildData] = useState<any>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [completedActivities, setCompletedActivities] = useState<Activity[]>([]);
   const [pendingActivities, setPendingActivities] = useState<Activity[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchChildData = async () => {
       try {
-        if (!user || !profile || profile.role !== 'child') {
-          console.log('Not a child user or not authenticated');
-          return;
+        if (!user || !profile || profile.role !== 'child' || isLoading) {
+          return; // Wait for authentication to complete
         }
 
         console.log('Fetching child data for user:', user.id);
@@ -48,7 +47,12 @@ const ChildDashboard: React.FC = () => {
           
         if (childError) {
           console.error('Error fetching child record:', childError);
-        } else if (childRecord) {
+          setError('Could not load your account information. Please try again.');
+          setLoading(false);
+          return;
+        } 
+        
+        if (childRecord) {
           console.log('Child record found:', childRecord);
           setChildData(childRecord);
           
@@ -60,6 +64,7 @@ const ChildDashboard: React.FC = () => {
             
           if (activitiesError) {
             console.error('Error fetching activities:', activitiesError);
+            setError('Could not load your activities. Please try again.');
           } else if (activitiesData) {
             console.log('Activities found:', activitiesData.length);
             const formattedActivities = activitiesData.map(activity => adaptSupabaseActivity(activity));
@@ -85,35 +90,31 @@ const ChildDashboard: React.FC = () => {
           } else if (transactionsData) {
             console.log('Transactions found:', transactionsData.length);
             const formattedTransactions = transactionsData.map(transaction => {
-              const compatibleTransaction: SupabaseTransaction = {
+              return adaptSupabaseTransaction({
                 id: transaction.id,
                 child_id: transaction.child_id,
                 amount: transaction.amount,
                 transaction_type: transaction.type === 'spend' ? 'spend' : 'earn',
-                // Fix: Explicitly type-cast the string to our Transaction type's expected values
                 type: (transaction.type as 'earned' | 'spent' | 'penalty' | 'given'),
                 description: transaction.description,
                 created_by: transaction.created_by,
                 created_at: transaction.created_at
-              };
-              return adaptSupabaseTransaction(compatibleTransaction);
+              });
             });
             setTransactions(formattedTransactions);
           }
+        } else {
+          setError('Child account not found. Please contact support.');
         }
       } catch (error) {
         console.error('Error in fetchChildData:', error);
-        toast({
-          title: "Error",
-          description: "Could not load dashboard data. Please try again.",
-          variant: "destructive",
-        });
+        setError('An unexpected error occurred. Please refresh the page.');
       } finally {
         setLoading(false);
       }
     };
     
-    if (isAuthenticated && !isLoading) {
+    if (!isLoading) {
       fetchChildData();
     }
   }, [isAuthenticated, isLoading, user, profile, toast]);
@@ -144,7 +145,7 @@ const ChildDashboard: React.FC = () => {
         description: `You earned ${activity.goodCoins} GoodCoins!`,
       });
       
-      // Refresh data
+      // Refresh data to show updated state
       const { data: activitiesData } = await supabase
         .from('activities')
         .select('*')
@@ -170,18 +171,16 @@ const ChildDashboard: React.FC = () => {
         
       if (transactionsData) {
         const formattedTransactions = transactionsData.map(transaction => {
-          const compatibleTransaction: SupabaseTransaction = {
+          return adaptSupabaseTransaction({
             id: transaction.id,
             child_id: transaction.child_id,
             amount: transaction.amount,
             transaction_type: transaction.type === 'spend' ? 'spend' : 'earn',
-            // Fix: Ensure proper typing for the transaction type
             type: (transaction.type as 'earned' | 'spent' | 'penalty' | 'given'),
             description: transaction.description,
             created_by: transaction.created_by,
             created_at: transaction.created_at
-          };
-          return adaptSupabaseTransaction(compatibleTransaction);
+          });
         });
         setTransactions(formattedTransactions);
       }
@@ -211,6 +210,22 @@ const ChildDashboard: React.FC = () => {
     return (
       <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
         <div className="text-2xl text-goodchild-text-primary">Loading your dashboard...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
+        <div className="text-2xl text-goodchild-text-primary text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()}
+            className="bg-goodchild-blue text-white hover:bg-goodchild-blue/90"
+          >
+            Refresh Page
+          </Button>
+        </div>
       </div>
     );
   }

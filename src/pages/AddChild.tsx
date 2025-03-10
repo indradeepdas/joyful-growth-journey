@@ -1,17 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import ChildAccountForm from '@/components/ChildAccountForm';
+import { Button } from '@/components/ui/button';
 
 function AddChild() {
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const { createChildAccount } = useSupabaseAuth();
   const { toast } = useToast();
 
-  const handleCreateChild = async (formData: {
+  const handleSubmit = async (formData: {
     name: string;
     surname: string;
     nickname?: string;
@@ -20,8 +22,15 @@ function AddChild() {
     avatar?: string;
   }) => {
     try {
+      setSubmitting(true);
+      
       // Generate a unique ID for the child account
       const userId = uuidv4();
+      
+      console.log("Creating child account with data:", {
+        ...formData,
+        userId,
+      });
       
       // Create the child account
       await createChildAccount({
@@ -47,6 +56,8 @@ function AddChild() {
         description: error.message || "Failed to create child account. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -63,16 +74,17 @@ function AddChild() {
         </div>
         
         <div className="glass-card p-6 rounded-xl">
-          <ChildAccountForm />
+          <ChildAccountForm onSubmit={handleSubmit} isSubmitting={submitting} />
         </div>
         
         <div className="mt-4 text-center">
-          <button 
+          <Button 
             onClick={() => navigate('/parent-dashboard')} 
-            className="text-goodchild-blue hover:underline"
+            variant="outline"
+            className="text-goodchild-blue hover:bg-goodchild-blue/10"
           >
             Back to Dashboard
-          </button>
+          </Button>
         </div>
       </div>
     </div>
