@@ -92,7 +92,7 @@ function Login() {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-goodchild-blue text-white hover:bg-goodchild-blue/90"
+              className="w-full bg-goodchild-blue hover:bg-goodchild-blue/90 text-white"
               disabled={loading}
             >
               {loading ? "Signing in..." : "Sign In"}

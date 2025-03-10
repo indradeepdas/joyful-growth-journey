@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
@@ -39,47 +38,57 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const updateUserState = async (session: Session | null) => {
     console.log('SupabaseAuthProvider: Updating user state, session exists:', !!session);
     
-    if (session?.user) {
-      // Convert Supabase user to our User type
-      setUser({
-        id: session.user.id,
-        email: session.user.email || '',
-        role: 'parent', // Default, will be overridden by profile data
-        createdAt: new Date().toISOString(), // Default, will be overridden by profile data
-      });
-      
-      // Fetch profile data
-      const profileData = await fetchProfile(session.user.id);
-      console.log('SupabaseAuthProvider: Profile data fetched:', profileData);
-      
-      if (profileData) {
-        setProfile(profileData);
-        // Update the user with correct role
-        setUser(prev => prev ? {
-          ...prev,
-          role: profileData.role as 'parent' | 'child',
-          createdAt: profileData.created_at,
-        } : null);
+    try {
+      if (session?.user) {
+        // Convert Supabase user to our User type
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          role: 'parent', // Default, will be overridden by profile data
+          createdAt: new Date().toISOString(), // Default, will be overridden by profile data
+        });
+        
+        // Fetch profile data
+        const profileData = await fetchProfile(session.user.id);
+        console.log('SupabaseAuthProvider: Profile data fetched:', profileData);
+        
+        if (profileData) {
+          setProfile(profileData);
+          // Update the user with correct role
+          setUser(prev => prev ? {
+            ...prev,
+            role: profileData.role as 'parent' | 'child',
+            createdAt: profileData.created_at,
+          } : null);
+          
+          // Fetch child accounts if the user is a parent
+          if (profileData && profileData.role === 'parent') {
+            const childData = await fetchChildAccounts(session.user.id);
+            console.log('SupabaseAuthProvider: Child accounts fetched:', childData);
+            setChildAccounts(childData);
+          } else {
+            setChildAccounts([]);
+          }
+        } else {
+          console.warn('SupabaseAuthProvider: No profile found for user:', session.user.id);
+          // Clear user if no profile found to prevent incorrect authentication state
+          setUser(null);
+        }
       } else {
-        console.warn('SupabaseAuthProvider: No profile found for user:', session.user.id);
-      }
-      
-      // Fetch child accounts if the user is a parent
-      if (profileData && profileData.role === 'parent') {
-        const childData = await fetchChildAccounts(session.user.id);
-        console.log('SupabaseAuthProvider: Child accounts fetched:', childData);
-        setChildAccounts(childData);
-      } else {
+        console.log('SupabaseAuthProvider: No session, clearing user state');
+        setUser(null);
+        setProfile(null);
         setChildAccounts([]);
       }
-    } else {
-      console.log('SupabaseAuthProvider: No session, clearing user state');
+    } catch (error) {
+      console.error('SupabaseAuthProvider: Error updating user state:', error);
+      // Reset state on error
       setUser(null);
       setProfile(null);
       setChildAccounts([]);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -107,11 +116,11 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       console.log('SupabaseAuthProvider: Signing in', email);
       setIsLoading(true);
       await authSignIn(email, password);
+      // Auth state update will be handled by the onAuthStateChange listener
     } catch (error) {
       console.error("SupabaseAuthProvider: Error signing in:", error);
+      setIsLoading(false); // Make sure to set loading to false here to prevent hanging
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -180,6 +189,20 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
+  const value = {
+    user,
+    profile,
+    childAccounts,
+    isAuthenticated: !!user && !!profile,
+    isLoading,
+    signIn,
+    signUp: authSignUp,
+    signOut: authSignOut,
+    resetPassword: authResetPassword,
+    updatePassword: authUpdatePassword,
+    createChildAccount
+  };
+
   console.log('SupabaseAuthProvider: Current state:', { 
     isAuthenticated: !!user && !!profile,
     isLoading, 
@@ -189,21 +212,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   });
 
   return (
-    <SupabaseAuthContext.Provider
-      value={{
-        user,
-        profile,
-        childAccounts,
-        isAuthenticated: !!user && !!profile,
-        isLoading,
-        signIn,
-        signUp,
-        signOut,
-        resetPassword,
-        updatePassword,
-        createChildAccount
-      }}
-    >
+    <SupabaseAuthContext.Provider value={value}>
       {children}
     </SupabaseAuthContext.Provider>
   );

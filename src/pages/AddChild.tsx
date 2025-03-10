@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
-
-// This is an existing component we're using that wasn't showing up in the route
 import ChildAccountForm from '@/components/ChildAccountForm';
 
 function AddChild() {
@@ -13,12 +11,12 @@ function AddChild() {
   const { createChildAccount } = useSupabaseAuth();
   const { toast } = useToast();
 
-  const handleCreateChild = async (data: {
+  const handleCreateChild = async (formData: {
     name: string;
     surname: string;
     nickname?: string;
     email: string;
-    avatar?: string | null;
+    avatar?: string;
   }) => {
     try {
       // Generate a unique ID for the child account
@@ -26,13 +24,14 @@ function AddChild() {
       
       // Create the child account
       await createChildAccount({
-        ...data,
-        userId
+        ...formData,
+        userId,
+        avatar: formData.avatar || null
       });
       
       toast({
         title: "Success!",
-        description: `Child account for ${data.name} created successfully.`,
+        description: `Child account for ${formData.name} created successfully.`,
       });
       
       // Redirect back to parent dashboard

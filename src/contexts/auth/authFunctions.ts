@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@/types';
 import { SupabaseProfile, SupabaseChild } from '@/services/types';
@@ -12,7 +11,15 @@ export const fetchProfile = async (userId: string): Promise<SupabaseProfile | nu
       .eq('id', userId)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Error fetching profile:", error);
+      return null;
+    }
+
+    if (!profileData) {
+      console.warn("No profile found for user:", userId);
+      return null;
+    }
 
     return {
       id: profileData.id,
@@ -39,7 +46,10 @@ export const fetchChildAccounts = async (parentId: string | undefined): Promise<
       .select('*')
       .eq('parent_id', parentId);
 
-    if (error) throw error;
+    if (error) {
+      console.error("Error fetching child accounts:", error);
+      return [];
+    }
 
     return childData || [];
   } catch (error) {
@@ -50,12 +60,19 @@ export const fetchChildAccounts = async (parentId: string | undefined): Promise<
 
 export const signIn = async (email: string, password: string): Promise<void> => {
   console.log('authFunctions: Signing in with email', email);
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  
   if (error) {
     console.error('authFunctions: Sign in error', error);
     throw error;
   }
-  console.log('authFunctions: Sign in successful');
+  
+  if (!data || !data.user) {
+    console.error('authFunctions: No user returned after sign in');
+    throw new Error('Failed to authenticate user');
+  }
+  
+  console.log('authFunctions: Sign in successful', data.user.id);
 };
 
 export const signUp = async (email: string, password: string, firstName: string, lastName: string): Promise<void> => {
