@@ -109,7 +109,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
 
       const particleCount = 50 * (timeLeft / duration);
       
-      // Use either confetti.create() or confetti() depending on your import
+      // Use confetti
       confetti({
         ...defaults,
         particleCount,
@@ -146,11 +146,14 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
       }
     }
     
+    // Get the winning prize value
+    const prize = PRIZES[winningIndex].value;
+    
     // Calculate the final rotation
     // Each prize takes up (360 / PRIZES.length) degrees
     // We need to point to the opposite of the winning prize
     const prizeAngle = 360 / PRIZES.length;
-    const destinationAngle = 360 - (winningIndex * prizeAngle) + prizeAngle / 2;
+    const destinationAngle = 360 - (winningIndex * prizeAngle);
     
     // Add several full rotations plus the destination
     const spins = 5; // Number of complete rotations
@@ -177,7 +180,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
       } else {
         setIsSpinning(false);
         setHasSpun(true);
-        const prize = PRIZES[winningIndex].value;
         setSelectedPrize(prize);
         
         // Launch confetti celebration
