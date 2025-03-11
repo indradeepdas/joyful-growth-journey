@@ -1,9 +1,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Gift, Star, Sparkles } from 'lucide-react';
+import { Gift, Star, Sparkles, PartyPopper } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import GoodCoinIcon from '@/components/GoodCoinIcon';
+import confetti from 'canvas-confetti';
 
 // Define the prizes and their probabilities
 const PRIZES = [
@@ -89,6 +90,42 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
 
   }, [rotation]);
 
+  // Launch confetti
+  const launchConfetti = () => {
+    const duration = 3 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval: any = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      
+      // Use either confetti.create() or confetti() depending on your import
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        colors: ['#FF719A', '#FFA99F', '#FFE29F', '#9b87f5', '#7E69AB', '#6E59A5', '#D946EF'],
+      });
+      
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        colors: ['#FF719A', '#FFA99F', '#FFE29F', '#9b87f5', '#7E69AB', '#6E59A5', '#D946EF'],
+      });
+    }, 250);
+  };
+
   // Spin the wheel
   const spinWheel = () => {
     if (isSpinning) return;
@@ -142,6 +179,9 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
         setHasSpun(true);
         const prize = PRIZES[winningIndex].value;
         setSelectedPrize(prize);
+        
+        // Launch confetti celebration
+        launchConfetti();
         
         // Call the onWin callback if provided
         if (onWin) {
@@ -210,10 +250,11 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
           </Button>
           
           {selectedPrize !== null && (
-            <div className="mt-4 text-center animate-bounce">
-              <div className="inline-block bg-goodchild-primary text-white px-4 py-2 rounded-full shadow-lg">
+            <div className="mt-6 text-center animate-bounce">
+              <div className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full shadow-lg text-xl font-bold">
                 <span className="flex items-center">
-                  <GoodCoinIcon className="mr-2" /> You won {selectedPrize} GoodCoins!
+                  <PartyPopper className="mr-2 h-6 w-6" /> 
+                  You won {selectedPrize} GoodCoins!
                 </span>
               </div>
             </div>

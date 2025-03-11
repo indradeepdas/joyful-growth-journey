@@ -170,8 +170,11 @@ const ActivityCenterShowcase = () => {
         </div>
         
         <div className="text-center">
-          <Link to="/activities">
-            <Button size="lg">
+          <Link to="/public/activities">
+            <Button 
+              size="lg" 
+              className="text-xl py-7 px-10 bg-gradient-to-r from-[#33a6b8] to-[#06D6A0] hover:from-[#2c95a6] hover:to-[#05c190] animate-[wiggle_1s_ease-in-out_infinite]"
+            >
               View Activity Center
             </Button>
           </Link>

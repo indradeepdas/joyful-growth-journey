@@ -21,15 +21,6 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
   const isAuthenticated = !!auth?.isAuthenticated;
   const userRole = auth?.role;
   
-  // Show loading state while authentication is being determined
-  if (false) { // Changed to false since we don't need loading state with localStorage
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
-      </div>
-    );
-  }
-  
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     console.log('Not authenticated, redirecting to login');

@@ -37,13 +37,13 @@ const Navbar: React.FC = () => {
         <nav className="hidden md:flex items-center space-x-6">
           <Link 
             to={getRouteForLink('/parent-dashboard', '/public/dashboard')} 
-            className={`nav-link ${location.pathname === '/parent-dashboard' || location.pathname === '/child-dashboard' || location.pathname === '/public/dashboard' ? 'active' : ''}`}
+            className={`nav-link ${location.pathname === '/parent-dashboard' || location.pathname === '/public/dashboard' ? 'active' : ''}`}
           >
             Dashboard
           </Link>
           <Link 
             to="/child-dashboard" 
-            className={`nav-link ${location.pathname === '/child-dashboard' ? 'active' : ''}`}
+            className={`nav-link ${location.pathname === '/child-dashboard' ? 'active' : ''} font-bold text-goodchild-blue`}
           >
             Child Dashboard
           </Link>
@@ -107,14 +107,14 @@ const Navbar: React.FC = () => {
             <div className="flex flex-col space-y-4 mt-8">
               <Link 
                 to={getRouteForLink('/parent-dashboard', '/public/dashboard')} 
-                className={`mobile-nav-link ${location.pathname === '/parent-dashboard' || location.pathname === '/child-dashboard' || location.pathname === '/public/dashboard' ? 'active' : ''}`}
+                className={`mobile-nav-link ${location.pathname === '/parent-dashboard' || location.pathname === '/public/dashboard' ? 'active' : ''}`}
                 onClick={() => setShowMenu(false)}
               >
                 Dashboard
               </Link>
               <Link 
                 to="/child-dashboard" 
-                className={`mobile-nav-link ${location.pathname === '/child-dashboard' ? 'active' : ''}`}
+                className={`mobile-nav-link ${location.pathname === '/child-dashboard' ? 'active' : ''} font-bold text-goodchild-blue`}
                 onClick={() => setShowMenu(false)}
               >
                 Child Dashboard

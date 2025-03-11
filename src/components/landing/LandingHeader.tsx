@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 const LandingHeader = () => {
   return (
-    <header className="w-full py-4 px-6 flex justify-between items-center">
+    <header className="w-full py-4 px-6 flex justify-between items-center sticky top-0 bg-white/90 backdrop-blur-sm z-50 shadow-sm">
       <Link to="/" className="flex items-center gap-2">
         <img
           src="/placeholder.svg"
@@ -22,7 +22,7 @@ const LandingHeader = () => {
         <Link to="/public/dashboard" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
           Parent Dashboard
         </Link>
-        <Link to="/child-dashboard" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
+        <Link to="/child-dashboard" className="text-goodchild-text-primary hover:text-goodchild-primary font-bold transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-gradient-to-r after:from-goodchild-blue after:to-goodchild-green">
           Child Dashboard
         </Link>
         <Link to="/public/activities" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">

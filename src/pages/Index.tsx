@@ -59,12 +59,12 @@ const Index: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="hover:shadow-md transition-shadow">
+          <div className="flex flex-col md:flex-row justify-center gap-6">
+            <Card className="hover:shadow-md transition-shadow flex flex-col md:max-w-[350px]">
               <CardHeader>
                 <CardTitle>Parent Dashboard</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-grow">
                 <p className="text-goodchild-text-secondary">
                   Preview the parent dashboard where you can track your children's progress and manage their activities.
                 </p>
@@ -76,11 +76,11 @@ const Index: React.FC = () => {
               </CardFooter>
             </Card>
             
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="hover:shadow-md transition-shadow flex flex-col md:max-w-[350px]">
               <CardHeader>
                 <CardTitle>Activity Center</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-grow">
                 <p className="text-goodchild-text-secondary">
                   Browse through sample activities designed to develop your child's skills across 7 key areas.
                 </p>
@@ -92,11 +92,11 @@ const Index: React.FC = () => {
               </CardFooter>
             </Card>
             
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="hover:shadow-md transition-shadow flex flex-col md:max-w-[350px]">
               <CardHeader>
                 <CardTitle>Rewards Hub</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-grow">
                 <p className="text-goodchild-text-secondary">
                   Check out the rewards your children can earn by completing activities and earning GoodCoins.
                 </p>
