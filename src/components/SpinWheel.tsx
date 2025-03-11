@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Gift, Star, Sparkles, PartyPopper } from 'lucide-react';
@@ -6,7 +5,6 @@ import { useToast } from '@/hooks/use-toast';
 import GoodCoinIcon from '@/components/GoodCoinIcon';
 import confetti from 'canvas-confetti';
 
-// Define the prizes and their probabilities
 const PRIZES = [
   { value: 5, color: '#FF719A', probability: 0.25 },
   { value: 10, color: '#FFA99F', probability: 0.25 },
@@ -29,7 +27,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
-  // Draw the wheel
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -41,10 +38,8 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
     const centerY = canvas.height / 2;
     const radius = Math.min(centerX, centerY) - 10;
     
-    // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw wheel segments
     const segmentAngle = (2 * Math.PI) / PRIZES.length;
     for (let i = 0; i < PRIZES.length; i++) {
       const startAngle = i * segmentAngle;
@@ -59,7 +54,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
       ctx.fill();
       ctx.restore();
       
-      // Add text
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate(startAngle + segmentAngle / 2);
@@ -70,7 +64,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
       ctx.restore();
     }
     
-    // Draw center circle
     ctx.beginPath();
     ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
     ctx.fillStyle = 'white';
@@ -80,7 +73,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
     ctx.stroke();
   }, [rotation]);
 
-  // Launch confetti
   const launchConfetti = () => {
     const duration = 3 * 1000;
     const animationEnd = Date.now() + duration;
@@ -99,7 +91,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
 
       const particleCount = 50 * (timeLeft / duration);
       
-      // Use confetti
       confetti({
         ...defaults,
         particleCount,
@@ -116,14 +107,12 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
     }, 250);
   };
 
-  // Spin the wheel
   const spinWheel = () => {
     if (isSpinning) return;
     
     setIsSpinning(true);
     setSelectedPrize(null);
     
-    // Determine the winning prize based on probabilities
     const random = Math.random();
     let cumulativeProbability = 0;
     let winningIndex = 0;
@@ -136,37 +125,28 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
       }
     }
     
-    // Get the winning prize value
     const prize = PRIZES[winningIndex].value;
     
-    // Calculate the final rotation
-    // Each prize takes up (360 / PRIZES.length) degrees
     const prizeAngle = 360 / PRIZES.length;
     
-    // For the wheel to stop with the arrow pointing to the winning segment,
-    // we need to calculate the rotation so that the segment aligns with the arrow at 270 degrees (top position)
-    // The arrow is fixed at the top (270 degrees)
     const destinationAngle = 270 - (winningIndex * prizeAngle) - (prizeAngle / 2);
     
-    // Add several full rotations plus the destination angle
-    const spins = 5; // Number of complete rotations
+    const spins = 5;
     const newRotation = (spins * 360) + destinationAngle;
     
-    // Animate the rotation
     let currentRotation = rotation;
-    const spinDuration = 5000; // 5 seconds
+    const spinDuration = 5000;
     const startTime = performance.now();
     
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / spinDuration, 1);
       
-      // Easing function for slowing down gradually
       const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
       const easedProgress = easeOut(progress);
       
       currentRotation = rotation + (newRotation - rotation) * easedProgress;
-      setRotation(currentRotation % 360); // Keep rotation within 0-360 for better performance
+      setRotation(currentRotation % 360);
       
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -175,10 +155,8 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
         setHasSpun(true);
         setSelectedPrize(prize);
         
-        // Launch confetti celebration
         launchConfetti();
         
-        // Call the onWin callback if provided
         if (onWin) {
           onWin(prize);
         }
@@ -203,23 +181,28 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
       </div>
       
       <div className="flex flex-col items-center justify-center">
-        <div className="relative my-6">
-          {/* Fixed pointer/arrow at the top of the wheel */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-            <div className="w-6 h-8 bg-goodchild-primary flex items-center justify-center rounded-t-full">
-              <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[15px] border-b-white"></div>
+        <div className="relative my-10">
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-[90%] z-10">
+            <div className="w-12 h-16 bg-goodchild-primary flex items-center justify-center rounded-t-xl shadow-lg">
+              <div className="w-0 h-0 
+                border-l-[20px] border-l-transparent 
+                border-r-[20px] border-r-transparent 
+                border-b-[30px] border-b-white"
+              ></div>
             </div>
           </div>
           
-          {/* Spinning wheel */}
           <div 
-            style={{ transform: `rotate(${rotation}deg)`, transition: isSpinning ? 'none' : 'transform 0.3s ease-out' }}
+            style={{ 
+              transform: `rotate(${rotation}deg)`, 
+              transition: isSpinning ? 'none' : 'transform 0.3s ease-out'
+            }}
           >
             <canvas 
               ref={canvasRef} 
               width={300} 
               height={300} 
-              className="rounded-full shadow-lg"
+              className="rounded-full shadow-xl"
             ></canvas>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="bg-white rounded-full p-2 shadow-inner">
