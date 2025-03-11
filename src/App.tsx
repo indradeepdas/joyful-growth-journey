@@ -20,6 +20,8 @@ import PublicActivityCenter from './pages/PublicActivityCenter';
 import PublicRewardsHub from './pages/PublicRewardsHub';
 import NotFound from './pages/NotFound';
 import AddChild from './pages/AddChild';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
           
           {/* Public Preview Routes */}
           <Route path="/public/dashboard" element={<PublicDashboard />} />
