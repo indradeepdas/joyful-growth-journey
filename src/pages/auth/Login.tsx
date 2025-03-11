@@ -1,45 +1,63 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
+// Dummy user data - in a real app, this would come from a database
+const DUMMY_USERS = [
+  { email: 'parent@example.com', password: 'password', role: 'parent' },
+  { email: 'child@example.com', password: 'password', role: 'child' },
+  { email: 'teacher@example.com', password: 'password', role: 'teacher' },
+  { email: 'admin@example.com', password: 'password', role: 'admin' },
+];
+
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, isAuthenticated, profile, isLoading } = useSupabaseAuth();
   const { toast } = useToast();
   
   // Get the intended destination from location state, if available
   const from = location.state?.from?.pathname || '/';
   
+  // Check if user is already logged in (from localStorage in this dummy implementation)
   useEffect(() => {
-    // Only redirect if authentication is confirmed (not loading) and user is authenticated
-    if (!isLoading && isAuthenticated && profile) {
+    const storedAuth = localStorage.getItem('auth');
+    if (storedAuth) {
+      const authData = JSON.parse(storedAuth);
+      setIsAuthenticated(true);
+      setUserRole(authData.role);
+    }
+  }, []);
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && userRole) {
       console.log('Login page - Redirecting authenticated user to appropriate dashboard');
       
       // Redirect based on user role
-      if (profile.role === 'parent') {
+      if (userRole === 'parent') {
         navigate('/parent-dashboard', { replace: true });
-      } else if (profile.role === 'child') {
+      } else if (userRole === 'child') {
         navigate('/child-dashboard', { replace: true });
-      } else if (profile.role === 'teacher') {
+      } else if (userRole === 'teacher') {
         navigate('/teacher-dashboard', { replace: true });
-      } else if (profile.role === 'admin') {
+      } else if (userRole === 'admin') {
         navigate('/admin-dashboard', { replace: true });
       } else {
         // Default fallback
         navigate(from, { replace: true });
       }
     }
-  }, [isAuthenticated, isLoading, profile, navigate, from]);
+  }, [isAuthenticated, userRole, navigate, from]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,8 +74,32 @@ function Login() {
     try {
       setLoading(true);
       console.log('Attempting login with email:', email);
-      await signIn(email, password);
-      // Redirection will be handled by the useEffect
+      
+      // Simulate backend authentication with dummy data
+      const user = DUMMY_USERS.find(u => u.email === email && u.password === password);
+      
+      if (user) {
+        // Store authentication data in localStorage (only for demo purposes)
+        const authData = {
+          email: user.email,
+          role: user.role,
+          isAuthenticated: true
+        };
+        localStorage.setItem('auth', JSON.stringify(authData));
+        
+        setIsAuthenticated(true);
+        setUserRole(user.role);
+        
+        // Toast success
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+        });
+        
+        // Redirect is handled by the useEffect
+      } else {
+        throw new Error("Invalid email or password");
+      }
     } catch (error: any) {
       console.error('Login error:', error.message);
       toast({
@@ -65,21 +107,13 @@ function Login() {
         description: error.message || "Invalid credentials. Please try again.",
         variant: "destructive",
       });
-      setLoading(false); // Reset loading state on error
+    } finally {
+      setLoading(false);
     }
   };
   
-  // If authentication is currently being determined, show loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-goodchild-background">
-        <div className="animate-pulse text-lg">Checking authentication status...</div>
-      </div>
-    );
-  }
-  
   // If already authenticated, show a loading state while redirect happens
-  if (isAuthenticated && profile) {
+  if (isAuthenticated && userRole) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-goodchild-background">
         <div className="animate-pulse text-lg">Redirecting to dashboard...</div>

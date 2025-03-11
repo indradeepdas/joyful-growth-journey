@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 
 interface PrivateRouteProps {
   children?: React.ReactNode;
@@ -9,11 +8,16 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
-  const { isAuthenticated, isLoading, profile } = useSupabaseAuth();
   const location = useLocation();
   
+  // Get authentication data from localStorage
+  const authData = localStorage.getItem('auth');
+  const auth = authData ? JSON.parse(authData) : null;
+  const isAuthenticated = !!auth?.isAuthenticated;
+  const userRole = auth?.role;
+  
   // Show loading state while authentication is being determined
-  if (isLoading) {
+  if (false) { // Changed to false since we don't need loading state with localStorage
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse">Loading...</div>
@@ -28,18 +32,18 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
   }
   
   // If specific roles are required, check the user's role
-  if (allowedRoles && allowedRoles.length > 0 && profile) {
-    if (!allowedRoles.includes(profile.role)) {
-      console.log(`User role ${profile.role} not in allowed roles: ${allowedRoles.join(', ')}`);
+  if (allowedRoles && allowedRoles.length > 0 && userRole) {
+    if (!allowedRoles.includes(userRole)) {
+      console.log(`User role ${userRole} not in allowed roles: ${allowedRoles.join(', ')}`);
       
       // Redirect based on role
-      if (profile.role === 'parent') {
+      if (userRole === 'parent') {
         return <Navigate to="/parent-dashboard" replace />;
-      } else if (profile.role === 'child') {
+      } else if (userRole === 'child') {
         return <Navigate to="/child-dashboard" replace />;
-      } else if (profile.role === 'teacher') {
+      } else if (userRole === 'teacher') {
         return <Navigate to="/teacher-dashboard" replace />;
-      } else if (profile.role === 'admin') {
+      } else if (userRole === 'admin') {
         return <Navigate to="/admin-dashboard" replace />;
       }
       

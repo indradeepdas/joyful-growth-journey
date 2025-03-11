@@ -1,37 +1,56 @@
 
 import React, { useState, useEffect } from 'react';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
+// Dummy child accounts data
+const DUMMY_CHILD_ACCOUNTS = [
+  {
+    id: "child-1",
+    name: "Emma",
+    surname: "Smith",
+    nickname: "Em",
+    good_coins: 150,
+    avatar: null
+  },
+  {
+    id: "child-2",
+    name: "Noah",
+    surname: "Johnson",
+    nickname: null,
+    good_coins: 75,
+    avatar: null
+  }
+];
+
 function ParentDashboard() {
-  const { profile, childAccounts, isLoading: authLoading } = useSupabaseAuth();
+  const [childAccounts, setChildAccounts] = useState(DUMMY_CHILD_ACCOUNTS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Simulate loading data from backend
   useEffect(() => {
-    // Simple function to load dashboard data
-    const loadDashboard = async () => {
-      try {
-        // Wait a moment to ensure profile and childAccounts are loaded
-        if (!authLoading) {
-          console.log("Dashboard loaded with profile:", profile?.first_name);
-          console.log("Child accounts loaded:", childAccounts.length);
-          setLoading(false);
-        }
-      } catch (err: any) {
-        console.error("Error loading dashboard:", err);
-        setError("Failed to load dashboard data. Please refresh the page.");
-        setLoading(false);
+    const timer = setTimeout(() => {
+      // Get user data from localStorage
+      const authData = localStorage.getItem('auth');
+      const auth = authData ? JSON.parse(authData) : null;
+      
+      if (!auth || auth.role !== 'parent') {
+        setError("You must be logged in as a parent to view this dashboard");
+      } else {
+        console.log("Dashboard loaded with profile:", auth.email);
+        console.log("Child accounts loaded:", childAccounts.length);
       }
-    };
+      
+      setLoading(false);
+    }, 500); // Simulate a small delay for data loading
     
-    loadDashboard();
-  }, [authLoading, profile, childAccounts]);
+    return () => clearTimeout(timer);
+  }, [childAccounts.length]);
 
   const handleAddChild = () => {
     navigate('/add-child');
@@ -45,8 +64,13 @@ function ParentDashboard() {
     });
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('auth');
+    navigate('/login');
+  };
+
   // Show loading state while authentication is loading or dashboard data is loading
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
         <div className="text-xl">Loading your dashboard...</div>
@@ -62,17 +86,27 @@ function ParentDashboard() {
       </div>
     );
   }
+
+  // Get parent name from localStorage
+  const authData = localStorage.getItem('auth');
+  const auth = authData ? JSON.parse(authData) : null;
+  const parentName = auth?.email?.split('@')[0] || 'Parent';
   
   return (
     <div className="min-h-screen bg-goodchild-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="glass-card p-6 rounded-xl mb-6">
-          <h1 className="text-3xl font-bold text-goodchild-text-primary mb-2">
-            Parent Dashboard
-          </h1>
-          <p className="text-xl text-goodchild-text-secondary">
-            Welcome, {profile?.first_name || 'Parent'}!
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-goodchild-text-primary mb-2">
+                Parent Dashboard
+              </h1>
+              <p className="text-xl text-goodchild-text-secondary">
+                Welcome, {parentName}!
+              </p>
+            </div>
+            <Button onClick={handleLogout} variant="outline">Logout</Button>
+          </div>
         </div>
 
         <div className="glass-card p-6 rounded-xl mb-6">

@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { 
   Card, 
   CardContent, 
@@ -14,189 +13,173 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GoodCoinIcon from '@/components/GoodCoinIcon';
 import { CheckCircle, Clock, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { Activity, Transaction } from '@/types';
-import { adaptSupabaseActivity, adaptSupabaseTransaction } from '@/utils/typeAdapters';
+import { useNavigate } from 'react-router-dom';
+
+// Dummy child data
+const DUMMY_CHILD = {
+  id: "child-1",
+  name: "Emma",
+  surname: "Smith",
+  nickname: "Em",
+  good_coins: 150,
+  avatar: null
+};
+
+// Dummy activity data
+const DUMMY_ACTIVITIES = [
+  {
+    id: "activity-1",
+    title: "Complete Math Homework",
+    description: "Finish all math problems in your workbook",
+    developmentArea: "Academic Excellence",
+    dueDate: "2023-12-15",
+    goodCoins: 20,
+    status: "pending"
+  },
+  {
+    id: "activity-2",
+    title: "Read for 30 Minutes",
+    description: "Read a book of your choice for at least 30 minutes",
+    developmentArea: "Academic Excellence",
+    dueDate: "2023-12-14",
+    goodCoins: 15,
+    status: "pending"
+  },
+  {
+    id: "activity-3",
+    title: "Clean Your Room",
+    description: "Tidy up your room, make your bed, and organize your desk",
+    developmentArea: "Responsibility",
+    dueDate: "2023-12-13",
+    goodCoins: 25,
+    status: "completed"
+  }
+];
+
+// Dummy transaction data
+const DUMMY_TRANSACTIONS = [
+  {
+    id: "transaction-1",
+    childId: "child-1",
+    amount: -15,
+    type: "penalty",
+    description: "Late for dinner",
+    createdBy: "parent-1",
+    createdAt: "2023-12-10T15:30:00Z"
+  },
+  {
+    id: "transaction-2",
+    childId: "child-1",
+    amount: -50,
+    type: "spent",
+    description: "Redeemed Movie Night Reward",
+    createdBy: "child-1",
+    createdAt: "2023-12-05T18:45:00Z"
+  },
+  {
+    id: "transaction-3",
+    childId: "child-1",
+    amount: 20,
+    type: "earned",
+    description: "Completed activity: Clean Your Room",
+    createdBy: "parent-1",
+    createdAt: "2023-12-03T14:20:00Z"
+  }
+];
 
 const ChildDashboard: React.FC = () => {
-  const { user, profile, isAuthenticated, isLoading } = useSupabaseAuth();
-  const [childData, setChildData] = useState<any>(null);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [completedActivities, setCompletedActivities] = useState<Activity[]>([]);
-  const [pendingActivities, setPendingActivities] = useState<Activity[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [childData, setChildData] = useState(DUMMY_CHILD);
+  const [activities, setActivities] = useState(DUMMY_ACTIVITIES);
+  const [completedActivities, setCompletedActivities] = useState<any[]>([]);
+  const [pendingActivities, setPendingActivities] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState(DUMMY_TRANSACTIONS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchChildData = async () => {
+    // Simulate loading data from backend
+    const timer = setTimeout(() => {
       try {
-        if (!user || !profile || profile.role !== 'child' || isLoading) {
-          return; // Wait for authentication to complete
-        }
-
-        console.log('Fetching child data for user:', user.id);
+        // Check if user is logged in as a child
+        const authData = localStorage.getItem('auth');
+        const auth = authData ? JSON.parse(authData) : null;
         
-        // Find child record in the children table
-        const { data: childRecord, error: childError } = await supabase
-          .from('children')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-          
-        if (childError) {
-          console.error('Error fetching child record:', childError);
-          setError('Could not load your account information. Please try again.');
+        if (!auth || auth.role !== 'child') {
+          setError("You must be logged in as a child to view this dashboard");
           setLoading(false);
           return;
-        } 
-        
-        if (childRecord) {
-          console.log('Child record found:', childRecord);
-          setChildData(childRecord);
-          
-          // Get activities for this child
-          const { data: activitiesData, error: activitiesError } = await supabase
-            .from('activities')
-            .select('*')
-            .eq('assigned_to', user.id);
-            
-          if (activitiesError) {
-            console.error('Error fetching activities:', activitiesError);
-            setError('Could not load your activities. Please try again.');
-          } else if (activitiesData) {
-            console.log('Activities found:', activitiesData.length);
-            const formattedActivities = activitiesData.map(activity => adaptSupabaseActivity(activity));
-            setActivities(formattedActivities);
-            
-            // Filter activities by completion status
-            const completed = formattedActivities.filter(activity => activity.status === 'completed');
-            const pending = formattedActivities.filter(activity => activity.status === 'pending');
-            
-            setCompletedActivities(completed);
-            setPendingActivities(pending);
-          }
-          
-          // Get transactions for this child
-          const { data: transactionsData, error: transactionsError } = await supabase
-            .from('transactions')
-            .select('*')
-            .eq('child_id', user.id)
-            .order('created_at', { ascending: false });
-            
-          if (transactionsError) {
-            console.error('Error fetching transactions:', transactionsError);
-          } else if (transactionsData) {
-            console.log('Transactions found:', transactionsData.length);
-            const formattedTransactions = transactionsData.map(transaction => {
-              return adaptSupabaseTransaction({
-                id: transaction.id,
-                child_id: transaction.child_id,
-                amount: transaction.amount,
-                transaction_type: transaction.type === 'spend' ? 'spend' : 'earn',
-                type: (transaction.type as 'earned' | 'spent' | 'penalty' | 'given'),
-                description: transaction.description,
-                created_by: transaction.created_by,
-                created_at: transaction.created_at
-              });
-            });
-            setTransactions(formattedTransactions);
-          }
-        } else {
-          setError('Child account not found. Please contact support.');
         }
-      } catch (error) {
-        console.error('Error in fetchChildData:', error);
+        
+        // Filter activities by completion status
+        const completed = activities.filter(activity => activity.status === 'completed');
+        const pending = activities.filter(activity => activity.status === 'pending');
+        
+        setCompletedActivities(completed);
+        setPendingActivities(pending);
+        setLoading(false);
+      } catch (error: any) {
+        console.error('Error in loading data:', error);
         setError('An unexpected error occurred. Please refresh the page.');
-      } finally {
         setLoading(false);
       }
-    };
+    }, 800); // Simulate a small delay for data loading
     
-    if (!isLoading) {
-      fetchChildData();
-    }
-  }, [isAuthenticated, isLoading, user, profile, toast]);
+    return () => clearTimeout(timer);
+  }, [activities]);
 
   const handleCompleteTask = async (activityId: string) => {
-    if (!user || !childData) return;
-    
     try {
-      // 1. Update the activity status in the database
-      const { error: updateError } = await supabase
-        .from('activities')
-        .update({ 
-          completed: true,
-          completed_date: new Date().toISOString() 
-        })
-        .eq('id', activityId);
-        
-      if (updateError) {
-        throw updateError;
-      }
-      
-      // Get the activity details
+      // Find the activity
       const activity = activities.find(a => a.id === activityId);
       if (!activity) return;
+      
+      /* 
+      BACKEND INTEGRATION COMMENT:
+      In a real application, this would connect to your database to:
+      1. Update the activity status to completed
+      2. Add GoodCoins to the child's balance
+      3. Create a transaction record for earning coins
+      */
+      
+      // Update activity status locally
+      const updatedActivities = activities.map(a => 
+        a.id === activityId ? { ...a, status: 'completed' } : a
+      );
+      setActivities(updatedActivities);
+      
+      // Update child's GoodCoins locally
+      setChildData(prev => ({
+        ...prev,
+        good_coins: prev.good_coins + activity.goodCoins
+      }));
+      
+      // Add a new transaction
+      const newTransaction = {
+        id: `transaction-${Date.now()}`,
+        childId: childData.id,
+        amount: activity.goodCoins,
+        type: "earned",
+        description: `Completed activity: ${activity.title}`,
+        createdBy: childData.id,
+        createdAt: new Date().toISOString()
+      };
+      
+      setTransactions(prev => [newTransaction, ...prev]);
+      
+      // Update completed and pending activities
+      const completed = updatedActivities.filter(a => a.status === 'completed');
+      const pending = updatedActivities.filter(a => a.status === 'pending');
+      
+      setCompletedActivities(completed);
+      setPendingActivities(pending);
       
       toast({
         title: "Activity Completed!",
         description: `You earned ${activity.goodCoins} GoodCoins!`,
       });
-      
-      // Refresh data to show updated state
-      const { data: activitiesData } = await supabase
-        .from('activities')
-        .select('*')
-        .eq('assigned_to', user.id);
-        
-      if (activitiesData) {
-        const formattedActivities = activitiesData.map(activity => adaptSupabaseActivity(activity));
-        setActivities(formattedActivities);
-        
-        const completed = formattedActivities.filter(activity => activity.status === 'completed');
-        const pending = formattedActivities.filter(activity => activity.status === 'pending');
-        
-        setCompletedActivities(completed);
-        setPendingActivities(pending);
-      }
-      
-      // Refresh transactions
-      const { data: transactionsData } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('child_id', user.id)
-        .order('created_at', { ascending: false });
-        
-      if (transactionsData) {
-        const formattedTransactions = transactionsData.map(transaction => {
-          return adaptSupabaseTransaction({
-            id: transaction.id,
-            child_id: transaction.child_id,
-            amount: transaction.amount,
-            transaction_type: transaction.type === 'spend' ? 'spend' : 'earn',
-            type: (transaction.type as 'earned' | 'spent' | 'penalty' | 'given'),
-            description: transaction.description,
-            created_by: transaction.created_by,
-            created_at: transaction.created_at
-          });
-        });
-        setTransactions(formattedTransactions);
-      }
-      
-      // Update child's GoodCoins
-      const { data: updatedChild } = await supabase
-        .from('children')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-        
-      if (updatedChild) {
-        setChildData(updatedChild);
-      }
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error completing task:', error);
       toast({
         title: "Error",
@@ -206,7 +189,12 @@ const ChildDashboard: React.FC = () => {
     }
   };
 
-  if (isLoading || loading) {
+  const handleLogout = () => {
+    localStorage.removeItem('auth');
+    navigate('/login');
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
         <div className="text-2xl text-goodchild-text-primary">Loading your dashboard...</div>
@@ -230,28 +218,15 @@ const ChildDashboard: React.FC = () => {
     );
   }
 
-  if (!isAuthenticated || !profile || profile.role !== 'child') {
-    return (
-      <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
-        <div className="text-2xl text-goodchild-text-primary">Please log in as a child to view this dashboard</div>
-      </div>
-    );
-  }
-
-  if (!childData) {
-    return (
-      <div className="min-h-screen bg-goodchild-background flex items-center justify-center">
-        <div className="text-2xl text-goodchild-text-primary">Child data not found</div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-goodchild-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
         <div className="glass-card p-6 rounded-xl mb-6 text-center">
-          <h1 className="text-4xl font-bold text-gradient mb-2">My Dashboard!</h1>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-4xl font-bold text-gradient">My Dashboard!</h1>
+            <Button onClick={handleLogout} variant="outline">Logout</Button>
+          </div>
           <p className="text-xl text-goodchild-text-secondary mb-4">
             Welcome back, {childData.nickname || childData.name}!
           </p>
@@ -390,7 +365,7 @@ const ChildDashboard: React.FC = () => {
                           </div>
                           <div className="flex items-center text-red-500 font-bold">
                             <X className="h-4 w-4 mr-1" />
-                            {transaction.amount} GoodCoins
+                            {Math.abs(transaction.amount)} GoodCoins
                           </div>
                         </div>
                       </CardContent>
@@ -410,7 +385,7 @@ const ChildDashboard: React.FC = () => {
                   <p>You haven't redeemed any rewards yet!</p>
                   <Button 
                     className="mt-2 bg-goodchild-secondary hover:bg-goodchild-secondary/80"
-                    onClick={() => window.location.href = '/rewards'}
+                    onClick={() => navigate('/rewards-hub')}
                   >
                     View Rewards
                   </Button>
@@ -428,7 +403,7 @@ const ChildDashboard: React.FC = () => {
                           </div>
                           <div className="flex items-center text-blue-500 font-bold">
                             <GoodCoinIcon className="h-4 w-4 mr-1" />
-                            {transaction.amount} GoodCoins
+                            {Math.abs(transaction.amount)} GoodCoins
                           </div>
                         </div>
                       </CardContent>
@@ -450,7 +425,7 @@ const ChildDashboard: React.FC = () => {
             </p>
             <Button 
               className="bg-goodchild-secondary hover:bg-goodchild-secondary/80"
-              onClick={() => window.location.href = '/rewards'}
+              onClick={() => navigate('/rewards-hub')}
             >
               Go to Rewards Hub
             </Button>

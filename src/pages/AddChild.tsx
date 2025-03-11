@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import ChildAccountForm from '@/components/ChildAccountForm';
@@ -10,17 +9,10 @@ import { Button } from '@/components/ui/button';
 function AddChild() {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { createChildAccount } = useSupabaseAuth();
   const { toast } = useToast();
-
-  const handleSubmit = async (formData: {
-    name: string;
-    surname: string;
-    nickname?: string;
-    email: string;
-    password: string;
-    avatar?: string;
-  }) => {
+  
+  // This function would normally create a child account in the database
+  const handleSubmit = async (formData: any) => {
     try {
       setSubmitting(true);
       
@@ -32,7 +24,14 @@ function AddChild() {
         userId,
       });
       
-      // Create the child account
+      /* 
+      BACKEND INTEGRATION COMMENT:
+      In a real application, this would connect to your database to:
+      1. Create a profile record for the child
+      2. Add a record in the children table linking to the parent's ID
+      3. Set up initial GoodCoins balance
+      
+      Example code (removed):
       await createChildAccount({
         name: formData.name,
         surname: formData.surname,
@@ -41,6 +40,10 @@ function AddChild() {
         avatar: formData.avatar || null,
         userId
       });
+      */
+      
+      // Simulate a short delay for the "API call"
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
         title: "Success!",
