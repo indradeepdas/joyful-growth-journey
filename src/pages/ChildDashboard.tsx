@@ -14,6 +14,7 @@ import GoodCoinIcon from '@/components/GoodCoinIcon';
 import { CheckCircle, Clock, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import SpinWheel from '@/components/SpinWheel';
 
 // Dummy child data
 const DUMMY_CHILD = {
@@ -102,16 +103,6 @@ const ChildDashboard: React.FC = () => {
     // Simulate loading data from backend
     const timer = setTimeout(() => {
       try {
-        // Check if user is logged in as a child
-        const authData = localStorage.getItem('auth');
-        const auth = authData ? JSON.parse(authData) : null;
-        
-        if (!auth || auth.role !== 'child') {
-          setError("You must be logged in as a child to view this dashboard");
-          setLoading(false);
-          return;
-        }
-        
         // Filter activities by completion status
         const completed = activities.filter(activity => activity.status === 'completed');
         const pending = activities.filter(activity => activity.status === 'pending');
@@ -189,6 +180,34 @@ const ChildDashboard: React.FC = () => {
     }
   };
 
+  const handleWinCoins = (amount: number) => {
+    /* 
+    BACKEND INTEGRATION COMMENT:
+    In a real application, this would connect to your database to:
+    1. Add the won GoodCoins to the child's balance
+    2. Create a transaction record for the prize
+    */
+    
+    // Update child's GoodCoins locally
+    setChildData(prev => ({
+      ...prev,
+      good_coins: prev.good_coins + amount
+    }));
+    
+    // Add a new transaction
+    const newTransaction = {
+      id: `transaction-${Date.now()}`,
+      childId: childData.id,
+      amount: amount,
+      type: "earned",
+      description: `Won ${amount} GoodCoins from Spin Wheel!`,
+      createdBy: childData.id,
+      createdAt: new Date().toISOString()
+    };
+    
+    setTransactions(prev => [newTransaction, ...prev]);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('auth');
     navigate('/login');
@@ -240,8 +259,11 @@ const ChildDashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* SpinWheel Section */}
+        <SpinWheel onWin={handleWinCoins} />
+
         {/* Tasks Section */}
-        <div className="glass-card p-6 rounded-xl mb-6">
+        <div className="glass-card p-6 rounded-xl mb-6 mt-6">
           <h2 className="text-2xl font-bold text-goodchild-text-primary mb-4">My Tasks</h2>
           
           <Tabs defaultValue="pending" className="w-full">

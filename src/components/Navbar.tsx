@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
@@ -39,6 +40,12 @@ const Navbar: React.FC = () => {
             className={`nav-link ${location.pathname === '/parent-dashboard' || location.pathname === '/child-dashboard' || location.pathname === '/public/dashboard' ? 'active' : ''}`}
           >
             Dashboard
+          </Link>
+          <Link 
+            to="/child-dashboard" 
+            className={`nav-link ${location.pathname === '/child-dashboard' ? 'active' : ''}`}
+          >
+            Child Dashboard
           </Link>
           <Link 
             to={getRouteForLink('/activities', '/public/activities')} 
@@ -104,6 +111,13 @@ const Navbar: React.FC = () => {
                 onClick={() => setShowMenu(false)}
               >
                 Dashboard
+              </Link>
+              <Link 
+                to="/child-dashboard" 
+                className={`mobile-nav-link ${location.pathname === '/child-dashboard' ? 'active' : ''}`}
+                onClick={() => setShowMenu(false)}
+              >
+                Child Dashboard
               </Link>
               <Link 
                 to={getRouteForLink('/activities', '/public/activities')} 

@@ -10,6 +10,11 @@ interface PrivateRouteProps {
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
   const location = useLocation();
   
+  // Special case for child dashboard - always accessible
+  if (location.pathname === '/child-dashboard') {
+    return children ? <>{children}</> : <Outlet />;
+  }
+  
   // Get authentication data from localStorage
   const authData = localStorage.getItem('auth');
   const auth = authData ? JSON.parse(authData) : null;

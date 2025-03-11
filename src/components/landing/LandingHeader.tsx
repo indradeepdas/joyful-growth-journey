@@ -22,6 +22,9 @@ const LandingHeader = () => {
         <Link to="/public/dashboard" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
           Parent Dashboard
         </Link>
+        <Link to="/child-dashboard" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
+          Child Dashboard
+        </Link>
         <Link to="/public/activities" className="text-goodchild-text-primary hover:text-goodchild-primary transition-colors">
           Activity Center
         </Link>
