@@ -78,16 +78,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 2;
     ctx.stroke();
-
-    // Draw pointer
-    ctx.beginPath();
-    ctx.moveTo(centerX + radius + 10, centerY);
-    ctx.lineTo(centerX + radius - 20, centerY - 15);
-    ctx.lineTo(centerX + radius - 20, centerY + 15);
-    ctx.closePath();
-    ctx.fillStyle = '#333';
-    ctx.fill();
-
   }, [rotation]);
 
   // Launch confetti
@@ -151,18 +141,16 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
     
     // Calculate the final rotation
     // Each prize takes up (360 / PRIZES.length) degrees
-    // We need to point to the opposite of the winning prize
     const prizeAngle = 360 / PRIZES.length;
     
-    // Calculate the destination angle
-    // We need to add (winningIndex * prizeAngle) to point to the specific segment
-    // Then add prizeAngle/2 to point to the middle of the segment
-    // Then add additional offset to account for the pointer position
-    const destinationAngle = (winningIndex * prizeAngle) + (prizeAngle / 2) + 90;
+    // For the wheel to stop with the arrow pointing to the winning segment,
+    // we need to calculate the rotation so that the segment aligns with the arrow at 270 degrees (top position)
+    // The arrow is fixed at the top (270 degrees)
+    const destinationAngle = 270 - (winningIndex * prizeAngle) - (prizeAngle / 2);
     
-    // Add several full rotations plus the destination
+    // Add several full rotations plus the destination angle
     const spins = 5; // Number of complete rotations
-    const newRotation = rotation + (spins * 360) + destinationAngle;
+    const newRotation = (spins * 360) + destinationAngle;
     
     // Animate the rotation
     let currentRotation = rotation;
@@ -178,7 +166,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
       const easedProgress = easeOut(progress);
       
       currentRotation = rotation + (newRotation - rotation) * easedProgress;
-      setRotation(currentRotation);
+      setRotation(currentRotation % 360); // Keep rotation within 0-360 for better performance
       
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -215,19 +203,28 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
       </div>
       
       <div className="flex flex-col items-center justify-center">
-        <div 
-          className="relative my-6"
-          style={{ transform: `rotate(${rotation}deg)`, transition: isSpinning ? 'none' : 'transform 0.3s ease-out' }}
-        >
-          <canvas 
-            ref={canvasRef} 
-            width={300} 
-            height={300} 
-            className="rounded-full shadow-lg"
-          ></canvas>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="bg-white rounded-full p-2 shadow-inner">
-              <GoodCoinIcon size="lg" animated={isSpinning} />
+        <div className="relative my-6">
+          {/* Fixed pointer/arrow at the top of the wheel */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+            <div className="w-6 h-8 bg-goodchild-primary flex items-center justify-center rounded-t-full">
+              <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[15px] border-b-white"></div>
+            </div>
+          </div>
+          
+          {/* Spinning wheel */}
+          <div 
+            style={{ transform: `rotate(${rotation}deg)`, transition: isSpinning ? 'none' : 'transform 0.3s ease-out' }}
+          >
+            <canvas 
+              ref={canvasRef} 
+              width={300} 
+              height={300} 
+              className="rounded-full shadow-lg"
+            ></canvas>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="bg-white rounded-full p-2 shadow-inner">
+                <GoodCoinIcon size="lg" animated={isSpinning} />
+              </div>
             </div>
           </div>
         </div>
