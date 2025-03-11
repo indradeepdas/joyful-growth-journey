@@ -8,8 +8,11 @@ export interface TestimonialItem {
 }
 
 export interface DevelopmentAreaItem {
-  title: string;
+  name: string;
   description: string;
-  icon: string;
+  icon: React.ReactNode;
+  smallIcon: React.ReactNode;
   color: string;
+  bgColor: string;
+  examples: string[];
 }

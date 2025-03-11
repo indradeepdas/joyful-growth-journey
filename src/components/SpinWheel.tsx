@@ -153,7 +153,12 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onWin }) => {
     // Each prize takes up (360 / PRIZES.length) degrees
     // We need to point to the opposite of the winning prize
     const prizeAngle = 360 / PRIZES.length;
-    const destinationAngle = 360 - (winningIndex * prizeAngle);
+    
+    // Calculate the destination angle
+    // We need to add (winningIndex * prizeAngle) to point to the specific segment
+    // Then add prizeAngle/2 to point to the middle of the segment
+    // Then add additional offset to account for the pointer position
+    const destinationAngle = (winningIndex * prizeAngle) + (prizeAngle / 2) + 90;
     
     // Add several full rotations plus the destination
     const spins = 5; // Number of complete rotations

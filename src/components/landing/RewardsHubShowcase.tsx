@@ -77,7 +77,7 @@ const RewardsHubShowcase = () => {
           <Link to="/public/rewards">
             <Button 
               size="lg" 
-              className="bg-[#FFA500] hover:bg-[#E69500] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] hover:scale-105 transition-transform duration-200"
+              className="bg-[#FFA500] hover:bg-[#E69500] animate-[wiggle_1s_ease-in-out_infinite] hover:scale-105 transition-transform duration-200"
             >
               Visit Rewards Hub
             </Button>
