@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { TestimonialItem } from './types';
+import { cn } from '@/lib/utils';
 
 const testimonials: TestimonialItem[] = [
   {
@@ -76,8 +77,49 @@ const testimonials: TestimonialItem[] = [
 ];
 
 const TestimonialsSection = () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+    
+    // Clone testimonials to create infinite scroll effect
+    const cloneTestimonials = () => {
+      const items = scrollContainer.querySelectorAll('.testimonial-item');
+      const clonedItems = Array.from(items).map(item => item.cloneNode(true));
+      clonedItems.forEach(item => {
+        scrollContainer.appendChild(item);
+      });
+    };
+    
+    cloneTestimonials();
+    
+    let scrollPosition = 0;
+    const scrollSpeed = 0.5; // pixels per frame
+    
+    const scroll = () => {
+      if (!scrollContainer) return;
+      
+      scrollPosition += scrollSpeed;
+      
+      // Reset scroll position when we've scrolled past half the original items
+      if (scrollPosition >= scrollContainer.children[0].clientWidth * (testimonials.length / 2)) {
+        scrollPosition = 0;
+      }
+      
+      scrollContainer.style.transform = `translateX(${-scrollPosition}px)`;
+      requestAnimationFrame(scroll);
+    };
+    
+    const animationId = requestAnimationFrame(scroll);
+    
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+  
   return (
-    <section className="w-full py-16 px-4 bg-goodchild-background">
+    <section className="w-full py-16 px-4 bg-goodchild-background overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-goodchild-text-primary mb-4">
@@ -88,28 +130,40 @@ const TestimonialsSection = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="glass-card p-6 rounded-xl hover:shadow-md transition-all">
-              <div className="flex items-center mb-4">
-                <div className="mr-4">
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.name} 
-                    className="w-16 h-16 rounded-full object-cover border-2 border-goodchild-accent" 
-                  />
+        <div className="relative">
+          <div 
+            ref={scrollRef} 
+            className="flex items-stretch gap-6 whitespace-nowrap will-change-transform"
+            style={{ transform: 'translateX(0)' }}
+          >
+            {testimonials.map((testimonial, index) => (
+              <div 
+                key={index} 
+                className={cn(
+                  "testimonial-item glass-card p-6 rounded-xl hover:shadow-md transition-all inline-block whitespace-normal",
+                  "w-80 flex-shrink-0"
+                )}
+              >
+                <div className="flex items-center mb-4">
+                  <div className="mr-4">
+                    <img 
+                      src={testimonial.image} 
+                      alt={testimonial.name} 
+                      className="w-16 h-16 rounded-full object-cover border-2 border-goodchild-accent" 
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-goodchild-text-primary">{testimonial.name}</h3>
+                    <p className="text-goodchild-text-secondary text-sm">{testimonial.role}</p>
+                    {testimonial.location && (
+                      <p className="text-goodchild-accent text-xs font-medium mt-1">{testimonial.location}</p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-goodchild-text-primary">{testimonial.name}</h3>
-                  <p className="text-goodchild-text-secondary text-sm">{testimonial.role}</p>
-                  {testimonial.location && (
-                    <p className="text-goodchild-accent text-xs font-medium mt-1">{testimonial.location}</p>
-                  )}
-                </div>
+                <p className="text-goodchild-text-secondary italic">{testimonial.quote}</p>
               </div>
-              <p className="text-goodchild-text-secondary italic">"{testimonial.quote}"</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
