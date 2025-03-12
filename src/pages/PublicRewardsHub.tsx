@@ -1,27 +1,17 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import GoodCoinIcon from '@/components/GoodCoinIcon';
-import { Lock, Tag } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import AffiliatedPartners from '@/components/rewards/AffiliatedPartners';
 import EmptySearch from '@/components/rewards/EmptySearch';
 import SearchBar from '@/components/rewards/SearchBar';
 import CategoryTabs from '@/components/rewards/CategoryTabs';
 import RedemptionDialog from '@/components/rewards/RedemptionDialog';
+import RewardCard from '@/components/rewards/RewardCard';
 
-// Sample category distribution for rewards
-const categoryMap = {
-  inYourCity: ['1', '5'],
-  dailyStuff: ['2', '6'],
-  brandExclusives: ['3', '7'],
-  experiences: ['4', '8'],
-};
-
-// Sample rewards with real images for preview
 const sampleRewards = [
   {
     id: '1',
@@ -113,14 +103,20 @@ const sampleRewards = [
   }
 ];
 
+const categoryMap = {
+  city: ['1', '5'],
+  daily: ['2', '6'],
+  brand: ['3', '7'],
+  experience: ['4', '8'],
+};
+
 const PublicRewardsHub: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [visibilityTab, setVisibilityTab] = useState('all');
-  const [selectedCategory, setSelectedCategory] = useState('inYourCity');
+  const [selectedCategory, setSelectedCategory] = useState('city');
   const [selectedReward, setSelectedReward] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Handle redemption confirmation
   const handleRedemptionConfirm = () => {
     if (selectedReward?.externalUrl) {
       window.open(selectedReward.externalUrl, '_blank');
@@ -128,20 +124,16 @@ const PublicRewardsHub: React.FC = () => {
     setDialogOpen(false);
   };
 
-  // Handle redeem button click
   const handleRedeemClick = (reward: any) => {
     setSelectedReward(reward);
     setDialogOpen(true);
   };
   
-  // Filter and sort rewards
   const filteredRewards = sampleRewards.filter(reward => {
-    // Filter by search query
     const matchesSearch = 
       reward.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       reward.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Filter by category
     const matchesCategory = categoryMap[selectedCategory as keyof typeof categoryMap]?.includes(reward.id);
     
     return matchesSearch && matchesCategory;
@@ -153,7 +145,6 @@ const PublicRewardsHub: React.FC = () => {
       
       <main className="flex-1 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {/* Page header */}
           <div className="text-center mb-10">
             <h1 className="text-4xl font-bold text-[#4a6fa1] mb-4">
               Rewards Hub Preview
@@ -163,7 +154,7 @@ const PublicRewardsHub: React.FC = () => {
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Link to="/signup">
-                <Button size="lg" className="bg-[#f8c291] hover:bg-[#f5b880]">Create Your Account</Button>
+                <Button size="lg" className="bg-[#aed6f1] hover:bg-[#85c1e9] text-[#4a6fa1]">Create Your Account</Button>
               </Link>
               <Link to="/login">
                 <Button variant="outline" size="lg" className="border-[#aed6f1] text-[#4a6fa1]">Log In</Button>
@@ -171,13 +162,10 @@ const PublicRewardsHub: React.FC = () => {
             </div>
           </div>
           
-          {/* Affiliated Partners */}
           <AffiliatedPartners />
           
-          {/* Category Tabs */}
           <CategoryTabs selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
           
-          {/* Search & sort bar */}
           <SearchBar 
             searchQuery={searchQuery}
             visibilityTab={visibilityTab}
@@ -186,62 +174,22 @@ const PublicRewardsHub: React.FC = () => {
             isChild={false}
           />
           
-          {/* Rewards grid with improved alignment */}
           {filteredRewards.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
               {filteredRewards.map((reward) => (
-                <Card 
-                  key={reward.id} 
-                  className="overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full border-[#aed6f1]"
-                >
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={reward.imageUrl}
-                      alt={reward.name}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-3 right-3 bg-[#f8c291] text-[#4a6fa1] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                      <GoodCoinIcon className="h-4 w-4" />
-                      <span>{reward.goodCoins}</span>
-                    </div>
-                  </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl line-clamp-1 text-[#4a6fa1]">{reward.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <p className="text-[#85c1e9] line-clamp-3 mb-4">
-                      {reward.description}
-                    </p>
-                    
-                    {(reward.originalPrice || reward.discountedPrice) && (
-                      <div className="flex items-center gap-2 mt-3">
-                        <Tag size={16} className="text-[#85c1e9]" />
-                        {reward.originalPrice !== reward.discountedPrice && reward.originalPrice && (
-                          <span className="text-[#85c1e9] line-through">${reward.originalPrice.toFixed(2)}</span>
-                        )}
-                        {reward.discountedPrice && (
-                          <span className="font-medium text-[#4a6fa1]">${reward.discountedPrice.toFixed(2)}</span>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter className="pt-0 mt-auto">
-                    <Button 
-                      className="w-full bg-[#f8c291] hover:bg-[#f5b880] text-[#4a6fa1]"
-                      onClick={() => handleRedeemClick(reward)}
-                    >
-                      <Lock className="mr-2 h-4 w-4" />
-                      Log in to Redeem
-                    </Button>
-                  </CardFooter>
-                </Card>
+                <RewardCard
+                  key={reward.id}
+                  reward={reward}
+                  isPending={false}
+                  isDisabled={true}
+                  onRedeemClick={handleRedeemClick}
+                />
               ))}
             </div>
           ) : (
             <EmptySearch />
           )}
           
-          {/* Preview Features Disclaimer */}
           <div className="bg-[#f8c291] border border-[#f5b880] rounded-lg p-6 text-center mb-8">
             <h2 className="text-xl font-semibold mb-2 text-[#4a6fa1]">This is a Preview</h2>
             <p className="mb-4 text-[#4a6fa1]">
@@ -259,7 +207,6 @@ const PublicRewardsHub: React.FC = () => {
         </div>
       </main>
       
-      {/* Redemption Confirmation Dialog */}
       {selectedReward && (
         <RedemptionDialog
           open={dialogOpen}

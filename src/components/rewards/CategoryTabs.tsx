@@ -15,16 +15,16 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
     <div className="mb-8">
       <Tabs value={selectedCategory} onValueChange={onCategoryChange} className="w-full">
         <TabsList className="bg-[#e8f0fe] w-full justify-start overflow-x-auto flex-wrap">
-          <TabsTrigger value="inYourCity" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
+          <TabsTrigger value="city" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
             In Your City
           </TabsTrigger>
-          <TabsTrigger value="dailyStuff" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
+          <TabsTrigger value="daily" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
             Daily Stuff
           </TabsTrigger>
-          <TabsTrigger value="brandExclusives" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
+          <TabsTrigger value="brand" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
             Brand Exclusives
           </TabsTrigger>
-          <TabsTrigger value="experiences" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
+          <TabsTrigger value="experience" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
             Experiences
           </TabsTrigger>
         </TabsList>
