@@ -1,94 +1,70 @@
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
 
-const partnerLogos = [
-  {
-    name: 'TEMU',
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0f/Temu_Logo.png'
-  },
-  {
-    name: 'AMAZON',
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg'
-  },
-  {
-    name: 'THALIA.DE',
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Thalia_Logo.svg'
-  },
-  {
-    name: 'SHEIN',
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c0/SHEIN_%28logo%29.svg'
-  },
-  {
-    name: 'LEGO',
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/24/LEGO_logo.svg'
-  }
-];
+const AffiliatedPartners: React.FC = () => {
+  const partners = [
+    {
+      name: 'Amazon',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1200px-Amazon_logo.svg.png'
+    },
+    {
+      name: 'TEMU',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Temu_Logo.svg/1200px-Temu_Logo.svg.png'
+    },
+    {
+      name: 'THALIA.DE',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Thalia_Logo_2022.svg/2560px-Thalia_Logo_2022.svg.png'
+    },
+    {
+      name: 'SHEIN',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/SHEIN_logo.svg/2560px-SHEIN_logo.svg.png'
+    },
+    {
+      name: 'LEGO',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/1200px-LEGO_logo.svg.png'
+    }
+  ];
 
-const AffiliatedPartners = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
-    
-    // Clone logos to create infinite scroll effect
-    const cloneLogos = () => {
-      const items = scrollContainer.querySelectorAll('.partner-logo');
-      const clonedItems = Array.from(items).map(item => item.cloneNode(true));
-      clonedItems.forEach(item => {
-        scrollContainer.appendChild(item);
-      });
-    };
-    
-    cloneLogos();
-    
-    let scrollPosition = 0;
-    const scrollSpeed = 0.5; // pixels per frame
-    
-    const scroll = () => {
-      if (!scrollContainer) return;
-      
-      scrollPosition += scrollSpeed;
-      
-      // Reset scroll position when we've scrolled past half the original items
-      if (scrollPosition >= scrollContainer.children[0].clientWidth * (partnerLogos.length / 2)) {
-        scrollPosition = 0;
-      }
-      
-      scrollContainer.style.transform = `translateX(${-scrollPosition}px)`;
-      requestAnimationFrame(scroll);
-    };
-    
-    const animationId = requestAnimationFrame(scroll);
-    
-    return () => {
-      cancelAnimationFrame(animationId);
-    };
-  }, []);
-  
   return (
-    <div className="bg-[#f0f3f8] py-8 overflow-hidden"> {/* Dreamy skies background */}
-      <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-[#4a6fa1] text-2xl font-bold text-center mb-6">Our Affiliated Partners</h2>
-        <div className="relative py-4">
-          <div 
-            ref={scrollRef} 
-            className="flex items-center gap-12 whitespace-nowrap will-change-transform"
-            style={{ transform: 'translateX(0)' }}
+    <div className="py-8 bg-[#e8f0fe] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <h2 className="text-2xl font-bold text-center text-[#4a6fa1] mb-6">Our Affiliated Partners</h2>
+        <div className="relative">
+          <motion.div
+            className="flex space-x-12 items-center"
+            animate={{ x: [0, -1500] }}
+            transition={{
+              x: {
+                repeat: Infinity,
+                repeatType: "loop",
+                duration: 30,
+                ease: "linear",
+              },
+            }}
           >
-            {partnerLogos.map((partner, index) => (
-              <div 
-                key={index}
-                className="partner-logo inline-block flex-shrink-0"
-              >
-                <img 
-                  src={partner.logoUrl} 
-                  alt={partner.name} 
-                  className="h-12 md:h-16 object-contain"
+            {/* First set of logos */}
+            {partners.map((partner, index) => (
+              <div key={`partner-1-${index}`} className="flex-shrink-0">
+                <img
+                  src={partner.logo}
+                  alt={partner.name}
+                  className="h-16 object-contain"
                 />
               </div>
             ))}
-          </div>
+            
+            {/* Duplicated set of logos for continuous scrolling */}
+            {partners.map((partner, index) => (
+              <div key={`partner-2-${index}`} className="flex-shrink-0">
+                <img
+                  src={partner.logo}
+                  alt={partner.name}
+                  className="h-16 object-contain"
+                />
+              </div>
+            ))}
+          </motion.div>
         </div>
       </div>
     </div>

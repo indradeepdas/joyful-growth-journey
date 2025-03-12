@@ -5,11 +5,21 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import GoodCoinIcon from '@/components/GoodCoinIcon';
-import { Search, Lock, Tag } from 'lucide-react';
+import { Lock, Tag } from 'lucide-react';
+import AffiliatedPartners from '@/components/rewards/AffiliatedPartners';
+import EmptySearch from '@/components/rewards/EmptySearch';
+import SearchBar from '@/components/rewards/SearchBar';
+import CategoryTabs from '@/components/rewards/CategoryTabs';
+import RedemptionDialog from '@/components/rewards/RedemptionDialog';
+
+// Sample category distribution for rewards
+const categoryMap = {
+  inYourCity: ['1', '5'],
+  dailyStuff: ['2', '6'],
+  brandExclusives: ['3', '7'],
+  experiences: ['4', '8'],
+};
 
 // Sample rewards with real images for preview
 const sampleRewards = [
@@ -20,7 +30,9 @@ const sampleRewards = [
     imageUrl: 'https://images.unsplash.com/photo-1544652478-6653e09f18a2?w=600&h=400&fit=crop',
     goodCoins: 50,
     originalPrice: null,
-    discountedPrice: null
+    discountedPrice: null,
+    category: 'inYourCity',
+    externalUrl: 'https://example.com/reward/1'
   },
   {
     id: '2',
@@ -29,7 +41,9 @@ const sampleRewards = [
     imageUrl: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&h=400&fit=crop',
     goodCoins: 75,
     originalPrice: null,
-    discountedPrice: null
+    discountedPrice: null,
+    category: 'dailyStuff',
+    externalUrl: 'https://example.com/reward/2'
   },
   {
     id: '3',
@@ -38,7 +52,9 @@ const sampleRewards = [
     imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&h=400&fit=crop',
     goodCoins: 60,
     originalPrice: null,
-    discountedPrice: null
+    discountedPrice: null,
+    category: 'brandExclusives',
+    externalUrl: 'https://example.com/reward/3'
   },
   {
     id: '4',
@@ -47,7 +63,9 @@ const sampleRewards = [
     imageUrl: 'https://images.unsplash.com/photo-1531353826977-0941b4779a1c?w=600&h=400&fit=crop',
     goodCoins: 40,
     originalPrice: null,
-    discountedPrice: null
+    discountedPrice: null,
+    category: 'experiences',
+    externalUrl: 'https://example.com/reward/4'
   },
   {
     id: '5',
@@ -56,7 +74,9 @@ const sampleRewards = [
     imageUrl: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&h=400&fit=crop',
     goodCoins: 35,
     originalPrice: 5.99,
-    discountedPrice: 4.99
+    discountedPrice: 4.99,
+    category: 'inYourCity',
+    externalUrl: 'https://example.com/reward/5'
   },
   {
     id: '6',
@@ -65,7 +85,9 @@ const sampleRewards = [
     imageUrl: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=400&fit=crop',
     goodCoins: 100,
     originalPrice: null,
-    discountedPrice: null
+    discountedPrice: null,
+    category: 'dailyStuff',
+    externalUrl: 'https://example.com/reward/6'
   },
   {
     id: '7',
@@ -74,7 +96,9 @@ const sampleRewards = [
     imageUrl: 'https://images.unsplash.com/photo-1556742031-c6961e8560b0?w=600&h=400&fit=crop',
     goodCoins: 150,
     originalPrice: 10.00,
-    discountedPrice: 10.00
+    discountedPrice: 10.00,
+    category: 'brandExclusives',
+    externalUrl: 'https://example.com/reward/7'
   },
   {
     id: '8',
@@ -83,13 +107,32 @@ const sampleRewards = [
     imageUrl: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&h=400&fit=crop',
     goodCoins: 80,
     originalPrice: null,
-    discountedPrice: null
+    discountedPrice: null,
+    category: 'experiences',
+    externalUrl: 'https://example.com/reward/8'
   }
 ];
 
 const PublicRewardsHub: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('name');
+  const [visibilityTab, setVisibilityTab] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('inYourCity');
+  const [selectedReward, setSelectedReward] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Handle redemption confirmation
+  const handleRedemptionConfirm = () => {
+    if (selectedReward?.externalUrl) {
+      window.open(selectedReward.externalUrl, '_blank');
+    }
+    setDialogOpen(false);
+  };
+
+  // Handle redeem button click
+  const handleRedeemClick = (reward: any) => {
+    setSelectedReward(reward);
+    setDialogOpen(true);
+  };
   
   // Filter and sort rewards
   const filteredRewards = sampleRewards.filter(reward => {
@@ -98,71 +141,50 @@ const PublicRewardsHub: React.FC = () => {
       reward.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       reward.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    return matchesSearch;
-  }).sort((a, b) => {
-    // Sort based on selected sort option
-    switch (sortBy) {
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'priceAsc':
-        return a.goodCoins - b.goodCoins;
-      case 'priceDesc':
-        return b.goodCoins - a.goodCoins;
-      default:
-        return 0;
-    }
+    // Filter by category
+    const matchesCategory = categoryMap[selectedCategory as keyof typeof categoryMap]?.includes(reward.id);
+    
+    return matchesSearch && matchesCategory;
   });
 
   return (
-    <div className="min-h-screen bg-goodchild-background flex flex-col font-sassoon">
+    <div className="min-h-screen bg-[#e8f0fe] flex flex-col font-sassoon">
       <Navbar />
       
       <main className="flex-1 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Page header */}
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-goodchild-text-primary mb-4">
+            <h1 className="text-4xl font-bold text-[#4a6fa1] mb-4">
               Rewards Hub Preview
             </h1>
-            <p className="text-xl text-goodchild-text-secondary max-w-3xl mx-auto">
+            <p className="text-xl text-[#85c1e9] max-w-3xl mx-auto">
               Browse sample rewards your children can earn by completing activities. Create an account to manage and customize rewards.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Link to="/signup">
-                <Button size="lg" className="bg-[#FFA500] hover:bg-[#E69500]">Create Your Account</Button>
+                <Button size="lg" className="bg-[#f8c291] hover:bg-[#f5b880]">Create Your Account</Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="lg">Log In</Button>
+                <Button variant="outline" size="lg" className="border-[#aed6f1] text-[#4a6fa1]">Log In</Button>
               </Link>
             </div>
           </div>
           
+          {/* Affiliated Partners */}
+          <AffiliatedPartners />
+          
+          {/* Category Tabs */}
+          <CategoryTabs selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+          
           {/* Search & sort bar */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Input
-                type="text"
-                placeholder="Search rewards..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-goodchild-text-secondary h-4 w-4" />
-            </div>
-            
-            <div className="flex gap-4">
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="name">Sort by Name</SelectItem>
-                  <SelectItem value="priceAsc">Price: Low to High</SelectItem>
-                  <SelectItem value="priceDesc">Price: High to Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <SearchBar 
+            searchQuery={searchQuery}
+            visibilityTab={visibilityTab}
+            onSearchChange={(e) => setSearchQuery(e.target.value)}
+            onVisibilityChange={setVisibilityTab}
+            isChild={false}
+          />
           
           {/* Rewards grid with improved alignment */}
           {filteredRewards.length > 0 ? (
@@ -170,7 +192,7 @@ const PublicRewardsHub: React.FC = () => {
               {filteredRewards.map((reward) => (
                 <Card 
                   key={reward.id} 
-                  className="overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full"
+                  className="overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full border-[#aed6f1]"
                 >
                   <div className="relative h-48 overflow-hidden">
                     <img
@@ -178,35 +200,35 @@ const PublicRewardsHub: React.FC = () => {
                       alt={reward.name}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-3 right-3 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                    <div className="absolute top-3 right-3 bg-[#f8c291] text-[#4a6fa1] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                       <GoodCoinIcon className="h-4 w-4" />
                       <span>{reward.goodCoins}</span>
                     </div>
                   </div>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-xl line-clamp-1">{reward.name}</CardTitle>
+                    <CardTitle className="text-xl line-clamp-1 text-[#4a6fa1]">{reward.name}</CardTitle>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                    <p className="text-goodchild-text-secondary line-clamp-3 mb-4">
+                    <p className="text-[#85c1e9] line-clamp-3 mb-4">
                       {reward.description}
                     </p>
                     
                     {(reward.originalPrice || reward.discountedPrice) && (
                       <div className="flex items-center gap-2 mt-3">
-                        <Tag size={16} className="text-gray-500" />
+                        <Tag size={16} className="text-[#85c1e9]" />
                         {reward.originalPrice !== reward.discountedPrice && reward.originalPrice && (
-                          <span className="text-gray-500 line-through">${reward.originalPrice.toFixed(2)}</span>
+                          <span className="text-[#85c1e9] line-through">${reward.originalPrice.toFixed(2)}</span>
                         )}
                         {reward.discountedPrice && (
-                          <span className="font-medium">${reward.discountedPrice.toFixed(2)}</span>
+                          <span className="font-medium text-[#4a6fa1]">${reward.discountedPrice.toFixed(2)}</span>
                         )}
                       </div>
                     )}
                   </CardContent>
                   <CardFooter className="pt-0 mt-auto">
                     <Button 
-                      className="w-full bg-[#FFA500] hover:bg-[#E69500]"
-                      onClick={() => window.location.href = '/login'}
+                      className="w-full bg-[#f8c291] hover:bg-[#f5b880] text-[#4a6fa1]"
+                      onClick={() => handleRedeemClick(reward)}
                     >
                       <Lock className="mr-2 h-4 w-4" />
                       Log in to Redeem
@@ -216,34 +238,36 @@ const PublicRewardsHub: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <div className="mb-4">
-                <Search className="h-12 w-12 mx-auto text-goodchild-text-secondary opacity-60" />
-              </div>
-              <h3 className="text-xl font-medium mb-2">No rewards found</h3>
-              <p className="text-goodchild-text-secondary mb-4">
-                Try adjusting your search criteria.
-              </p>
-            </div>
+            <EmptySearch />
           )}
           
           {/* Preview Features Disclaimer */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-center mb-8">
-            <h2 className="text-xl font-semibold mb-2">This is a Preview</h2>
-            <p className="mb-4">
+          <div className="bg-[#f8c291] border border-[#f5b880] rounded-lg p-6 text-center mb-8">
+            <h2 className="text-xl font-semibold mb-2 text-[#4a6fa1]">This is a Preview</h2>
+            <p className="mb-4 text-[#4a6fa1]">
               Create an account to let your children earn GoodCoins and redeem them for real rewards.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link to="/signup">
-                <Button className="bg-[#FFA500] hover:bg-[#E69500]">Create Account</Button>
+                <Button className="bg-[#aed6f1] hover:bg-[#85c1e9] text-[#4a6fa1]">Create Account</Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline">Log In</Button>
+                <Button variant="outline" className="border-[#aed6f1] text-[#4a6fa1]">Log In</Button>
               </Link>
             </div>
           </div>
         </div>
       </main>
+      
+      {/* Redemption Confirmation Dialog */}
+      {selectedReward && (
+        <RedemptionDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          reward={selectedReward}
+          onConfirm={handleRedemptionConfirm}
+        />
+      )}
       
       <Footer />
     </div>

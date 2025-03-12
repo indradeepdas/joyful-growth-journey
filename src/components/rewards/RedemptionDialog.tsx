@@ -1,65 +1,55 @@
 
 import React from 'react';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface RedemptionDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  reward: {
+    name: string;
+    goodCoins: number;
+    externalUrl?: string;
+  };
   onConfirm: () => void;
-  rewardName: string;
-  goodCoins: number;
 }
 
 const RedemptionDialog: React.FC<RedemptionDialogProps> = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  rewardName,
-  goodCoins
+  open,
+  onOpenChange,
+  reward,
+  onConfirm
 }) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#fdfcf9]"> {/* Dreamy skies background */}
-        <DialogHeader>
-          <DialogTitle className="text-[#4a6fa1] flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-[#94c5cc]" />
-            Confirm Redemption
-          </DialogTitle>
-          <DialogDescription>
-            You are about to redeem <span className="font-bold">{rewardName}</span> for <span className="font-bold">{goodCoins} GoodCoins</span>.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="py-4">
-          <p className="text-[#707b9b]">
-            Are you sure you want to redeem this reward? This action cannot be undone.
-          </p>
-        </div>
-        <DialogFooter>
-          <Button 
-            variant="outline" 
-            onClick={onClose}
-            className="border-[#94c5cc] text-[#4a6fa1]"
-          >
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="bg-white border-[#aed6f1]">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-[#4a6fa1]">Confirm Redemption</AlertDialogTitle>
+          <AlertDialogDescription className="text-[#85c1e9]">
+            Are you sure you want to redeem <strong>{reward.name}</strong> for <strong>{reward.goodCoins} GoodCoins</strong>?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="border-[#aed6f1] text-[#4a6fa1]">
             Cancel
-          </Button>
-          <Button 
+          </AlertDialogCancel>
+          <AlertDialogAction 
             onClick={onConfirm}
-            className="bg-[#94c5cc] hover:bg-[#7db0b7] text-white"
+            className="bg-[#aed6f1] text-[#4a6fa1] hover:bg-[#85c1e9]"
           >
-            Confirm Redemption
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            Yes, Redeem Now
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

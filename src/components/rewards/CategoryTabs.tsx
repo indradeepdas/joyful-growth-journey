@@ -1,33 +1,31 @@
 
 import React from 'react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Clock, Tag, Star } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface CategoryTabsProps {
-  categoryTab: string;
+  selectedCategory: string;
   onCategoryChange: (value: string) => void;
 }
 
-const CategoryTabs: React.FC<CategoryTabsProps> = ({ categoryTab, onCategoryChange }) => {
+const CategoryTabs: React.FC<CategoryTabsProps> = ({
+  selectedCategory,
+  onCategoryChange
+}) => {
   return (
     <div className="mb-8">
-      <Tabs value={categoryTab} onValueChange={onCategoryChange} className="w-full">
-        <TabsList className="grid grid-cols-4 w-full max-w-3xl mx-auto bg-[#e8eef8]">
-          <TabsTrigger value="city" className="text-[#4a6fa1] flex items-center gap-2 data-[state=active]:bg-[#bdd0e8]">
-            <MapPin className="h-4 w-4" />
-            <span className="hidden sm:inline">In Your City</span>
+      <Tabs value={selectedCategory} onValueChange={onCategoryChange} className="w-full">
+        <TabsList className="bg-[#e8f0fe] w-full justify-start overflow-x-auto flex-wrap">
+          <TabsTrigger value="inYourCity" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
+            In Your City
           </TabsTrigger>
-          <TabsTrigger value="daily" className="text-[#4a6fa1] flex items-center gap-2 data-[state=active]:bg-[#bdd0e8]">
-            <Clock className="h-4 w-4" />
-            <span className="hidden sm:inline">Daily Stuff</span>
+          <TabsTrigger value="dailyStuff" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
+            Daily Stuff
           </TabsTrigger>
-          <TabsTrigger value="brand" className="text-[#4a6fa1] flex items-center gap-2 data-[state=active]:bg-[#bdd0e8]">
-            <Tag className="h-4 w-4" />
-            <span className="hidden sm:inline">Brand Exclusives</span>
+          <TabsTrigger value="brandExclusives" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
+            Brand Exclusives
           </TabsTrigger>
-          <TabsTrigger value="experience" className="text-[#4a6fa1] flex items-center gap-2 data-[state=active]:bg-[#bdd0e8]">
-            <Star className="h-4 w-4" />
-            <span className="hidden sm:inline">Experiences</span>
+          <TabsTrigger value="experiences" className="text-[#4a6fa1] data-[state=active]:bg-[#aed6f1]">
+            Experiences
           </TabsTrigger>
         </TabsList>
       </Tabs>
