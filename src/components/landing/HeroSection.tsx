@@ -13,7 +13,7 @@ const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center">
         <div className="md:w-1/2 text-center md:text-left mb-10 md:mb-0">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-goodchild-text-primary mb-6">
-            Transform Parenting with <span className="text-gradient">Gamified Positive Reinforcement</span>
+            <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent font-sassoon">It Pays to Be Good</span>
           </h1>
           <p className="text-xl text-goodchild-text-secondary mb-8 max-w-xl">
             Encourage your child's development through fun, engaging activities and rewarding experiences.

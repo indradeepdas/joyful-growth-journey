@@ -1,78 +1,77 @@
 
 import React, { useEffect, useRef } from 'react';
 import { TestimonialItem } from './types';
-import { cn } from '@/lib/utils';
 
 const testimonials: TestimonialItem[] = [
   {
     name: "Sarah Johnson",
     role: "Mother of two",
     location: "United States",
-    image: "https://randomuser.me/api/portraits/women/32.jpg",
-    quote: "The Good Child Project has completely transformed our household dynamics. My children are excited to complete their activities and earn GoodCoins. It's made parenting so much more enjoyable!"
+    image: "https://images.unsplash.com/photo-1631018971179-5c5b21ebe31a?q=80&w=1287&auto=format&fit=crop",
+    quote: "Our kids are excited about earning GoodCoins!"
   },
   {
     name: "Michael Chen",
     role: "Father of three",
     location: "Singapore",
-    image: "https://randomuser.me/api/portraits/men/44.jpg",
-    quote: "My kids used to argue about chores constantly. Now they eagerly check the app to see what activities they can complete. The rewards system has been a game-changer for our family."
+    image: "https://images.unsplash.com/photo-1603217040250-86a9698f9d80?q=80&w=1366&auto=format&fit=crop",
+    quote: "It transformed our family dynamics completely!"
   },
   {
     name: "Emily Rodriguez",
     role: "Mother of four",
     location: "Canada",
-    image: "https://randomuser.me/api/portraits/women/65.jpg",
-    quote: "I was skeptical at first, but the positive reinforcement approach really works. My children have developed better habits and our home is much more peaceful now."
+    image: "https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?q=80&w=1370&auto=format&fit=crop",
+    quote: "Positive reinforcement really works with my children."
   },
   {
     name: "Sophie Dubois",
     role: "Mother of twins",
     location: "France",
-    image: "https://randomuser.me/api/portraits/women/29.jpg",
-    quote: "Magnifique! My twins have always been competitive, and this platform channels that energy in a positive way. They're learning responsibility while having fun."
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1287&auto=format&fit=crop",
+    quote: "My twins love competing for GoodCoins!"
   },
   {
     name: "David Thompson",
     role: "Single father",
     location: "United Kingdom",
-    image: "https://randomuser.me/api/portraits/men/55.jpg",
-    quote: "As a single dad, I was looking for ways to better organize our household routines. This platform has been invaluable - it's like having a co-parent to help manage responsibilities."
+    image: "https://images.unsplash.com/photo-1608681299041-cc19878f79f1?q=80&w=1287&auto=format&fit=crop",
+    quote: "It's like having a co-parent to help manage responsibilities."
   },
   {
     name: "Akiko Tanaka",
     role: "Mother of one",
     location: "Japan",
-    image: "https://randomuser.me/api/portraits/women/39.jpg",
-    quote: "The structured approach aligns perfectly with our values. My daughter takes pride in completing her tasks and has become more independent. I highly recommend it!"
+    image: "https://images.unsplash.com/photo-1648737966769-98fa88fe66bb?q=80&w=1170&auto=format&fit=crop",
+    quote: "My daughter takes pride in earning rewards!"
   },
   {
     name: "James Wilson",
     role: "Father of two",
     location: "Australia",
-    image: "https://randomuser.me/api/portraits/men/22.jpg",
-    quote: "The reward system has been incredibly motivating for my children. They're learning the value of hard work and delayed gratification in a fun, engaging way."
+    image: "https://images.unsplash.com/photo-1623834574145-77dc07e1b2c6?q=80&w=1287&auto=format&fit=crop",
+    quote: "The reward system has been incredibly motivating."
   },
   {
     name: "Lian Wei",
     role: "Mother of three",
     location: "Singapore",
-    image: "https://randomuser.me/api/portraits/women/17.jpg",
-    quote: "This platform has helped my children develop self-discipline and responsibility. The variety of activities keeps them engaged and excited about personal growth."
+    image: "https://images.unsplash.com/photo-1664575602276-acd073f104c1?q=80&w=1287&auto=format&fit=crop",
+    quote: "This platform helps develop self-discipline."
   },
   {
     name: "Thomas Petit",
     role: "Father of one",
     location: "France",
-    image: "https://randomuser.me/api/portraits/men/33.jpg",
-    quote: "After trying many different parenting techniques, I finally found something that works. My son is thriving with this positive reinforcement system."
+    image: "https://images.unsplash.com/photo-1605923156812-42169b761bd6?q=80&w=1287&auto=format&fit=crop",
+    quote: "My son is thriving with this positive reinforcement system."
   },
   {
     name: "Haruki Nakamura",
     role: "Father of two",
     location: "Japan",
-    image: "https://randomuser.me/api/portraits/men/75.jpg",
-    quote: "The balance of structure and fun is perfect. My children eagerly complete their responsibilities and take pride in earning rewards. Excellent platform!"
+    image: "https://images.unsplash.com/photo-1578426720323-6d3b67133446?q=80&w=1305&auto=format&fit=crop",
+    quote: "My children eagerly complete their responsibilities!"
   }
 ];
 
@@ -139,28 +138,29 @@ const TestimonialsSection = () => {
             {testimonials.map((testimonial, index) => (
               <div 
                 key={index} 
-                className={cn(
-                  "testimonial-item glass-card p-6 rounded-xl hover:shadow-md transition-all inline-block whitespace-normal",
-                  "w-80 flex-shrink-0"
-                )}
+                className="testimonial-item inline-block whitespace-normal w-72 flex-shrink-0"
               >
-                <div className="flex items-center mb-4">
-                  <div className="mr-4">
+                <div className="rounded-2xl overflow-hidden glass-card hover:shadow-lg transition-all">
+                  <div className="h-64 w-full">
                     <img 
                       src={testimonial.image} 
                       alt={testimonial.name} 
-                      className="w-16 h-16 rounded-full object-cover border-2 border-goodchild-accent" 
+                      className="w-full h-full object-cover" 
                     />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-goodchild-text-primary">{testimonial.name}</h3>
-                    <p className="text-goodchild-text-secondary text-sm">{testimonial.role}</p>
-                    {testimonial.location && (
-                      <p className="text-goodchild-accent text-xs font-medium mt-1">{testimonial.location}</p>
-                    )}
+                  <div className="p-4">
+                    <p className="text-goodchild-text-primary font-medium text-lg mb-3">
+                      "{testimonial.quote}"
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-bold text-goodchild-text-primary">{testimonial.name}</h3>
+                        <p className="text-goodchild-text-secondary text-sm">{testimonial.role}</p>
+                      </div>
+                      <p className="text-goodchild-accent text-xs font-medium">{testimonial.location}</p>
+                    </div>
                   </div>
                 </div>
-                <p className="text-goodchild-text-secondary italic">{testimonial.quote}</p>
               </div>
             ))}
           </div>

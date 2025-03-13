@@ -39,7 +39,7 @@ const RewardsHubShowcase = () => {
           <div className="glass-card p-6 rounded-xl max-w-xs w-full text-center">
             <div className="h-48 mb-4 overflow-hidden rounded-lg">
               <img 
-                src="https://m.media-amazon.com/images/I/71WvL7H4jiL._AC_UF1000,1000_QL80_.jpg" 
+                src="https://images.unsplash.com/photo-1599458148441-bbe7809363a4?q=80&w=1170&auto=format&fit=crop" 
                 alt="Art Supplies Kit" 
                 className="w-full h-full object-cover" 
               />
@@ -57,7 +57,7 @@ const RewardsHubShowcase = () => {
           <div className="glass-card p-6 rounded-xl max-w-xs w-full text-center">
             <div className="h-48 mb-4 overflow-hidden rounded-lg">
               <img 
-                src="https://images.prismic.io/bookriot/89e252d9-5823-43fb-9b28-ae6ab8dbe9da_childrens+book+bundle.jpg?auto=compress,format" 
+                src="https://images.unsplash.com/photo-1535905557558-afc4877a26fc?q=80&w=1287&auto=format&fit=crop" 
                 alt="Children's Book Bundle" 
                 className="w-full h-full object-cover" 
               />
