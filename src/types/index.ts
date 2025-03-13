@@ -46,6 +46,7 @@ export interface Reward {
   originalPrice: number;
   discountedPrice: number;
   goodCoins: number;
+  externalUrl?: string; // Added externalUrl property
 }
 
 export interface Transaction {

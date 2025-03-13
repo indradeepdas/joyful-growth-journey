@@ -1,27 +1,34 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import GoodCoinIcon from '@/components/GoodCoinIcon';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Reward } from '@/types';
 import { adaptSupabaseReward } from '@/utils/typeAdapters';
 import { SupabaseReward } from '@/services/types';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import AffiliatedPartners from '@/components/rewards/AffiliatedPartners';
+import RedemptionDialog from '@/components/rewards/RedemptionDialog';
+import RewardCard from '@/components/rewards/RewardCard';
+import SearchBar from '@/components/rewards/SearchBar';
+import CategoryTabs from '@/components/rewards/CategoryTabs';
+import EmptySearch from '@/components/rewards/EmptySearch';
+import LoadingState from '@/components/rewards/LoadingState';
+import ErrorState from '@/components/rewards/ErrorState';
 
 const RewardsHub: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [tab, setTab] = useState('all');
+  const [categoryTab, setCategoryTab] = useState('city');
+  const [visibilityTab, setVisibilityTab] = useState('all');
   const { toast } = useToast();
   const { profile, isLoading: authLoading } = useSupabaseAuth();
   const queryClient = useQueryClient();
+  
+  // State for redemption dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   
   // Function to fetch rewards from Supabase
   const fetchRewards = async (): Promise<Reward[]> => {
@@ -132,6 +139,11 @@ const RewardsHub: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['rewards'] });
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      
+      // Redirect to external website if URL exists
+      if (data.externalUrl) {
+        window.open(data.externalUrl, '_blank');
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -142,21 +154,54 @@ const RewardsHub: React.FC = () => {
     }
   });
   
-  // Filter rewards based on search query and tab
-  const filteredRewards = rewards.filter(reward => {
-    const matchesSearch = reward.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          reward.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    if (tab === 'all') return matchesSearch;
-    if (tab === 'affordable' && profile?.role === 'child') {
-      // Assuming profile.goodCoins is available if role is 'child'
-      const childProfile = profile as any; // Type assertion for simplicity
-      return matchesSearch && reward.goodCoins <= (childProfile.goodCoins || 0);
-    }
-    return matchesSearch;
-  });
+  // Sample data for categories
+  // In a real application, these would come from the database
+  // BACKEND NOTE: Need to add 'category' field to rewards table in database with values like: 'city', 'daily', 'brand', 'experience'
+  const cityRewards = rewards.filter(r => r.id.includes('1') || r.id.includes('5'));
+  const dailyRewards = rewards.filter(r => r.id.includes('2') || r.id.includes('6'));
+  const brandRewards = rewards.filter(r => r.id.includes('3') || r.id.includes('7'));
+  const experienceRewards = rewards.filter(r => r.id.includes('4') || r.id.includes('8'));
   
-  const handleRedeem = (rewardId: string) => {
+  // Filter rewards based on search query and tab
+  const getFilteredRewards = () => {
+    let categoryFiltered;
+    
+    // First filter by category
+    switch (categoryTab) {
+      case 'city':
+        categoryFiltered = cityRewards;
+        break;
+      case 'daily':
+        categoryFiltered = dailyRewards;
+        break;
+      case 'brand':
+        categoryFiltered = brandRewards;
+        break;
+      case 'experience':
+        categoryFiltered = experienceRewards;
+        break;
+      default:
+        categoryFiltered = rewards;
+    }
+    
+    // Then filter by search and affordability
+    return categoryFiltered.filter(reward => {
+      const matchesSearch = reward.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          reward.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      if (visibilityTab === 'all') return matchesSearch;
+      if (visibilityTab === 'affordable' && profile?.role === 'child') {
+        // Assuming profile.goodCoins is available if role is 'child'
+        const childProfile = profile as any; // Type assertion for simplicity
+        return matchesSearch && reward.goodCoins <= (childProfile.goodCoins || 0);
+      }
+      return matchesSearch;
+    });
+  };
+  
+  const filteredRewards = getFilteredRewards();
+  
+  const handleRedeemClick = (reward: Reward) => {
     if (!profile) {
       toast({
         title: "Error",
@@ -166,137 +211,88 @@ const RewardsHub: React.FC = () => {
       return;
     }
     
-    redeemMutation.mutate(rewardId);
+    setSelectedReward(reward);
+    setDialogOpen(true);
+  };
+  
+  const handleConfirmRedeem = () => {
+    if (selectedReward) {
+      redeemMutation.mutate(selectedReward.id);
+      setDialogOpen(false);
+    }
   };
   
   if (isLoading || authLoading) {
-    return (
-      <div className="min-h-screen bg-goodchild-background flex flex-col font-sassoon">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="animate-pulse text-xl">Loading Rewards...</div>
-        </div>
-        <Footer />
-      </div>
-    );
+    return <LoadingState />;
   }
   
   if (error) {
-    return (
-      <div className="min-h-screen bg-goodchild-background flex flex-col font-sassoon">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center p-8 max-w-md">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Error Loading Rewards</h2>
-            <p className="text-goodchild-text-secondary mb-4">
-              {error instanceof Error ? error.message : 'An unexpected error occurred'}
-            </p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
+    return <ErrorState error={error} />;
   }
 
   return (
-    <div className="min-h-screen bg-goodchild-background flex flex-col font-sassoon">
+    <div className="min-h-screen bg-[#fdfcf9] flex flex-col font-sassoon">
       <Navbar />
+      
+      {/* Affiliated Partners Hero Section */}
+      <AffiliatedPartners />
       
       <main className="flex-1 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-goodchild-text-primary mb-4">Rewards Hub</h1>
-            <p className="text-xl text-goodchild-text-secondary max-w-2xl mx-auto">
+            <h1 className="text-4xl font-bold text-[#4a6fa1] mb-4">Rewards Hub</h1>
+            <p className="text-xl text-[#707b9b] max-w-2xl mx-auto">
               Redeem your GoodCoins for exciting rewards that encourage and celebrate positive behavior!
             </p>
           </div>
           
-          {/* Search and tabs bar */}
-          <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="relative w-full md:w-auto flex-1 md:max-w-md">
-              <Input
-                type="text"
-                placeholder="Search rewards..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-goodchild-text-secondary h-4 w-4" />
-            </div>
-            
-            <Tabs value={tab} onValueChange={setTab} className="w-full md:w-auto">
-              <TabsList>
-                <TabsTrigger value="all">All Rewards</TabsTrigger>
-                {profile?.role === 'child' && (
-                  <TabsTrigger value="affordable">I Can Afford</TabsTrigger>
-                )}
-              </TabsList>
-            </Tabs>
-          </div>
+          {/* Category Tabs */}
+          <CategoryTabs 
+            categoryTab={categoryTab} 
+            onCategoryChange={setCategoryTab} 
+          />
+          
+          {/* Search and affordability filter bar */}
+          <SearchBar
+            searchQuery={searchQuery}
+            visibilityTab={visibilityTab}
+            onSearchChange={(e) => setSearchQuery(e.target.value)}
+            onVisibilityChange={setVisibilityTab}
+            isChild={profile?.role === 'child'}
+          />
           
           {/* Rewards grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {isLoading ? (
-              <div className="col-span-full text-center py-12">Loading rewards...</div>
+              <div className="col-span-full text-center py-12 text-[#707b9b]">Loading rewards...</div>
             ) : filteredRewards.length > 0 ? (
               filteredRewards.map((reward) => (
-                <Card key={reward.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-48 overflow-hidden bg-gray-100">
-                    <img
-                      src={reward.imageUrl || "https://placehold.co/400x300/FFD166/073B4C?text=Reward"}
-                      alt={reward.name}
-                      className="w-full h-full object-cover transition-transform hover:scale-105"
-                    />
-                  </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">{reward.name}</CardTitle>
-                    <CardDescription>{reward.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <div className="flex items-center gap-2 mb-1">
-                      <GoodCoinIcon className="h-5 w-5" />
-                      <span className="font-bold text-lg">{reward.goodCoins} GoodCoins</span>
-                    </div>
-                    {reward.originalPrice && (
-                      <p className="text-sm text-goodchild-text-secondary">
-                        <span className="line-through">${reward.originalPrice.toFixed(2)}</span>
-                        {reward.discountedPrice && (
-                          <span className="ml-1 font-medium text-goodchild-green">
-                            ${reward.discountedPrice.toFixed(2)}
-                          </span>
-                        )}
-                      </p>
-                    )}
-                  </CardContent>
-                  <CardFooter>
-                    <Button 
-                      onClick={() => handleRedeem(reward.id)} 
-                      className="w-full"
-                      disabled={profile?.role !== 'child' || redeemMutation?.isPending}
-                    >
-                      {redeemMutation?.isPending && redeemMutation.variables === reward.id 
-                        ? "Redeeming..." 
-                        : "Redeem Reward"}
-                    </Button>
-                  </CardFooter>
-                </Card>
+                <RewardCard 
+                  key={reward.id}
+                  reward={reward}
+                  isPending={redeemMutation.isPending}
+                  isDisabled={profile?.role !== 'child'}
+                  currentRewardId={redeemMutation.variables}
+                  onRedeemClick={handleRedeemClick}
+                />
               ))
             ) : (
-              <div className="col-span-full text-center py-12">
-                <div className="mb-4">
-                  <Search className="h-12 w-12 mx-auto text-goodchild-text-secondary opacity-60" />
-                </div>
-                <h3 className="text-xl font-medium mb-2">No rewards found</h3>
-                <p className="text-goodchild-text-secondary">
-                  Try adjusting your search or check back later for new rewards.
-                </p>
-              </div>
+              <EmptySearch />
             )}
           </div>
         </div>
       </main>
+      
+      {/* Redemption Confirmation Dialog */}
+      {selectedReward && (
+        <RedemptionDialog
+          isOpen={dialogOpen}
+          onClose={() => setDialogOpen(false)}
+          onConfirm={handleConfirmRedeem}
+          rewardName={selectedReward.name}
+          goodCoins={selectedReward.goodCoins}
+        />
+      )}
       
       <Footer />
     </div>
