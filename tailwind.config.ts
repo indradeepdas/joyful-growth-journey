@@ -64,16 +64,26 @@ const config = {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
         },
         goodchild: {
-          background: "#f9f9fa", // Light background
-          "background-alt": "#f0f3f8", // Alternate background
-          "background-dark": "#1a2236", // Dark background for footer etc.
-          "text-primary": "#2d3748", // Primary text color
-          "text-secondary": "#718096", // Secondary/muted text
-          blue: "#33a6b8", // Primary blue
-          yellow: "#FFD166", // Accent yellow
-          green: "#06D6A0", // Success green
-          red: "#EF476F", // Error/alert red
-          purple: "#8B5CF6", // Highlight purple
+          background: "#91EBFF", // Light background (unicorn blue)
+          "background-alt": "#B8A9FA", // Alternate background (unicorn purple)
+          "background-dark": "#FF85E2", // Dark background (unicorn pink)
+          "text-primary": "#FFFFFF", // Primary text color - white for contrast
+          "text-secondary": "#FFC2E9", // Secondary/muted text (unicorn lilac)
+          blue: "#91EBFF", // Primary blue (unicorn blue)
+          yellow: "#FFD4A9", // Accent yellow/peach (unicorn peach)
+          green: "#A7C2FF", // Success green/now blue (unicorn sky)
+          red: "#FF85E2", // Error/alert pink (unicorn pink)
+          purple: "#B8A9FA", // Highlight purple (unicorn purple)
+        },
+        // Magical Unicorn Theme
+        unicorn: {
+          pink: "#FF85E2", // Hot pink
+          purple: "#B8A9FA", // Lavender purple
+          blue: "#91EBFF", // Bright cyan
+          lilac: "#FFC2E9", // Soft pink
+          sky: "#A7C2FF", // Periwinkle
+          "light-blue": "#85D3FF", // Sky blue
+          peach: "#FFD4A9", // Peachy orange
         }
       },
       borderRadius: {
@@ -84,12 +94,14 @@ const config = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         sassoon: ['Sassoon Infant', ...fontFamily.sans],
+        nunito: ['Nunito', ...fontFamily.sans],
       },
       boxShadow: {
         'soft': '0 4px 20px rgba(0, 0, 0, 0.05)',
         'medium': '0 4px 25px rgba(0, 0, 0, 0.1)',
         'glow-yellow': '0 0 15px rgba(255, 209, 102, 0.6)',
         'glow-blue': '0 0 15px rgba(51, 166, 184, 0.6)',
+        'glow-pink': '0 0 15px rgba(255, 133, 226, 0.6)',
       },
       keyframes: {
         "accordion-down": {

@@ -5,6 +5,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
 @import url('https://fonts.cdnfonts.com/css/sassoon-infant');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
@@ -46,6 +47,15 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Magical Unicorn Palette */
+    --unicorn-pink: 328 100% 76%;
+    --unicorn-purple: 252 89% 82%;
+    --unicorn-blue: 193 100% 78%;
+    --unicorn-lilac: 326 100% 90%;
+    --unicorn-sky: 206 100% 76%;
+    --unicorn-light-blue: 196 100% 70%;
+    --unicorn-peach: 30 100% 83%;
   }
 
   .dark {
@@ -86,11 +96,11 @@
 
   body {
     @apply bg-goodchild-background text-goodchild-text-primary antialiased;
-    font-family: 'Sassoon Infant', 'Poppins', sans-serif;
+    font-family: 'Nunito', 'Sassoon Infant', 'Poppins', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Sassoon Infant', 'Quicksand', sans-serif;
+    font-family: 'Nunito', 'Sassoon Infant', 'Quicksand', sans-serif;
     @apply font-bold leading-tight;
   }
 
@@ -134,6 +144,10 @@
   
   .font-sassoon {
     font-family: 'Sassoon Infant', 'Poppins', sans-serif;
+  }
+
+  .font-nunito {
+    font-family: 'Nunito', sans-serif;
   }
   
   .development-area-tile {

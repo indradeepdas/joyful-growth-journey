@@ -9,23 +9,23 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ scrollToFeatures }) => {
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-[#91EBFF] to-[#B8A9FA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold mb-6 font-sassoon">
-          <span className="text-blue-500">It </span>
-          <span className="text-purple-500">Pays </span>
-          <span className="text-green-500">to </span>
-          <span className="text-yellow-500">Be </span>
-          <span className="text-red-500">Good</span>
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 font-['Nunito',_sans-serif]">
+          <span className="text-[#FF85E2]">It </span>
+          <span className="text-[#A7C2FF]">Pays </span>
+          <span className="text-[#91EBFF]">to </span>
+          <span className="text-[#FFD4A9]">Be </span>
+          <span className="text-[#FFC2E9]">Good</span>
         </h1>
-        <p className="text-xl md:text-2xl text-goodchild-text-secondary mb-8 max-w-3xl mx-auto">
+        <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto font-['Nunito',_sans-serif]">
           GoodChild helps parents motivate positive behavior through exciting activities and meaningful rewards.
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
           <Button 
             size="lg" 
-            className="bg-goodchild-primary hover:bg-goodchild-primary-dark text-white"
+            className="bg-[#FF85E2] hover:bg-[#FF59D6] text-white font-['Nunito',_sans-serif]"
             onClick={() => window.location.href = '/auth/sign-up'}
           >
             Start Your Free Trial <ArrowRight className="ml-2 h-5 w-5" />
@@ -33,7 +33,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToFeatures }) => {
           <Button 
             variant="outline" 
             size="lg" 
-            className="border-goodchild-primary text-goodchild-primary hover:bg-goodchild-primary/10"
+            className="border-white text-white hover:bg-white/10 font-['Nunito',_sans-serif]"
             onClick={scrollToFeatures}
           >
             Learn More
@@ -46,7 +46,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToFeatures }) => {
             alt="Happy Family Using GoodChild App"
             className="rounded-xl shadow-xl max-w-4xl w-full mx-auto"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://placehold.co/1200x800/e8eef8/4a6fa1?text=GoodChild+App+Dashboard";
+              (e.target as HTMLImageElement).src = "https://placehold.co/1200x800/FFC2E9/FFFFFF?text=GoodChild+App+Dashboard";
             }}
           />
         </div>

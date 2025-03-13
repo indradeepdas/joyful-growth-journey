@@ -22,43 +22,41 @@ const RewardCard: React.FC<RewardCardProps> = ({
   onRedeemClick
 }) => {
   // Fallback image for broken URLs
-  const fallbackImageUrl = "https://placehold.co/400x300/e8eef8/4a6fa1?text=Reward";
+  const fallbackImageUrl = "https://placehold.co/400x200/e8eef8/4a6fa1?text=Reward";
   
-  // Random background color from a vibrant palette
+  // Random background color from a vibrant palette - magical unicorn theme
   const bgColors = [
-    "bg-[#E5DEFF]", "bg-[#FEF7CD]", "bg-[#FEC6A1]", "bg-[#F2FCE2]", 
-    "bg-[#FFDEE2]", "bg-[#FDE1D3]", "bg-[#D3E4FD]"
+    "bg-[#FF85E2]", "bg-[#B8A9FA]", "bg-[#91EBFF]", "bg-[#FFC2E9]", 
+    "bg-[#A7C2FF]", "bg-[#85D3FF]", "bg-[#FFD4A9]"
   ];
   
   const randomBgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
   
-  // Random gradient for card background
+  // Random gradient for card background - magical unicorn theme
   const gradients = [
-    "bg-gradient-to-r from-[#E5DEFF] to-[#FEF7CD]",
-    "bg-gradient-to-r from-[#FEC6A1] to-[#FFDEE2]",
-    "bg-gradient-to-r from-[#F2FCE2] to-[#D3E4FD]",
-    "bg-gradient-to-r from-[#FDE1D3] to-[#E5DEFF]",
-    "bg-gradient-to-r from-[#FFDEE2] to-[#FEF7CD]"
+    "bg-gradient-to-r from-[#FF85E2] to-[#A7C2FF]",
+    "bg-gradient-to-r from-[#B8A9FA] to-[#FFD4A9]",
+    "bg-gradient-to-r from-[#91EBFF] to-[#FFC2E9]",
+    "bg-gradient-to-r from-[#FFC2E9] to-[#85D3FF]",
+    "bg-gradient-to-r from-[#A7C2FF] to-[#FF85E2]"
   ];
   
   const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
   
   return (
     <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      animate={{ 
+      whileHover={{ 
+        scale: 1.05,
         rotate: [0, 2, 0, -2, 0],
-      }}
-      transition={{ 
-        repeat: Infinity, 
-        duration: 2 + Math.random() * 2,
-        ease: "easeInOut" 
+        transition: { 
+          duration: 0.3,
+          ease: "easeInOut" 
+        }
       }}
       className="h-full"
     >
-      <Card className={`h-full overflow-hidden shadow-lg border-2 border-[#bdd0e8] ${randomGradient}`}>
-        <div className="h-48 overflow-hidden">
+      <Card className={`h-full overflow-hidden shadow-lg border-2 border-[#FFC2E9] ${randomGradient}`}>
+        <div className="h-36 overflow-hidden">
           <img
             src={reward.imageUrl || fallbackImageUrl}
             alt={reward.name}
@@ -69,30 +67,30 @@ const RewardCard: React.FC<RewardCardProps> = ({
             }}
           />
         </div>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl font-bold text-[#4a6fa1]">{reward.name}</CardTitle>
-          <CardDescription className="text-[#707b9b] font-medium">{reward.description}</CardDescription>
+        <CardHeader className="pb-2 pt-3">
+          <CardTitle className="text-lg font-bold text-white">{reward.name}</CardTitle>
+          <CardDescription className="text-white/80 font-medium text-xs">{reward.description}</CardDescription>
         </CardHeader>
         <CardContent className="pb-2">
           <div className="flex items-center gap-2 mb-1">
-            <GoodCoinIcon className="h-6 w-6 text-yellow-500" />
-            <span className="font-bold text-lg text-[#f6b961]">{reward.goodCoins} GoodCoins</span>
+            <GoodCoinIcon className="h-5 w-5 text-yellow-500" />
+            <span className="font-bold text-lg text-white">{reward.goodCoins} GoodCoins</span>
           </div>
           {reward.originalPrice && (
-            <p className="text-sm text-[#707b9b]">
+            <p className="text-sm text-white/80">
               <span className="line-through">${reward.originalPrice.toFixed(2)}</span>
               {reward.discountedPrice && (
-                <span className="ml-1 font-medium text-[#6eb87a]">
+                <span className="ml-1 font-medium text-white">
                   ${reward.discountedPrice.toFixed(2)}
                 </span>
               )}
             </p>
           )}
         </CardContent>
-        <CardFooter>
+        <CardFooter className="pt-1 pb-3">
           <Button 
             onClick={() => onRedeemClick(reward)} 
-            className="w-full bg-[#94c5cc] hover:bg-[#7db0b7] text-white font-bold shadow-md hover:shadow-lg transition-all"
+            className="w-full bg-[#FF85E2] hover:bg-[#FF59D6] text-white font-bold shadow-md hover:shadow-lg transition-all"
             disabled={isDisabled || (isPending && currentRewardId === reward.id)}
           >
             {isPending && currentRewardId === reward.id 

@@ -27,8 +27,8 @@ const AffiliatedPartners: React.FC = () => {
   ];
 
   return (
-    <div className="bg-[#C1E8F7] py-8 mb-12 overflow-hidden">
-      <h2 className="text-2xl font-bold text-center text-[#4a6fa1] mb-8">Our Affiliated Partners</h2>
+    <div className="bg-[#A7C2FF] py-6 mb-10 overflow-hidden">
+      <h2 className="text-2xl font-bold text-center text-white mb-6 font-['Nunito',_sans-serif]">Our Affiliated Partners</h2>
       <motion.div 
         className="flex space-x-16"
         animate={{ x: [0, -1200] }}
@@ -43,9 +43,9 @@ const AffiliatedPartners: React.FC = () => {
             <img 
               src={logo.url} 
               alt={logo.name}
-              className="h-12 w-auto object-contain"
+              className="h-10 w-auto object-contain"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://placehold.co/200x80/e8eef8/4a6fa1?text=Partner';
+                (e.target as HTMLImageElement).src = 'https://placehold.co/200x80/FF85E2/FFFFFF?text=Partner';
               }}
             />
           </div>

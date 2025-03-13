@@ -59,24 +59,24 @@ const PublicRewardsHub: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#e8f0fe] flex flex-col font-sassoon">
+    <div className="min-h-screen bg-gradient-to-b from-[#91EBFF] to-[#B8A9FA] flex flex-col font-nunito">
       <Navbar />
       
       <main className="flex-1 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-[#4a6fa1] mb-4">
+            <h1 className="text-4xl font-bold text-white mb-4 font-nunito">
               Rewards Hub Preview
             </h1>
-            <p className="text-xl text-[#85c1e9] max-w-3xl mx-auto">
+            <p className="text-xl text-white/90 max-w-3xl mx-auto font-nunito">
               Browse sample rewards your children can earn by completing activities. Create an account to manage and customize rewards.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Link to="/signup">
-                <Button size="lg" className="bg-[#aed6f1] hover:bg-[#85c1e9] text-[#4a6fa1]">Create Your Account</Button>
+                <Button size="lg" className="bg-[#FF85E2] hover:bg-[#FF59D6] text-white font-nunito">Create Your Account</Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="lg" className="border-[#aed6f1] text-[#4a6fa1]">Log In</Button>
+                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10 font-nunito">Log In</Button>
               </Link>
             </div>
           </div>
@@ -109,17 +109,17 @@ const PublicRewardsHub: React.FC = () => {
             <EmptySearch />
           )}
           
-          <div className="bg-[#f8c291] border border-[#f5b880] rounded-lg p-6 text-center mb-8">
-            <h2 className="text-xl font-semibold mb-2 text-[#4a6fa1]">This is a Preview</h2>
-            <p className="mb-4 text-[#4a6fa1]">
+          <div className="bg-[#FF85E2]/30 border border-[#FF85E2] rounded-lg p-6 text-center mb-8">
+            <h2 className="text-xl font-semibold mb-2 text-white font-nunito">This is a Preview</h2>
+            <p className="mb-4 text-white/90 font-nunito">
               Create an account to let your children earn GoodCoins and redeem them for real rewards.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link to="/signup">
-                <Button className="bg-[#aed6f1] hover:bg-[#85c1e9] text-[#4a6fa1]">Create Account</Button>
+                <Button className="bg-[#FF85E2] hover:bg-[#FF59D6] text-white font-nunito">Create Account</Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" className="border-[#aed6f1] text-[#4a6fa1]">Log In</Button>
+                <Button variant="outline" className="border-white text-white hover:bg-white/10 font-nunito">Log In</Button>
               </Link>
             </div>
           </div>
