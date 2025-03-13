@@ -1,865 +1,855 @@
 
-export interface RewardItem {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  goodCoins: number;
-  originalPrice: number | null;
-  discountedPrice: number | null;
-  category: string;
-  externalUrl?: string;
-}
+// Rewards data organized by categories
 
-// Berlin City Rewards (25)
-export const berlinCityRewards: RewardItem[] = [
+// City rewards - Berlin, Germany specific
+export const cityRewards = [
   {
-    id: 'berlin-1',
-    name: 'Berlin Zoo Tickets',
-    description: 'Family ticket to Berlin Zoo, one of the most visited and species-rich zoos in Europe.',
-    imageUrl: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=600&h=400&fit=crop',
-    goodCoins: 150,
-    originalPrice: 59.90,
-    discountedPrice: 50.90,
+    id: 'city-1',
+    name: 'Berlin Zoo Ticket',
+    description: 'Free entry to the Berlin Zoo, one of the most prestigious and oldest zoos in Germany.',
+    imageUrl: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 19.99,
+    discountedPrice: 0,
     category: 'city',
     externalUrl: 'https://www.zoo-berlin.de/en'
   },
   {
-    id: 'berlin-2',
-    name: 'Legoland Discovery Centre',
-    description: 'Tickets for the whole family to LEGOLAND Discovery Centre Berlin with rides and attractions.',
-    imageUrl: 'https://images.unsplash.com/photo-1575364289437-fb1bc980de6d?w=600&h=400&fit=crop',
-    goodCoins: 120,
-    originalPrice: 42.00,
-    discountedPrice: 36.00,
-    category: 'city',
-    externalUrl: 'https://www.legolanddiscoverycentre.de/berlin/'
-  },
-  {
-    id: 'berlin-3',
+    id: 'city-2',
     name: 'Museum Island Pass',
-    description: 'Family pass to all 5 museums on Berlin's Museum Island - a UNESCO World Heritage site.',
-    imageUrl: 'https://images.unsplash.com/photo-1553547274-7c72beba9a89?w=600&h=400&fit=crop',
-    goodCoins: 130,
-    originalPrice: 48.00,
-    discountedPrice: 41.00,
+    description: 'One-day access to Berlin\'s famous Museum Island with 5 world-renowned museums.',
+    imageUrl: 'https://images.unsplash.com/photo-1605641532626-5ab1dab56f19?w=600&h=400&fit=crop',
+    goodCoins: 120,
+    originalPrice: 22.50,
+    discountedPrice: 0,
     category: 'city',
-    externalUrl: 'https://www.smb.museum/en/museums-institutions/museumsinsel-berlin/'
+    externalUrl: 'https://www.museumsinsel-berlin.de/en/'
   },
   {
-    id: 'berlin-4',
-    name: 'AquaDom & SEA LIFE Berlin',
-    description: 'Tickets to SEA LIFE Berlin featuring the famous AquaDom - the largest free-standing cylindrical aquarium in the world.',
-    imageUrl: 'https://images.unsplash.com/photo-1520302659201-9b20b5c4b611?w=600&h=400&fit=crop',
-    goodCoins: 100,
-    originalPrice: 35.00,
-    discountedPrice: 30.00,
+    id: 'city-3',
+    name: 'Legoland Discovery Centre',
+    description: 'Ticket to Berlin\'s Legoland Discovery Centre for a day of brick-building fun.',
+    imageUrl: 'https://images.unsplash.com/photo-1560961911-ba7ef651a56a?w=600&h=400&fit=crop',
+    goodCoins: 110,
+    originalPrice: 21.00,
+    discountedPrice: 0,
     category: 'city',
-    externalUrl: 'https://www.visitsealife.com/berlin/'
+    externalUrl: 'https://www.legolanddiscoverycentre.de/berlin/en/'
   },
   {
-    id: 'berlin-5',
-    name: 'Berlin TV Tower Fast Pass',
-    description: 'Skip-the-line tickets to the TV Tower (Fernsehturm) - Berlin's tallest structure with panoramic views.',
-    imageUrl: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&h=400&fit=crop',
+    id: 'city-4',
+    name: 'Berlin Aquarium',
+    description: 'Entry to the amazing Berlin Aquarium with thousands of marine creatures.',
+    imageUrl: 'https://images.unsplash.com/photo-1571030893839-b17883f7d1a4?w=600&h=400&fit=crop',
     goodCoins: 90,
-    originalPrice: 32.00,
-    discountedPrice: 28.00,
+    originalPrice: 17.50,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.aquarium-berlin.de/en'
+  },
+  {
+    id: 'city-5',
+    name: 'Mauerpark Flea Market Allowance',
+    description: 'Spending money for the famous Mauerpark Sunday flea market.',
+    imageUrl: 'https://images.unsplash.com/photo-1531784029696-14712e8a2af9?w=600&h=400&fit=crop',
+    goodCoins: 50,
+    originalPrice: 10.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.mauerpark.info/'
+  },
+  {
+    id: 'city-6',
+    name: 'Berlin Bike Tour',
+    description: 'Guided family bike tour through Berlin\'s most interesting neighborhoods.',
+    imageUrl: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop',
+    goodCoins: 130,
+    originalPrice: 25.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://berlinonbike.de/en/'
+  },
+  {
+    id: 'city-7',
+    name: 'Madame Tussauds Berlin',
+    description: 'Entry ticket to see lifelike wax figures of celebrities and historical figures.',
+    imageUrl: 'https://images.unsplash.com/photo-1608711794931-07968c97b7dc?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 19.50,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.madametussauds.com/berlin/en/'
+  },
+  {
+    id: 'city-8',
+    name: 'Berliner Fernsehturm Entry',
+    description: 'Visit to the iconic TV tower for panoramic views of Berlin from 203 meters up.',
+    imageUrl: 'https://images.unsplash.com/photo-1560930950-5cc20e80e392?w=600&h=400&fit=crop',
+    goodCoins: 110,
+    originalPrice: 21.50,
+    discountedPrice: 0,
     category: 'city',
     externalUrl: 'https://tv-turm.de/en/'
   },
   {
-    id: 'berlin-6',
-    name: 'Madame Tussauds Berlin',
-    description: 'Tickets to see lifelike wax figures of famous celebrities, historical figures, and more.',
-    imageUrl: 'https://images.unsplash.com/photo-1588610172434-63e463fd523d?w=600&h=400&fit=crop',
-    goodCoins: 100,
-    originalPrice: 34.00,
-    discountedPrice: 29.00,
-    category: 'city',
-    externalUrl: 'https://www.madametussauds.com/berlin/'
-  },
-  {
-    id: 'berlin-7',
-    name: 'Berlin Dungeon Experience',
-    description: 'Interactive journey through Berlin's dark history with live actors and special effects.',
-    imageUrl: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=600&h=400&fit=crop',
-    goodCoins: 90,
-    originalPrice: 30.00,
-    discountedPrice: 25.00,
-    category: 'city',
-    externalUrl: 'https://www.thedungeons.com/berlin/en/'
-  },
-  {
-    id: 'berlin-8',
-    name: 'Computerspielemuseum Tickets',
-    description: 'Tickets to one of the world's first museums for interactive entertainment and video games.',
-    imageUrl: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=600&h=400&fit=crop',
-    goodCoins: 70,
-    originalPrice: 24.00,
-    discountedPrice: 19.00,
-    category: 'city',
-    externalUrl: 'https://www.computerspielemuseum.de/en/'
-  },
-  {
-    id: 'berlin-9',
-    name: 'East Side Gallery Tour',
-    description: 'Guided family tour of the East Side Gallery - the longest remaining section of the Berlin Wall.',
-    imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&h=400&fit=crop',
+    id: 'city-9',
+    name: 'Little BIG City Berlin',
+    description: 'Interactive miniature world experience showing Berlin\'s history in a fun way.',
+    imageUrl: 'https://images.unsplash.com/photo-1569587112490-20c221987ccf?w=600&h=400&fit=crop',
     goodCoins: 80,
-    originalPrice: 28.00,
-    discountedPrice: 23.00,
+    originalPrice: 15.50,
+    discountedPrice: 0,
     category: 'city',
-    externalUrl: 'https://www.eastsidegalleryberlin.de/'
+    externalUrl: 'https://www.littlebigcity.com/berlin/en'
   },
   {
-    id: 'berlin-10',
-    name: 'Jump House Berlin',
-    description: 'Tickets to Berlin's largest trampoline park with various jumping areas and activities.',
-    imageUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=600&h=400&fit=crop',
-    goodCoins: 85,
-    originalPrice: 29.00,
-    discountedPrice: 24.00,
-    category: 'city',
-    externalUrl: 'https://berlin.jumphouse.de/'
-  },
-  {
-    id: 'berlin-11',
-    name: 'Labyrinth Children's Museum',
-    description: 'Interactive museum where children can touch, play, and explore various exhibits.',
-    imageUrl: 'https://images.unsplash.com/photo-1591993676692-aa6803f3a4a5?w=600&h=400&fit=crop',
-    goodCoins: 60,
-    originalPrice: 22.00,
-    discountedPrice: 18.00,
-    category: 'city',
-    externalUrl: 'https://www.labyrinth-kindermuseum.de/'
-  },
-  {
-    id: 'berlin-12',
-    name: 'Kindercafé Spielzimmer Voucher',
-    description: 'Gift card for Kindercafé Spielzimmer - a café with play areas, toys, and food.',
-    imageUrl: 'https://images.unsplash.com/photo-1568484653093-ed0ba32c1e36?w=600&h=400&fit=crop',
-    goodCoins: 50,
-    originalPrice: 18.00,
-    discountedPrice: 15.00,
-    category: 'city',
-    externalUrl: 'https://www.kindercafe-spielzimmer.de/'
-  },
-  {
-    id: 'berlin-13',
-    name: 'MACHmit! Museum for Children',
-    description: 'Tickets to an interactive museum with workshops for children to learn through play.',
-    imageUrl: 'https://images.unsplash.com/photo-1555050551-82f8d3dde557?w=600&h=400&fit=crop',
-    goodCoins: 55,
-    originalPrice: 20.00,
-    discountedPrice: 16.00,
-    category: 'city',
-    externalUrl: 'https://www.machmitmuseum.de/'
-  },
-  {
-    id: 'berlin-14',
-    name: 'Berlin Puppet Theater Tickets',
-    description: 'Family tickets to one of Berlin's traditional puppet theaters for a magical performance.',
-    imageUrl: 'https://images.unsplash.com/photo-1579546929556-3f6580432bff?w=600&h=400&fit=crop',
-    goodCoins: 65,
-    originalPrice: 24.00,
-    discountedPrice: 20.00,
-    category: 'city',
-    externalUrl: 'https://www.puppentheater-berlin.de/'
-  },
-  {
-    id: 'berlin-15',
-    name: 'Miniatur Welten Berlin',
-    description: 'Tickets to see incredible miniature worlds and model railways in amazing detail.',
-    imageUrl: 'https://images.unsplash.com/photo-1515276427842-f85802d514a2?w=600&h=400&fit=crop',
-    goodCoins: 75,
-    originalPrice: 26.00,
-    discountedPrice: 22.00,
-    category: 'city',
-    externalUrl: 'https://www.miniatur-welten-berlin.de/'
-  },
-  {
-    id: 'berlin-16',
-    name: 'Tierpark Berlin Family Pass',
-    description: 'Family ticket to Tierpark Berlin - a spacious landscape zoo in the eastern part of Berlin.',
-    imageUrl: 'https://images.unsplash.com/photo-1569704045404-a3401889bad9?w=600&h=400&fit=crop',
-    goodCoins: 110,
-    originalPrice: 38.00,
-    discountedPrice: 32.00,
-    category: 'city',
-    externalUrl: 'https://www.tierpark-berlin.de/en'
-  },
-  {
-    id: 'berlin-17',
-    name: 'Climbmax Climbing Hall',
-    description: 'Family pass to Berlin's popular indoor climbing center with routes for all abilities.',
-    imageUrl: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?w=600&h=400&fit=crop',
-    goodCoins: 95,
-    originalPrice: 32.00,
-    discountedPrice: 27.00,
-    category: 'city',
-    externalUrl: 'https://www.climbmax.de/'
-  },
-  {
-    id: 'berlin-18',
-    name: 'Minigolf at Volkspark Friedrichshain',
-    description: 'Family ticket for minigolf in one of Berlin's beautiful parks.',
-    imageUrl: 'https://images.unsplash.com/photo-1579756423368-5bcb6d240cf4?w=600&h=400&fit=crop',
-    goodCoins: 60,
-    originalPrice: 22.00,
-    discountedPrice: 18.00,
-    category: 'city',
-    externalUrl: 'https://minigolf-berlin.de/'
-  },
-  {
-    id: 'berlin-19',
-    name: 'Berlin Bike Tour',
-    description: 'Family-friendly guided bike tour through Berlin's main attractions.',
-    imageUrl: 'https://images.unsplash.com/photo-1591711696757-98697609beee?w=600&h=400&fit=crop',
-    goodCoins: 120,
-    originalPrice: 42.00,
-    discountedPrice: 36.00,
-    category: 'city',
-    externalUrl: 'https://berlinonbike.de/'
-  },
-  {
-    id: 'berlin-20',
-    name: 'Boat Tour on River Spree',
-    description: 'Relaxing boat tour on the River Spree to see Berlin from a different perspective.',
-    imageUrl: 'https://images.unsplash.com/photo-1559751943-c40ef20f4ef5?w=600&h=400&fit=crop',
-    goodCoins: 100,
-    originalPrice: 35.00,
-    discountedPrice: 30.00,
-    category: 'city',
-    externalUrl: 'https://www.berliner-stadtrundfart.de/'
-  },
-  {
-    id: 'berlin-21',
-    name: 'Berlin Chocolate Workshop',
-    description: 'Family chocolate making workshop at Ritter Sport ChocoWorld Berlin.',
-    imageUrl: 'https://images.unsplash.com/photo-1511381939415-e44015466834?w=600&h=400&fit=crop',
-    goodCoins: 90,
-    originalPrice: 30.00,
-    discountedPrice: 25.00,
-    category: 'city',
-    externalUrl: 'https://www.ritter-sport.de/en/ChocoWorld/'
-  },
-  {
-    id: 'berlin-22',
+    id: 'city-10',
     name: 'Tropical Islands Day Pass',
-    description: 'Day passes to Tropical Islands - Europe's largest tropical holiday resort.',
-    imageUrl: 'https://images.unsplash.com/photo-1610741083757-1ae88e1a17f7?w=600&h=400&fit=crop',
-    goodCoins: 140,
-    originalPrice: 48.00,
-    discountedPrice: 42.00,
+    description: 'Day trip to the Tropical Islands resort just outside Berlin.',
+    imageUrl: 'https://images.unsplash.com/photo-1536882240095-0379873feb4e?w=600&h=400&fit=crop',
+    goodCoins: 150,
+    originalPrice: 30.00,
+    discountedPrice: 0,
     category: 'city',
     externalUrl: 'https://www.tropical-islands.de/en/'
   },
   {
-    id: 'berlin-23',
-    name: 'LOXX Miniatur Welten Berlin',
-    description: 'Tickets to see Berlin in miniature at this incredible model exhibition.',
-    imageUrl: 'https://images.unsplash.com/photo-1530210124550-912dc1381cb8?w=600&h=400&fit=crop',
+    id: 'city-11',
+    name: 'Berlin Wall Memorial Visit',
+    description: 'Educational visit to the Berlin Wall Memorial with a guided tour.',
+    imageUrl: 'https://images.unsplash.com/photo-1597677543094-aef60e6085e3?w=600&h=400&fit=crop',
     goodCoins: 70,
-    originalPrice: 25.00,
-    discountedPrice: 21.00,
+    originalPrice: 13.50,
+    discountedPrice: 0,
     category: 'city',
-    externalUrl: 'https://www.loxx.de/en/'
+    externalUrl: 'https://www.berliner-mauer-gedenkstaette.de/en/'
   },
   {
-    id: 'berlin-24',
-    name: 'Science Center Spectrum',
-    description: 'Tickets to an interactive science museum with over 150 experiments to try.',
-    imageUrl: 'https://images.unsplash.com/photo-1576086776739-46c92bd49658?w=600&h=400&fit=crop',
+    id: 'city-12',
+    name: 'Computerspielemuseum Ticket',
+    description: 'Entry to this unique museum of video game history with interactive exhibits.',
+    imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&h=400&fit=crop',
+    goodCoins: 60,
+    originalPrice: 12.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.computerspielemuseum.de/1210_Home.htm'
+  },
+  {
+    id: 'city-13',
+    name: 'Jump House Berlin',
+    description: 'Two-hour pass to Berlin\'s popular trampoline park.',
+    imageUrl: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=600&h=400&fit=crop',
+    goodCoins: 90,
+    originalPrice: 18.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.jumphouse.de/en/locations/berlin/'
+  },
+  {
+    id: 'city-14',
+    name: 'Berlin Dungeon Experience',
+    description: 'Interactive tour through Berlin\'s dark history with live actors and special effects.',
+    imageUrl: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 19.99,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.thedungeons.com/berlin/en/'
+  },
+  {
+    id: 'city-15',
+    name: 'Labyrinth Kindermuseum',
+    description: 'Interactive children\'s museum with hands-on exhibits and play spaces.',
+    imageUrl: 'https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=600&h=400&fit=crop',
+    goodCoins: 70,
+    originalPrice: 14.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.labyrinth-kindermuseum.de/'
+  },
+  {
+    id: 'city-16',
+    name: 'SEA LIFE Berlin',
+    description: 'Underwater adventure with thousands of sea creatures in Berlin\'s aquarium.',
+    imageUrl: 'https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 19.50,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.visitsealife.com/berlin/'
+  },
+  {
+    id: 'city-17',
+    name: 'MountMitte Climbing Park',
+    description: 'Adventure climbing course in the heart of Berlin with various difficulty levels.',
+    imageUrl: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?w=600&h=400&fit=crop',
+    goodCoins: 90,
+    originalPrice: 18.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://beachberlin.de/mountmitte/'
+  },
+  {
+    id: 'city-18',
+    name: 'Berlin Tierpark Visit',
+    description: 'Entry to Berlin\'s other great zoo, the largest animal park in Europe.',
+    imageUrl: 'https://images.unsplash.com/photo-1534567153574-2b12153a87f0?w=600&h=400&fit=crop',
+    goodCoins: 90,
+    originalPrice: 17.50,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.tierpark-berlin.de/en'
+  },
+  {
+    id: 'city-19',
+    name: 'DDR Museum Experience',
+    description: 'Interactive museum about everyday life in former East Germany.',
+    imageUrl: 'https://images.unsplash.com/photo-1568213214202-aee0a28567da?w=600&h=400&fit=crop',
     goodCoins: 80,
-    originalPrice: 28.00,
-    discountedPrice: 24.00,
+    originalPrice: 15.00,
+    discountedPrice: 0,
     category: 'city',
-    externalUrl: 'https://sdtb.de/spectrum/start/'
+    externalUrl: 'https://www.ddr-museum.de/en/'
   },
   {
-    id: 'berlin-25',
-    name: 'Berlin Escape Room Experience',
-    description: 'Family ticket to one of Berlin's popular escape rooms for an exciting adventure.',
-    imageUrl: 'https://images.unsplash.com/photo-1569416078500-3857b00616f8?w=600&h=400&fit=crop',
-    goodCoins: 110,
-    originalPrice: 38.00,
-    discountedPrice: 32.00,
+    id: 'city-20',
+    name: 'Berlin Botanical Garden',
+    description: 'Family pass to explore one of the world\'s most important botanical gardens.',
+    imageUrl: 'https://images.unsplash.com/photo-1463736932348-4915535cf6c9?w=600&h=400&fit=crop',
+    goodCoins: 70,
+    originalPrice: 14.00,
+    discountedPrice: 0,
     category: 'city',
-    externalUrl: 'https://www.exitgame-berlin.de/'
+    externalUrl: 'https://www.bgbm.org/en'
   },
+  {
+    id: 'city-21',
+    name: 'Berliner Unterwelten Tour',
+    description: 'Guided tour of Berlin\'s underground bunkers and tunnel systems.',
+    imageUrl: 'https://images.unsplash.com/photo-1504376379689-8d54347b26c6?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 20.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.berliner-unterwelten.de/en/'
+  },
+  {
+    id: 'city-22',
+    name: 'FEZ Berlin Activities',
+    description: 'Day pass to Europe\'s largest non-profit children\'s and youth leisure center.',
+    imageUrl: 'https://images.unsplash.com/photo-1472162072942-cd5147eb3902?w=600&h=400&fit=crop',
+    goodCoins: 60,
+    originalPrice: 12.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://fez-berlin.de/'
+  },
+  {
+    id: 'city-23',
+    name: 'KÖRPERWELTEN Museum',
+    description: 'Educational visit to the fascinating Body Worlds exhibition in Berlin.',
+    imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&h=400&fit=crop',
+    goodCoins: 120,
+    originalPrice: 24.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://bodyworlds.com/exhibitions/'
+  },
+  {
+    id: 'city-24',
+    name: 'Science Center Spectrum',
+    description: 'Interactive science museum with over 150 experiments to try hands-on.',
+    imageUrl: 'https://images.unsplash.com/photo-1566192091627-173e4b43a1ee?w=600&h=400&fit=crop',
+    goodCoins: 80,
+    originalPrice: 16.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.deutsches-technikmuseum.de/en/exhibitions/spectrum'
+  },
+  {
+    id: 'city-25',
+    name: 'Winterwelt Potsdamer Platz',
+    description: 'Winter season sledding and ice skating at Potsdamer Platz.',
+    imageUrl: 'https://images.unsplash.com/photo-1574366343290-515e466e0b15?w=600&h=400&fit=crop',
+    goodCoins: 75,
+    originalPrice: 15.00,
+    discountedPrice: 0,
+    category: 'city',
+    externalUrl: 'https://www.potsdamerplatz.de/en/'
+  }
 ];
 
-// Daily Stuff Rewards (25)
-export const dailyStuffRewards: RewardItem[] = [
+// Daily stuff rewards
+export const dailyStuffRewards = [
   {
     id: 'daily-1',
-    name: '30 Minutes Extra Screen Time',
-    description: 'Earn 30 minutes of additional screen time to be used at your discretion.',
-    imageUrl: 'https://images.unsplash.com/photo-1544652478-6653e09f18a2?w=600&h=400&fit=crop',
-    goodCoins: 50,
-    originalPrice: null,
-    discountedPrice: null,
-    category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-1'
-  },
-  {
-    id: 'daily-2',
     name: 'Choose Dinner For The Family',
     description: 'Get to pick what the family has for dinner one night this week.',
     imageUrl: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&h=400&fit=crop',
-    goodCoins: 75,
+    goodCoins: 30,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-2'
+    externalUrl: null
+  },
+  {
+    id: 'daily-2',
+    name: 'Extra 30 Minutes of Screen Time',
+    description: 'Earn an additional 30 minutes of screen time to be used at your discretion.',
+    imageUrl: 'https://images.unsplash.com/photo-1544652478-6653e09f18a2?w=600&h=400&fit=crop',
+    goodCoins: 20,
+    originalPrice: null,
+    discountedPrice: null,
+    category: 'daily',
+    externalUrl: null
   },
   {
     id: 'daily-3',
     name: 'Stay Up 30 Minutes Later',
-    description: 'Push your bedtime back by 30 minutes for one night.',
+    description: 'Push your bedtime back by 30 minutes for one night of your choosing.',
     imageUrl: 'https://images.unsplash.com/photo-1531353826977-0941b4779a1c?w=600&h=400&fit=crop',
-    goodCoins: 40,
+    goodCoins: 25,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-3'
+    externalUrl: null
   },
   {
     id: 'daily-4',
     name: 'Special Dessert',
     description: 'Receive a special dessert or treat of your choice after dinner.',
     imageUrl: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&h=400&fit=crop',
-    goodCoins: 35,
+    goodCoins: 15,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-4'
+    externalUrl: null
   },
   {
     id: 'daily-5',
     name: 'No Chores Day',
     description: 'Get a day off from your regular chores and responsibilities.',
     imageUrl: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&h=400&fit=crop',
-    goodCoins: 80,
+    goodCoins: 40,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-5'
+    externalUrl: null
   },
   {
     id: 'daily-6',
-    name: 'Breakfast in Bed',
-    description: 'Have your breakfast served to you in bed on a weekend morning.',
-    imageUrl: 'https://images.unsplash.com/photo-1615300236079-4bdb43bd9a9a?w=600&h=400&fit=crop',
-    goodCoins: 60,
+    name: 'Hot Chocolate Special',
+    description: 'Enjoy a deluxe hot chocolate with all the toppings.',
+    imageUrl: 'https://images.unsplash.com/photo-1577303935007-0d306ee638cf?w=600&h=400&fit=crop',
+    goodCoins: 10,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-6'
+    externalUrl: null
   },
   {
     id: 'daily-7',
-    name: 'Picnic in the Park',
-    description: 'Have a special picnic with your family at a local park.',
-    imageUrl: 'https://images.unsplash.com/photo-1540173196447-4a4ccebe3d70?w=600&h=400&fit=crop',
-    goodCoins: 65,
+    name: 'Movie Night Selection',
+    description: 'Choose the movie for the next family movie night.',
+    imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&h=400&fit=crop',
+    goodCoins: 20,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-7'
+    externalUrl: null
   },
   {
     id: 'daily-8',
-    name: 'Board Game Night Host',
-    description: 'You get to choose all the games for the next family game night.',
-    imageUrl: 'https://images.unsplash.com/photo-1611371805429-8b5c1f0536fc?w=600&h=400&fit=crop',
-    goodCoins: 45,
+    name: 'Breakfast in Bed',
+    description: 'Have your breakfast served in bed on a weekend morning.',
+    imageUrl: 'https://images.unsplash.com/photo-1513442542250-854d436a73f2?w=600&h=400&fit=crop',
+    goodCoins: 25,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-8'
+    externalUrl: null
   },
   {
     id: 'daily-9',
-    name: 'Solo TV Time',
-    description: 'Get the TV to yourself for 1 hour to watch your favorite show.',
-    imageUrl: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&h=400&fit=crop',
-    goodCoins: 55,
+    name: 'Pick the Family Game',
+    description: 'Choose which game the family plays on game night.',
+    imageUrl: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=600&h=400&fit=crop',
+    goodCoins: 15,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-9'
+    externalUrl: null
   },
   {
     id: 'daily-10',
-    name: 'Extra Playdate',
-    description: 'Have a friend over for an extra playdate this week.',
-    imageUrl: 'https://images.unsplash.com/photo-1602030638412-bb8dcc0bc8b0?w=600&h=400&fit=crop',
-    goodCoins: 70,
+    name: 'One-Hour Uninterrupted Parent Time',
+    description: 'Get one hour of uninterrupted one-on-one time with a parent doing an activity of your choice.',
+    imageUrl: 'https://images.unsplash.com/photo-1601979031925-424e53b6caaa?w=600&h=400&fit=crop',
+    goodCoins: 30,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-10'
+    externalUrl: null
   },
   {
     id: 'daily-11',
-    name: 'Pizza Night',
-    description: 'Order your favorite pizza for a special dinner.',
-    imageUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&h=400&fit=crop',
-    goodCoins: 60,
+    name: 'Control the Music',
+    description: 'Choose the music the family listens to for a day.',
+    imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&h=400&fit=crop',
+    goodCoins: 15,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-11'
+    externalUrl: null
   },
   {
     id: 'daily-12',
-    name: 'Baking Session',
-    description: 'Choose a recipe and bake something delicious with a parent.',
-    imageUrl: 'https://images.unsplash.com/photo-1588710277537-126980d60b56?w=600&h=400&fit=crop',
-    goodCoins: 55,
+    name: 'Special Lunch Pack',
+    description: 'Get a special lunch with your favorite items packed for school.',
+    imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=400&fit=crop',
+    goodCoins: 15,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-12'
+    externalUrl: null
   },
   {
     id: 'daily-13',
-    name: 'Movie Night Snack Bar',
-    description: 'Set up a special snack bar for the next family movie night.',
-    imageUrl: 'https://images.unsplash.com/photo-1594675229822-4043eec07268?w=600&h=400&fit=crop',
+    name: 'Extra Allowance Boost',
+    description: 'Boost your weekly allowance by 25% for one week.',
+    imageUrl: 'https://images.unsplash.com/photo-1567427018141-0584cfcbf1b8?w=600&h=400&fit=crop',
     goodCoins: 50,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-13'
+    externalUrl: null
   },
   {
     id: 'daily-14',
-    name: 'Breakfast Choice',
-    description: 'Choose what the family has for breakfast on a weekend morning.',
-    imageUrl: 'https://images.unsplash.com/photo-1550369875-7ab15ad86b85?w=600&h=400&fit=crop',
-    goodCoins: 40,
+    name: 'Late Homework Pass',
+    description: 'One pass to turn in non-critical homework a day late without penalty (parent must approve).',
+    imageUrl: 'https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=600&h=400&fit=crop',
+    goodCoins: 35,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-14'
+    externalUrl: null
   },
   {
     id: 'daily-15',
-    name: 'Indoor Camping Night',
-    description: 'Set up a tent in the living room for an indoor camping experience.',
-    imageUrl: 'https://images.unsplash.com/photo-1542107358-95778532a0ed?w=600&h=400&fit=crop',
-    goodCoins: 70,
+    name: 'Choose Weekend Activity',
+    description: 'Pick an activity for the family to do together on the weekend.',
+    imageUrl: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=600&h=400&fit=crop',
+    goodCoins: 30,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-15'
+    externalUrl: null
   },
   {
     id: 'daily-16',
-    name: 'Be the Photographer',
-    description: 'Be in charge of taking family photos for a special occasion.',
-    imageUrl: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=600&h=400&fit=crop',
-    goodCoins: 45,
+    name: 'Invite a Friend Over',
+    description: 'Have a friend come over for a play date or sleepover.',
+    imageUrl: 'https://images.unsplash.com/photo-1542623024-a797a755b8d0?w=600&h=400&fit=crop',
+    goodCoins: 35,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-16'
+    externalUrl: null
   },
   {
     id: 'daily-17',
-    name: 'Extra Reading Time',
-    description: 'Get an extra 30 minutes of reading time before bed.',
-    imageUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&h=400&fit=crop',
-    goodCoins: 35,
+    name: 'Double Dessert Day',
+    description: 'Get twice the usual dessert portion for one day.',
+    imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&h=400&fit=crop',
+    goodCoins: 20,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-17'
+    externalUrl: null
   },
   {
     id: 'daily-18',
-    name: 'Special Lunch Box',
-    description: 'Have a special themed lunch box prepared for school.',
-    imageUrl: 'https://images.unsplash.com/photo-1548642783-007f6a4bf005?w=600&h=400&fit=crop',
-    goodCoins: 40,
+    name: 'Homemade Pizza Night',
+    description: 'Family makes homemade pizzas together with your choice of toppings.',
+    imageUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&h=400&fit=crop',
+    goodCoins: 25,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-18'
+    externalUrl: null
   },
   {
     id: 'daily-19',
-    name: 'Parent Helper',
-    description: 'Be the special helper for a parent on a project of your choice.',
-    imageUrl: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=600&h=400&fit=crop',
-    goodCoins: 50,
+    name: 'Skip a Vegetable Day',
+    description: 'One day where you can skip eating a vegetable you don\'t like.',
+    imageUrl: 'https://images.unsplash.com/photo-1478144592103-25e218a04891?w=600&h=400&fit=crop',
+    goodCoins: 15,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-19'
+    externalUrl: null
   },
   {
     id: 'daily-20',
-    name: 'Pajama Day',
-    description: 'Spend the whole day in your pajamas (on a weekend).',
-    imageUrl: 'https://images.unsplash.com/photo-1566938064504-a379175168ba?w=600&h=400&fit=crop',
-    goodCoins: 35,
+    name: 'Parent Does Your Chore',
+    description: 'Have a parent complete one of your regular chores for you.',
+    imageUrl: 'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&h=400&fit=crop',
+    goodCoins: 30,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-20'
+    externalUrl: null
   },
   {
     id: 'daily-21',
-    name: 'DIY Craft Afternoon',
-    description: 'Have a special crafting session with all supplies provided.',
-    imageUrl: 'https://images.unsplash.com/photo-1584847654591-ae3edaa0dc3d?w=600&h=400&fit=crop',
-    goodCoins: 55,
+    name: 'Special Bedtime Story',
+    description: 'Extra-long bedtime story with parent doing all the funny voices.',
+    imageUrl: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=600&h=400&fit=crop',
+    goodCoins: 15,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-21'
+    externalUrl: null
   },
   {
     id: 'daily-22',
-    name: 'Control the Music',
-    description: 'Be the DJ for a day and choose all the music for the house.',
-    imageUrl: 'https://images.unsplash.com/photo-1518911710364-17ec553bde5d?w=600&h=400&fit=crop',
-    goodCoins: 40,
+    name: 'Pillow Fort Night',
+    description: 'Build an epic pillow fort in the living room and sleep in it overnight.',
+    imageUrl: 'https://images.unsplash.com/photo-1584382296853-21c4b28a1528?w=600&h=400&fit=crop',
+    goodCoins: 25,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-22'
+    externalUrl: null
   },
   {
     id: 'daily-23',
-    name: 'Extra Allowance',
-    description: 'Receive an extra $5 in your next allowance.',
-    imageUrl: 'https://images.unsplash.com/photo-1593672715438-d88a1cf7a8f9?w=600&h=400&fit=crop',
-    goodCoins: 75,
+    name: 'Breakfast for Dinner',
+    description: 'Have breakfast foods for dinner one night.',
+    imageUrl: 'https://images.unsplash.com/photo-1533089860892-a9b9ac6e3a19?w=600&h=400&fit=crop',
+    goodCoins: 20,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-23'
+    externalUrl: null
   },
   {
     id: 'daily-24',
-    name: 'Special Bath Time',
-    description: 'Have a special bath with extra bubbles, toys, and time.',
-    imageUrl: 'https://images.unsplash.com/photo-1600414729532-77f00b16a0bb?w=600&h=400&fit=crop',
-    goodCoins: 35,
+    name: 'Indoor Picnic',
+    description: 'Have a special indoor picnic dinner on a blanket in the living room.',
+    imageUrl: 'https://images.unsplash.com/photo-1529778873920-4da98f6b73b8?w=600&h=400&fit=crop',
+    goodCoins: 20,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-24'
+    externalUrl: null
   },
   {
     id: 'daily-25',
-    name: 'Sidewalk Chalk Art',
-    description: 'Get new sidewalk chalk and permission to create a masterpiece on the driveway.',
-    imageUrl: 'https://images.unsplash.com/photo-1597094618611-de2a44bc9ce9?w=600&h=400&fit=crop',
-    goodCoins: 45,
+    name: 'Baking Assistant',
+    description: 'Help bake and decorate special cookies or cupcakes with a parent.',
+    imageUrl: 'https://images.unsplash.com/photo-1558961363-fa8fdf7a3d77?w=600&h=400&fit=crop',
+    goodCoins: 20,
     originalPrice: null,
     discountedPrice: null,
     category: 'daily',
-    externalUrl: 'https://example.com/reward/daily-25'
-  },
+    externalUrl: null
+  }
 ];
 
-// Brand Exclusive Rewards (25)
-export const brandExclusiveRewards: RewardItem[] = [
+// Brand exclusive rewards
+export const brandExclusiveRewards = [
   {
     id: 'brand-1',
-    name: 'LEGO Creator Set',
-    description: 'A LEGO Creator 3-in-1 set that can be built in three different ways.',
-    imageUrl: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=600&h=400&fit=crop',
+    name: 'LEGO Building Set',
+    description: 'A fun LEGO set to encourage creativity and building skills.',
+    imageUrl: 'https://images.unsplash.com/photo-1607853554439-0069ec0f29b6?w=600&h=400&fit=crop',
     goodCoins: 120,
-    originalPrice: 39.99,
-    discountedPrice: 29.99,
-    category: 'brand',
-    externalUrl: 'https://www.lego.com/'
-  },
-  {
-    id: 'brand-2',
-    name: 'Crayola Art Set',
-    description: 'Comprehensive art set with colored pencils, markers, and crayons.',
-    imageUrl: 'https://images.unsplash.com/photo-1599161244426-f31991b36d2c?w=600&h=400&fit=crop',
-    goodCoins: 80,
     originalPrice: 24.99,
     discountedPrice: 19.99,
     category: 'brand',
-    externalUrl: 'https://www.crayola.com/'
+    externalUrl: 'https://www.lego.com'
+  },
+  {
+    id: 'brand-2',
+    name: 'Adidas Kids Sneakers',
+    description: 'Cool and comfortable sneakers for active kids.',
+    imageUrl: 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=600&h=400&fit=crop',
+    goodCoins: 150,
+    originalPrice: 49.99,
+    discountedPrice: 39.99,
+    category: 'brand',
+    externalUrl: 'https://www.adidas.com'
   },
   {
     id: 'brand-3',
-    name: 'Nintendo eShop Card',
-    description: '$10 Nintendo eShop Card to purchase games or content.',
-    imageUrl: 'https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=600&h=400&fit=crop',
-    goodCoins: 150,
-    originalPrice: 10.00,
-    discountedPrice: 10.00,
-    category: 'brand',
-    externalUrl: 'https://www.nintendo.com/'
-  },
-  {
-    id: 'brand-4',
-    name: 'Spotify Premium (1 Month)',
-    description: 'One month of Spotify Premium for ad-free music streaming.',
-    imageUrl: 'https://images.unsplash.com/photo-1614680376408-81e91ffe3db7?w=600&h=400&fit=crop',
-    goodCoins: 100,
-    originalPrice: 9.99,
-    discountedPrice: 9.99,
-    category: 'brand',
-    externalUrl: 'https://www.spotify.com/'
-  },
-  {
-    id: 'brand-5',
-    name: 'Disney+ Subscription (1 Month)',
+    name: 'Disney+ Monthly Subscription',
     description: 'One month of Disney+ streaming service.',
-    imageUrl: 'https://images.unsplash.com/photo-1584905066893-7d5c142ba4e1?w=600&h=400&fit=crop',
-    goodCoins: 120,
-    originalPrice: 11.99,
-    discountedPrice: 11.99,
-    category: 'brand',
-    externalUrl: 'https://www.disneyplus.com/'
-  },
-  {
-    id: 'brand-6',
-    name: 'Minecraft Extension Content',
-    description: 'Special content pack for Minecraft game.',
-    imageUrl: 'https://images.unsplash.com/photo-1607603750871-b5a3205a207c?w=600&h=400&fit=crop',
-    goodCoins: 90,
+    imageUrl: 'https://images.unsplash.com/photo-1604149333939-5953e95e89db?w=600&h=400&fit=crop',
+    goodCoins: 80,
     originalPrice: 8.99,
     discountedPrice: 8.99,
     category: 'brand',
-    externalUrl: 'https://www.minecraft.net/'
+    externalUrl: 'https://www.disneyplus.com'
+  },
+  {
+    id: 'brand-4',
+    name: 'Nintendo eShop Card €10',
+    description: 'Digital gift card for Nintendo eShop - perfect for gamers!',
+    imageUrl: 'https://images.unsplash.com/photo-1614465895564-7e672550d3a0?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 10.00,
+    discountedPrice: 10.00,
+    category: 'brand',
+    externalUrl: 'https://www.nintendo.com'
+  },
+  {
+    id: 'brand-5',
+    name: 'Playmobil Set',
+    description: 'Playmobil play set with detailed figures and accessories.',
+    imageUrl: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=600&h=400&fit=crop',
+    goodCoins: 110,
+    originalPrice: 22.99,
+    discountedPrice: 19.99,
+    category: 'brand',
+    externalUrl: 'https://www.playmobil.de'
+  },
+  {
+    id: 'brand-6',
+    name: 'Spotify Kids Subscription',
+    description: 'One month of Spotify Kids with family-friendly music and stories.',
+    imageUrl: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=600&h=400&fit=crop',
+    goodCoins: 70,
+    originalPrice: 7.99,
+    discountedPrice: 7.99,
+    category: 'brand',
+    externalUrl: 'https://www.spotify.com/kids'
   },
   {
     id: 'brand-7',
-    name: 'Hasbro Board Game',
-    description: 'Classic Hasbro board game for family fun.',
-    imageUrl: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=600&h=400&fit=crop',
-    goodCoins: 110,
-    originalPrice: 34.99,
-    discountedPrice: 29.99,
+    name: 'Roblox Gift Card',
+    description: 'Digital gift card for Roblox - get Robux for your favorite games!',
+    imageUrl: 'https://images.unsplash.com/photo-1604506822419-fe3103508fba?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 10.00,
+    discountedPrice: 10.00,
     category: 'brand',
-    externalUrl: 'https://shop.hasbro.com/'
+    externalUrl: 'https://www.roblox.com'
   },
   {
     id: 'brand-8',
-    name: 'National Geographic Kids Subscription',
-    description: '1-year subscription to National Geographic Kids magazine.',
-    imageUrl: 'https://images.unsplash.com/photo-1576633587370-461fe5e6fa4a?w=600&h=400&fit=crop',
+    name: 'Science Experiment Kit',
+    description: 'Fun and educational science experiments for kids.',
+    imageUrl: 'https://images.unsplash.com/photo-1575468130797-aa759c1495f7?w=600&h=400&fit=crop',
     goodCoins: 130,
-    originalPrice: 39.99,
-    discountedPrice: 30.00,
+    originalPrice: 34.99,
+    discountedPrice: 27.99,
     category: 'brand',
-    externalUrl: 'https://kids.nationalgeographic.com/'
+    externalUrl: 'https://www.galttoys.com'
   },
   {
     id: 'brand-9',
-    name: 'Adidas Gift Card',
-    description: '$25 gift card to Adidas online or in-store.',
-    imageUrl: 'https://images.unsplash.com/photo-1609709295948-a8e93d661948?w=600&h=400&fit=crop',
-    goodCoins: 250,
-    originalPrice: 25.00,
-    discountedPrice: 25.00,
+    name: 'Art Supplies Kit',
+    description: 'Complete art supplies kit with paints, pencils, and markers.',
+    imageUrl: 'https://images.unsplash.com/photo-1599658880436-c61792e70672?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 19.99,
+    discountedPrice: 15.99,
     category: 'brand',
-    externalUrl: 'https://www.adidas.com/'
+    externalUrl: 'https://www.faber-castell.com'
   },
   {
     id: 'brand-10',
-    name: 'Amazon Kids+ Subscription',
-    description: '3-month subscription to Amazon Kids+ with books, games, and videos.',
-    imageUrl: 'https://images.unsplash.com/photo-1571867424488-4565932edb41?w=600&h=400&fit=crop',
-    goodCoins: 140,
+    name: 'Children\'s Book Bundle',
+    description: 'Set of 3 age-appropriate books to encourage reading.',
+    imageUrl: 'https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=600&h=400&fit=crop',
+    goodCoins: 90,
     originalPrice: 29.99,
-    discountedPrice: 29.99,
+    discountedPrice: 23.99,
     category: 'brand',
-    externalUrl: 'https://www.amazon.com/Amazon-FreeTime-Unlimited-Monthly-Subscription/dp/B01KPTV12W'
+    externalUrl: 'https://www.thalia.de'
   },
   {
     id: 'brand-11',
     name: 'Nerf Blaster',
-    description: 'Popular Nerf blaster toy with darts.',
-    imageUrl: 'https://images.unsplash.com/photo-1563396983088-a621091fbf49?w=600&h=400&fit=crop',
-    goodCoins: 95,
-    originalPrice: 29.99,
-    discountedPrice: 24.99,
+    description: 'Popular Nerf blaster with foam darts for active indoor/outdoor play.',
+    imageUrl: 'https://images.unsplash.com/photo-1648113912828-41e6e5628fac?w=600&h=400&fit=crop',
+    goodCoins: 110,
+    originalPrice: 24.99,
+    discountedPrice: 19.99,
     category: 'brand',
-    externalUrl: 'https://nerf.hasbro.com/'
+    externalUrl: 'https://www.hasbro.com/nerf'
   },
   {
     id: 'brand-12',
-    name: 'Roblox Gift Card',
-    description: '$10 Roblox gift card for in-game currency.',
-    imageUrl: 'https://images.unsplash.com/photo-1597534458220-9fb4969f2df5?w=600&h=400&fit=crop',
+    name: 'Amazon Kids+ Subscription',
+    description: 'One month of Amazon Kids+ with thousands of books, movies, and TV shows.',
+    imageUrl: 'https://images.unsplash.com/photo-1612128346994-846fc6196f94?w=600&h=400&fit=crop',
+    goodCoins: 80,
+    originalPrice: 7.99,
+    discountedPrice: 7.99,
+    category: 'brand',
+    externalUrl: 'https://www.amazon.com/kids-plus'
+  },
+  {
+    id: 'brand-13',
+    name: 'Minecraft Gift Card',
+    description: 'Digital gift card for Minecraft marketplace items.',
+    imageUrl: 'https://images.unsplash.com/photo-1639162906614-ddd90b333e2e?w=600&h=400&fit=crop',
     goodCoins: 100,
     originalPrice: 10.00,
     discountedPrice: 10.00,
     category: 'brand',
-    externalUrl: 'https://www.roblox.com/'
-  },
-  {
-    id: 'brand-13',
-    name: 'Barbie Dreamhouse Accessories',
-    description: 'Accessory pack for Barbie Dreamhouse play.',
-    imageUrl: 'https://images.unsplash.com/photo-1612462766564-3dbec0a35b0f?w=600&h=400&fit=crop',
-    goodCoins: 85,
-    originalPrice: 24.99,
-    discountedPrice: 19.99,
-    category: 'brand',
-    externalUrl: 'https://barbie.mattel.com/'
+    externalUrl: 'https://www.minecraft.net'
   },
   {
     id: 'brand-14',
-    name: 'Hot Wheels 5-Pack',
-    description: 'Set of 5 Hot Wheels die-cast cars.',
-    imageUrl: 'https://images.unsplash.com/photo-1595779950632-5e586fd0f9a5?w=600&h=400&fit=crop',
-    goodCoins: 70,
-    originalPrice: 19.99,
-    discountedPrice: 14.99,
+    name: 'H&M Kids Clothing Voucher',
+    description: '€20 voucher for H&M kids clothing.',
+    imageUrl: 'https://images.unsplash.com/photo-1548094891-c4ba474efd16?w=600&h=400&fit=crop',
+    goodCoins: 150,
+    originalPrice: 20.00,
+    discountedPrice: 20.00,
     category: 'brand',
-    externalUrl: 'https://hotwheels.mattel.com/'
+    externalUrl: 'https://www.hm.com'
   },
   {
     id: 'brand-15',
-    name: 'Playmobil Figure Set',
-    description: 'Character set from Playmobil for imaginative play.',
-    imageUrl: 'https://images.unsplash.com/photo-1610395179018-efa0ac4fc616?w=600&h=400&fit=crop',
-    goodCoins: 90,
-    originalPrice: 29.99,
-    discountedPrice: 24.99,
+    name: 'Pokémon Card Starter Pack',
+    description: 'Pokémon Trading Card Game starter pack.',
+    imageUrl: 'https://images.unsplash.com/photo-1613771404721-1f92d799e136?w=600&h=400&fit=crop',
+    goodCoins: 75,
+    originalPrice: 14.99,
+    discountedPrice: 12.99,
     category: 'brand',
-    externalUrl: 'https://www.playmobil.de/'
+    externalUrl: 'https://www.pokemon.com'
   },
   {
     id: 'brand-16',
-    name: 'Pokémon Trading Card Game Pack',
-    description: 'Booster pack of Pokémon trading cards.',
-    imageUrl: 'https://images.unsplash.com/photo-1605979713174-eff45f0b341f?w=600&h=400&fit=crop',
-    goodCoins: 60,
-    originalPrice: 16.99,
-    discountedPrice: 14.99,
-    category: 'brand',
-    externalUrl: 'https://www.pokemon.com/us/pokemon-tcg/'
-  },
-  {
-    id: 'brand-17',
-    name: 'Ravensburger Puzzle',
-    description: 'High-quality puzzle from Ravensburger.',
-    imageUrl: 'https://images.unsplash.com/photo-1586984826607-5281d9a1ab56?w=600&h=400&fit=crop',
-    goodCoins: 75,
-    originalPrice: 22.99,
-    discountedPrice: 18.99,
-    category: 'brand',
-    externalUrl: 'https://www.ravensburger.org/en/start/index.html'
-  },
-  {
-    id: 'brand-18',
-    name: 'Audible Kids Book',
-    description: 'One audiobook credit for a children's book on Audible.',
-    imageUrl: 'https://images.unsplash.com/photo-1612367974659-1779e0a92f11?w=600&h=400&fit=crop',
-    goodCoins: 80,
-    originalPrice: 14.95,
-    discountedPrice: 14.95,
-    category: 'brand',
-    externalUrl: 'https://www.audible.com/'
-  },
-  {
-    id: 'brand-19',
-    name: 'Melissa & Doug Craft Kit',
-    description: 'Creative craft kit from Melissa & Doug.',
-    imageUrl: 'https://images.unsplash.com/photo-1583149269449-7a8bfaf94a86?w=600&h=400&fit=crop',
-    goodCoins: 85,
-    originalPrice: 24.99,
-    discountedPrice: 19.99,
-    category: 'brand',
-    externalUrl: 'https://www.melissaanddoug.com/'
-  },
-  {
-    id: 'brand-20',
-    name: 'Play-Doh Super Set',
-    description: 'Multi-color Play-Doh set with tools.',
-    imageUrl: 'https://images.unsplash.com/photo-1535572290543-960a8046f5af?w=600&h=400&fit=crop',
-    goodCoins: 70,
-    originalPrice: 19.99,
-    discountedPrice: 16.99,
-    category: 'brand',
-    externalUrl: 'https://playdoh.hasbro.com/'
-  },
-  {
-    id: 'brand-21',
-    name: 'Minecraft Plush Toy',
-    description: 'Official Minecraft character plush toy.',
-    imageUrl: 'https://images.unsplash.com/photo-1619547871583-51511ed57a3f?w=600&h=400&fit=crop',
-    goodCoins: 65,
-    originalPrice: 18.99,
-    discountedPrice: 15.99,
-    category: 'brand',
-    externalUrl: 'https://www.minecraft.net/'
-  },
-  {
-    id: 'brand-22',
-    name: 'YouTube Premium (1 Month)',
-    description: 'One month of ad-free YouTube viewing.',
+    name: 'YouTube Premium Family Month',
+    description: 'One month of YouTube Premium Family for ad-free viewing.',
     imageUrl: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=600&h=400&fit=crop',
-    goodCoins: 100,
-    originalPrice: 11.99,
-    discountedPrice: 11.99,
+    goodCoins: 120,
+    originalPrice: 17.99,
+    discountedPrice: 17.99,
     category: 'brand',
     externalUrl: 'https://www.youtube.com/premium'
   },
   {
-    id: 'brand-23',
-    name: 'Nintendo Amiibo Figure',
-    description: 'Collectible Nintendo Amiibo character figure.',
-    imageUrl: 'https://images.unsplash.com/photo-1612036781871-9679b73d7723?w=600&h=400&fit=crop',
-    goodCoins: 120,
-    originalPrice: 14.99,
-    discountedPrice: 12.99,
-    category: 'brand',
-    externalUrl: 'https://www.nintendo.com/amiibo/'
-  },
-  {
-    id: 'brand-24',
-    name: 'Klutz Activity Book',
-    description: 'Hands-on activity book with supplies included.',
-    imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop',
-    goodCoins: 85,
-    originalPrice: 24.99,
-    discountedPrice: 19.99,
-    category: 'brand',
-    externalUrl: 'https://klutz.com/'
-  },
-  {
-    id: 'brand-25',
-    name: 'Fortnite V-Bucks Card',
-    description: '1,000 V-Bucks card for Fortnite in-game currency.',
-    imageUrl: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?w=600&h=400&fit=crop',
+    id: 'brand-17',
+    name: 'TEMU Shopping Credit',
+    description: '€15 shopping credit for TEMU online marketplace.',
+    imageUrl: 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=600&h=400&fit=crop',
     goodCoins: 130,
+    originalPrice: 15.00,
+    discountedPrice: 15.00,
+    category: 'brand',
+    externalUrl: 'https://www.temu.com'
+  },
+  {
+    id: 'brand-18',
+    name: 'Schleich Animal Figure',
+    description: 'Realistic Schleich animal figure for collectors.',
+    imageUrl: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=400&fit=crop',
+    goodCoins: 60,
+    originalPrice: 12.99,
+    discountedPrice: 9.99,
+    category: 'brand',
+    externalUrl: 'https://www.schleich-s.com'
+  },
+  {
+    id: 'brand-19',
+    name: 'Fortnite V-Bucks',
+    description: '1000 V-Bucks for Fortnite in-game purchases.',
+    imageUrl: 'https://images.unsplash.com/photo-1589241062272-c0a000072224?w=600&h=400&fit=crop',
+    goodCoins: 110,
     originalPrice: 9.99,
     discountedPrice: 9.99,
     category: 'brand',
-    externalUrl: 'https://www.epicgames.com/fortnite/'
+    externalUrl: 'https://www.epicgames.com/fortnite'
   },
+  {
+    id: 'brand-20',
+    name: 'Ravensburger Puzzle',
+    description: 'High-quality Ravensburger puzzle with 300 pieces.',
+    imageUrl: 'https://images.unsplash.com/photo-1609217705170-165a6c6471b6?w=600&h=400&fit=crop',
+    goodCoins: 80,
+    originalPrice: 16.99,
+    discountedPrice: 14.99,
+    category: 'brand',
+    externalUrl: 'https://www.ravensburger.de'
+  },
+  {
+    id: 'brand-21',
+    name: 'Tonies Audio Character',
+    description: 'Tonies audio character for the Toniebox audio system.',
+    imageUrl: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=600&h=400&fit=crop',
+    goodCoins: 90,
+    originalPrice: 17.99,
+    discountedPrice: 15.99,
+    category: 'brand',
+    externalUrl: 'https://tonies.com'
+  },
+  {
+    id: 'brand-22',
+    name: 'SHEIN Kids Fashion Voucher',
+    description: '€20 voucher for SHEIN kids fashion items.',
+    imageUrl: 'https://images.unsplash.com/photo-1551854590-25ae0a237339?w=600&h=400&fit=crop',
+    goodCoins: 150,
+    originalPrice: 20.00,
+    discountedPrice: 20.00,
+    category: 'brand',
+    externalUrl: 'https://www.shein.com'
+  },
+  {
+    id: 'brand-23',
+    name: 'Steiff Teddy Bear',
+    description: 'Classic Steiff teddy bear with famous button in ear.',
+    imageUrl: 'https://images.unsplash.com/photo-1585155770447-2f66e2a397b5?w=600&h=400&fit=crop',
+    goodCoins: 200,
+    originalPrice: 49.99,
+    discountedPrice: 39.99,
+    category: 'brand',
+    externalUrl: 'https://www.steiff.com'
+  },
+  {
+    id: 'brand-24',
+    name: 'HABA Board Game',
+    description: 'Family-friendly HABA board game for ages 5+.',
+    imageUrl: 'https://images.unsplash.com/photo-1611371805429-1286704f0cf7?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 19.99,
+    discountedPrice: 17.99,
+    category: 'brand',
+    externalUrl: 'https://www.haba.de'
+  },
+  {
+    id: 'brand-25',
+    name: 'smarTrike Balance Bike Credit',
+    description: 'Credit toward a smarTrike balance bike for toddlers.',
+    imageUrl: 'https://images.unsplash.com/photo-1558981001-5864b3250a69?w=600&h=400&fit=crop',
+    goodCoins: 250,
+    originalPrice: 69.99,
+    discountedPrice: 59.99,
+    category: 'brand',
+    externalUrl: 'https://www.smartrike.com'
+  }
 ];
 
-// Experience Rewards (25)
-export const experienceRewards: RewardItem[] = [
+// Experience rewards
+export const experienceRewards = [
   {
     id: 'experience-1',
-    name: 'Movie Night Selection',
-    description: 'Choose the movie for the next family movie night.',
-    imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&h=400&fit=crop',
-    goodCoins: 60,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Family Movie Theater Outing',
+    description: 'Family trip to the local movie theater to see a new release.',
+    imageUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&h=400&fit=crop',
+    goodCoins: 120,
+    originalPrice: 40.00,
+    discountedPrice: 35.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-1'
+    externalUrl: null
   },
   {
     id: 'experience-2',
@@ -870,283 +860,259 @@ export const experienceRewards: RewardItem[] = [
     originalPrice: null,
     discountedPrice: null,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-2'
+    externalUrl: null
   },
   {
     id: 'experience-3',
-    name: 'Parent-Child Date',
-    description: 'Special one-on-one outing with a parent of your choice.',
-    imageUrl: 'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=600&h=400&fit=crop',
-    goodCoins: 90,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Indoor Climbing Adventure',
+    description: 'Family visit to an indoor climbing center.',
+    imageUrl: 'https://images.unsplash.com/photo-1507034589631-9433cc6bc453?w=600&h=400&fit=crop',
+    goodCoins: 150,
+    originalPrice: 45.00,
+    discountedPrice: 40.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-3'
+    externalUrl: null
   },
   {
     id: 'experience-4',
-    name: 'Swimming Pool Day',
-    description: 'Family trip to a local swimming pool or water park.',
-    imageUrl: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=600&h=400&fit=crop',
-    goodCoins: 120,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Mini Golf Outing',
+    description: 'Family mini golf adventure at a local course.',
+    imageUrl: 'https://images.unsplash.com/photo-1594164976952-e499a7bacf6e?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 30.00,
+    discountedPrice: 25.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-4'
+    externalUrl: null
   },
   {
     id: 'experience-5',
-    name: 'Cooking Class',
-    description: 'Learn to cook a special dish with a parent as your instructor.',
-    imageUrl: 'https://images.unsplash.com/photo-1607877212339-37e2500ce0e3?w=600&h=400&fit=crop',
-    goodCoins: 85,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Ice Cream Shop Visit',
+    description: 'Special trip to an ice cream shop for a deluxe treat.',
+    imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&h=400&fit=crop',
+    goodCoins: 50,
+    originalPrice: 15.00,
+    discountedPrice: 15.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-5'
+    externalUrl: null
   },
   {
     id: 'experience-6',
-    name: 'Camping in the Backyard',
-    description: 'Set up a tent and camp overnight in your backyard with a parent.',
-    imageUrl: 'https://images.unsplash.com/photo-1504851149312-7a075b496cc7?w=600&h=400&fit=crop',
-    goodCoins: 95,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Trampoline Park Tickets',
+    description: 'Tickets for the family to enjoy an hour at a trampoline park.',
+    imageUrl: 'https://images.unsplash.com/photo-1601564650013-6b7e6c83be19?w=600&h=400&fit=crop',
+    goodCoins: 130,
+    originalPrice: 40.00,
+    discountedPrice: 35.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-6'
+    externalUrl: null
   },
   {
     id: 'experience-7',
-    name: 'Bike Riding Adventure',
-    description: 'Go on a special bike ride adventure with the family on a trail of your choice.',
-    imageUrl: 'https://images.unsplash.com/photo-1541625602330-2277a4861bc6?w=600&h=400&fit=crop',
-    goodCoins: 80,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Special Restaurant Dinner',
+    description: 'Dinner at a restaurant of your choice with the family.',
+    imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&h=400&fit=crop',
+    goodCoins: 150,
+    originalPrice: 60.00,
+    discountedPrice: 60.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-7'
+    externalUrl: null
   },
   {
     id: 'experience-8',
-    name: 'Star Gazing Night',
-    description: 'Stay up late on a clear night to look at stars with a parent and hot chocolate.',
-    imageUrl: 'https://images.unsplash.com/photo-1532978379173-523e16f371f9?w=600&h=400&fit=crop',
-    goodCoins: 70,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Bowling Night',
+    description: 'Family bowling night with snacks included.',
+    imageUrl: 'https://images.unsplash.com/photo-1587920149371-ac728dd20da7?w=600&h=400&fit=crop',
+    goodCoins: 120,
+    originalPrice: 35.00,
+    discountedPrice: 30.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-8'
+    externalUrl: null
   },
   {
     id: 'experience-9',
-    name: 'Visit to a Museum',
-    description: 'Family trip to a local museum of your choice.',
-    imageUrl: 'https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=600&h=400&fit=crop',
-    goodCoins: 100,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Weekend Camping Trip',
+    description: 'Family camping adventure at a local campground.',
+    imageUrl: 'https://images.unsplash.com/photo-1504851149312-7a075b496cc7?w=600&h=400&fit=crop',
+    goodCoins: 200,
+    originalPrice: 100.00,
+    discountedPrice: 90.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-9'
+    externalUrl: null
   },
   {
     id: 'experience-10',
-    name: 'Amusement Park Visit',
-    description: 'Trip to a local amusement park with the family.',
-    imageUrl: 'https://images.unsplash.com/photo-1500927920626-afb1dd86e035?w=600&h=400&fit=crop',
-    goodCoins: 150,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Water Park Day',
+    description: 'Day at a water park with slides and pools.',
+    imageUrl: 'https://images.unsplash.com/photo-1560206779-37875ab47f48?w=600&h=400&fit=crop',
+    goodCoins: 180,
+    originalPrice: 80.00,
+    discountedPrice: 70.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-10'
+    externalUrl: null
   },
   {
     id: 'experience-11',
-    name: 'Science Experiment Day',
-    description: 'Spend a day doing fun science experiments with materials provided.',
-    imageUrl: 'https://images.unsplash.com/photo-1575900100747-7e544905bbe2?w=600&h=400&fit=crop',
-    goodCoins: 85,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Pizza Making Workshop',
+    description: 'Special workshop where the family learns to make pizza from scratch.',
+    imageUrl: 'https://images.unsplash.com/photo-1581873372796-635b67ca2008?w=600&h=400&fit=crop',
+    goodCoins: 140,
+    originalPrice: 50.00,
+    discountedPrice: 45.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-11'
+    externalUrl: null
   },
   {
     id: 'experience-12',
-    name: 'Breakfast at a Café',
-    description: 'Special breakfast outing at a café of your choice.',
-    imageUrl: 'https://images.unsplash.com/photo-1619096252214-ef06c45683e3?w=600&h=400&fit=crop',
-    goodCoins: 90,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Pottery Painting Session',
+    description: 'Family session at a pottery painting studio.',
+    imageUrl: 'https://images.unsplash.com/photo-1510546020578-a35ae9fcfb0f?w=600&h=400&fit=crop',
+    goodCoins: 120,
+    originalPrice: 40.00,
+    discountedPrice: 35.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-12'
+    externalUrl: null
   },
   {
     id: 'experience-13',
-    name: 'Ice Cream Date',
-    description: 'Special trip to an ice cream parlor for a treat of your choice.',
-    imageUrl: 'https://images.unsplash.com/photo-1517093157656-b9eccef91cb1?w=600&h=400&fit=crop',
-    goodCoins: 60,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Escape Room Challenge',
+    description: 'Family escape room adventure with puzzles to solve together.',
+    imageUrl: 'https://images.unsplash.com/photo-1563203368-33f822dddd09?w=600&h=400&fit=crop',
+    goodCoins: 160,
+    originalPrice: 60.00,
+    discountedPrice: 55.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-13'
+    externalUrl: null
   },
   {
     id: 'experience-14',
-    name: 'Nature Hike',
-    description: 'Family hiking trip on a local nature trail with picnic included.',
-    imageUrl: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=400&fit=crop',
-    goodCoins: 80,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Laser Tag Battle',
+    description: 'Exciting laser tag session for the family.',
+    imageUrl: 'https://images.unsplash.com/photo-1565060169861-3631b58e647c?w=600&h=400&fit=crop',
+    goodCoins: 130,
+    originalPrice: 45.00,
+    discountedPrice: 40.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-14'
+    externalUrl: null
   },
   {
     id: 'experience-15',
-    name: 'Bowling Night',
-    description: 'Family bowling night at a local bowling alley.',
-    imageUrl: 'https://images.unsplash.com/photo-1538511059235-e0231dfb728a?w=600&h=400&fit=crop',
-    goodCoins: 95,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Aquarium Visit',
+    description: 'Family visit to a local aquarium to see marine life.',
+    imageUrl: 'https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=600&h=400&fit=crop',
+    goodCoins: 140,
+    originalPrice: 50.00,
+    discountedPrice: 45.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-15'
+    externalUrl: null
   },
   {
     id: 'experience-16',
-    name: 'Trampoline Park Visit',
-    description: 'Trip to a local trampoline park for jumping fun.',
-    imageUrl: 'https://images.unsplash.com/photo-1575330933415-ea9d1626b638?w=600&h=400&fit=crop',
-    goodCoins: 110,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Science Museum Tickets',
+    description: 'Family tickets to a hands-on science museum.',
+    imageUrl: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&h=400&fit=crop',
+    goodCoins: 130,
+    originalPrice: 45.00,
+    discountedPrice: 40.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-16'
+    externalUrl: null
   },
   {
     id: 'experience-17',
-    name: 'Laser Tag Adventure',
-    description: 'Family game of laser tag at a local entertainment center.',
-    imageUrl: 'https://images.unsplash.com/photo-1566415608380-8967c7841680?w=600&h=400&fit=crop',
-    goodCoins: 100,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Horseback Riding Lesson',
+    description: 'Introductory horseback riding lesson for beginners.',
+    imageUrl: 'https://images.unsplash.com/photo-1511195448560-cbef11859a18?w=600&h=400&fit=crop',
+    goodCoins: 170,
+    originalPrice: 65.00,
+    discountedPrice: 60.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-17'
+    externalUrl: null
   },
   {
     id: 'experience-18',
-    name: 'Art Gallery Visit',
-    description: 'Visit to a local art gallery followed by an art creation session at home.',
-    imageUrl: 'https://images.unsplash.com/photo-1594326427411-6e262103de5c?w=600&h=400&fit=crop',
-    goodCoins: 75,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Kayaking Adventure',
+    description: 'Family kayaking trip on a local lake or river.',
+    imageUrl: 'https://images.unsplash.com/photo-1623600989906-6b5c4677a870?w=600&h=400&fit=crop',
+    goodCoins: 160,
+    originalPrice: 60.00,
+    discountedPrice: 55.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-18'
+    externalUrl: null
   },
   {
     id: 'experience-19',
-    name: 'Planetarium Visit',
-    description: 'Trip to a local planetarium to learn about stars and planets.',
-    imageUrl: 'https://images.unsplash.com/photo-1509715513011-e394f0cb20c4?w=600&h=400&fit=crop',
-    goodCoins: 90,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Cooking Class for Kids',
+    description: 'Special cooking class designed for children to learn kitchen skills.',
+    imageUrl: 'https://images.unsplash.com/photo-1569058242272-5cfb19c1534b?w=600&h=400&fit=crop',
+    goodCoins: 140,
+    originalPrice: 50.00,
+    discountedPrice: 45.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-19'
+    externalUrl: null
   },
   {
     id: 'experience-20',
-    name: 'Mini Golf Adventure',
-    description: 'Family mini golf outing at a local course.',
-    imageUrl: 'https://images.unsplash.com/photo-1642263161368-97d171a0e993?w=600&h=400&fit=crop',
-    goodCoins: 85,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Theater Show Tickets',
+    description: 'Tickets to a family-friendly theater performance.',
+    imageUrl: 'https://images.unsplash.com/photo-1581100896544-3d9b23afa470?w=600&h=400&fit=crop',
+    goodCoins: 150,
+    originalPrice: 55.00,
+    discountedPrice: 50.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-20'
+    externalUrl: null
   },
   {
     id: 'experience-21',
-    name: 'Visit to an Aquarium',
-    description: 'Family trip to a local aquarium to see marine life.',
-    imageUrl: 'https://images.unsplash.com/photo-1580650958738-26817803ed9c?w=600&h=400&fit=crop',
-    goodCoins: 120,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Indoor Skydiving',
+    description: 'Experience the thrill of indoor skydiving in a wind tunnel.',
+    imageUrl: 'https://images.unsplash.com/photo-1591854914571-ba7acb805bca?w=600&h=400&fit=crop',
+    goodCoins: 200,
+    originalPrice: 80.00,
+    discountedPrice: 75.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-21'
+    externalUrl: null
   },
   {
     id: 'experience-22',
-    name: 'Pottery Painting Session',
-    description: 'Visit to a pottery painting studio to create your own masterpiece.',
-    imageUrl: 'https://images.unsplash.com/photo-1597696929736-6d13bed8e6a8?w=600&h=400&fit=crop',
-    goodCoins: 90,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Chocolate Workshop',
+    description: 'Family workshop to learn chocolate making basics.',
+    imageUrl: 'https://images.unsplash.com/photo-1548848221-0c2e497ed557?w=600&h=400&fit=crop',
+    goodCoins: 130,
+    originalPrice: 45.00,
+    discountedPrice: 40.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-22'
+    externalUrl: null
   },
   {
     id: 'experience-23',
-    name: 'Arcade Game Day',
-    description: 'Trip to a local arcade with a set amount of tokens/credits.',
-    imageUrl: 'https://images.unsplash.com/photo-1518997321083-513f78b9c251?w=600&h=400&fit=crop',
-    goodCoins: 100,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Video Game Arcade Day',
+    description: 'Family day at a retro video game arcade with unlimited plays.',
+    imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&h=400&fit=crop',
+    goodCoins: 120,
+    originalPrice: 40.00,
+    discountedPrice: 35.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-23'
+    externalUrl: null
   },
   {
     id: 'experience-24',
-    name: 'Botanical Garden Visit',
-    description: 'Family trip to a local botanical garden to explore plants and flowers.',
-    imageUrl: 'https://images.unsplash.com/photo-1556113275-88b981b1b04b?w=600&h=400&fit=crop',
-    goodCoins: 70,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Ice Skating Session',
+    description: 'Family ice skating session with skate rentals included.',
+    imageUrl: 'https://images.unsplash.com/photo-1550229276-63cf19481c54?w=600&h=400&fit=crop',
+    goodCoins: 100,
+    originalPrice: 35.00,
+    discountedPrice: 30.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-24'
+    externalUrl: null
   },
   {
     id: 'experience-25',
-    name: 'Theater Show',
-    description: 'Tickets to a children's theater production at a local venue.',
-    imageUrl: 'https://images.unsplash.com/photo-1572888195250-3eaeb81b1539?w=600&h=400&fit=crop',
-    goodCoins: 130,
-    originalPrice: null,
-    discountedPrice: null,
+    name: 'Planetarium Show',
+    description: 'Tickets to a fascinating planetarium show about space and astronomy.',
+    imageUrl: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&h=400&fit=crop',
+    goodCoins: 110,
+    originalPrice: 40.00,
+    discountedPrice: 35.00,
     category: 'experience',
-    externalUrl: 'https://example.com/reward/experience-25'
-  },
-];
-
-// Combine all rewards
-export const allRewards = [
-  ...berlinCityRewards,
-  ...dailyStuffRewards,
-  ...brandExclusiveRewards,
-  ...experienceRewards
-];
-
-// Get specific category rewards
-export const getRewardsByCategory = (category: string) => {
-  switch(category) {
-    case 'city':
-      return berlinCityRewards;
-    case 'daily':
-      return dailyStuffRewards;
-    case 'brand':
-      return brandExclusiveRewards;
-    case 'experience':
-      return experienceRewards;
-    default:
-      return allRewards;
+    externalUrl: null
   }
-};
+];

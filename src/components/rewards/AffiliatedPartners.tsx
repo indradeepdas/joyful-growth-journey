@@ -6,7 +6,7 @@ const AffiliatedPartners: React.FC = () => {
   const partnerLogos = [
     {
       name: 'TEMU',
-      url: 'https://sf16-scmcdn-sg.ibytedtos.com/goofy/tiktok-shop-ph/order_manager/74a0c6d2/1694423768/c5f2f42c/TEMU-logo.png'
+      url: 'https://logos-world.net/wp-content/uploads/2023/10/Temu-Logo.png'
     },
     {
       name: 'AMAZON',
@@ -18,7 +18,7 @@ const AffiliatedPartners: React.FC = () => {
     },
     {
       name: 'SHEIN',
-      url: 'https://logos-world.net/wp-content/uploads/2022/05/Shein-Logo.png'
+      url: 'https://logos-world.net/wp-content/uploads/2022/05/Shein-Symbol.png'
     },
     {
       name: 'LEGO',
@@ -27,7 +27,7 @@ const AffiliatedPartners: React.FC = () => {
   ];
 
   return (
-    <div className="bg-[#e8f0fe] py-8 mb-12 overflow-hidden">
+    <div className="bg-[#C1E8F7] py-8 mb-12 overflow-hidden">
       <h2 className="text-2xl font-bold text-center text-[#4a6fa1] mb-8">Our Affiliated Partners</h2>
       <motion.div 
         className="flex space-x-12"
