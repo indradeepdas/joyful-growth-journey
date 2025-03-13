@@ -1,24 +1,22 @@
 
 import React from 'react';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import GoodCoinIcon from '@/components/GoodCoinIcon';
+import { Reward } from '@/types';
+import confetti from 'canvas-confetti';
 
 interface RedemptionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  reward: {
-    name: string;
-    goodCoins: number;
-    externalUrl?: string;
-  };
+  reward: Reward;
   onConfirm: () => void;
 }
 
@@ -28,28 +26,54 @@ const RedemptionDialog: React.FC<RedemptionDialogProps> = ({
   reward,
   onConfirm
 }) => {
+  const handleConfirm = () => {
+    // Trigger confetti when confirming redemption
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+    
+    onConfirm();
+  };
+
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="bg-white border-[#aed6f1]">
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-[#4a6fa1]">Confirm Redemption</AlertDialogTitle>
-          <AlertDialogDescription className="text-[#85c1e9]">
-            Are you sure you want to redeem <strong>{reward.name}</strong> for <strong>{reward.goodCoins} GoodCoins</strong>?
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel className="border-[#aed6f1] text-[#4a6fa1]">
-            Cancel
-          </AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={onConfirm}
-            className="bg-[#aed6f1] text-[#4a6fa1] hover:bg-[#85c1e9]"
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl text-center text-[#4a6fa1]">Redeem Reward</DialogTitle>
+          <DialogDescription className="text-center">
+            Are you sure you want to redeem this reward?
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="flex flex-col items-center p-4 border rounded-lg bg-[#f8f9fa] mb-4">
+          <h3 className="font-bold text-lg text-[#4a6fa1] mb-2">{reward.name}</h3>
+          <div className="flex items-center text-[#f6b961] font-bold">
+            <GoodCoinIcon className="h-5 w-5 mr-1" />
+            <span>{reward.goodCoins} GoodCoins</span>
+          </div>
+        </div>
+        
+        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="flex-1"
           >
-            Yes, Redeem Now
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+            Cancel
+          </Button>
+          <Button 
+            type="button" 
+            onClick={handleConfirm}
+            className="flex-1 bg-[#94c5cc] hover:bg-[#7db0b7] text-white"
+          >
+            Confirm Redemption
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const testimonials = [
@@ -42,33 +42,8 @@ const testimonials = [
 ];
 
 const TestimonialsSection: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const scrollContainer = containerRef.current;
-    if (!scrollContainer) return;
-
-    const scrollWidth = scrollContainer.scrollWidth;
-    const clientWidth = scrollContainer.clientWidth;
-
-    if (scrollWidth <= clientWidth) return;
-
-    const scroll = () => {
-      if (!scrollContainer) return;
-      
-      if (scrollContainer.scrollLeft + clientWidth >= scrollWidth) {
-        scrollContainer.scrollLeft = 0;
-      } else {
-        scrollContainer.scrollLeft += 1;
-      }
-    };
-
-    const timer = setInterval(scroll, 30);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-goodchild-text-primary mb-4">
@@ -79,32 +54,42 @@ const TestimonialsSection: React.FC = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div 
-              key={index}
-              className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-            >
-              <div className="h-64 overflow-hidden">
-                <img 
-                  src={testimonial.image} 
-                  alt={testimonial.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <p className="text-xl font-semibold mb-4 text-goodchild-text-primary">
-                  "{testimonial.quote}"
-                </p>
-                <div className="flex items-center">
-                  <div>
-                    <p className="font-bold text-goodchild-text-primary">{testimonial.name}</p>
-                    <p className="text-goodchild-text-secondary">{testimonial.role}</p>
+        <div className="relative">
+          <motion.div 
+            className="flex space-x-6 py-4"
+            animate={{ x: [0, -2000] }}
+            transition={{ 
+              repeat: Infinity,
+              duration: 40,
+              ease: "linear"
+            }}
+          >
+            {[...testimonials, ...testimonials].map((testimonial, index) => (
+              <div 
+                key={index}
+                className="flex-shrink-0 w-80 bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
+              >
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={testimonial.image} 
+                    alt={testimonial.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6">
+                  <p className="text-xl font-semibold mb-4 text-goodchild-text-primary">
+                    "{testimonial.quote}"
+                  </p>
+                  <div className="flex items-center">
+                    <div>
+                      <p className="font-bold text-goodchild-text-primary">{testimonial.name}</p>
+                      <p className="text-goodchild-text-secondary">{testimonial.role}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </motion.div>
         </div>
       </div>
     </section>
