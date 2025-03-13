@@ -28,28 +28,28 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   return (
     <div className="mb-8">
       <Tabs value={selectedCategory} onValueChange={onCategoryChange} className="w-full">
-        <TabsList className={`bg-[${colors.background}] w-full grid grid-cols-4 h-16 rounded-xl p-2`}>
+        <TabsList className="bg-[#C1E8F7] w-full grid grid-cols-4 h-20 rounded-xl p-2">
           <TabsTrigger 
             value="city" 
-            className={`text-[${colors.baseText}] font-medium text-lg rounded-lg data-[state=active]:bg-[${colors.tab1Bg}] data-[state=active]:text-[${colors.tab1Text}] data-[state=active]:shadow-md transition-all`}
+            className="text-[#4a6fa1] font-bold text-lg md:text-xl rounded-lg data-[state=active]:bg-[#E5DEFF] data-[state=active]:text-[#8B5CF6] data-[state=active]:shadow-md transition-all"
           >
             In Your City
           </TabsTrigger>
           <TabsTrigger 
             value="daily" 
-            className={`text-[${colors.baseText}] font-medium text-lg rounded-lg data-[state=active]:bg-[${colors.tab2Bg}] data-[state=active]:text-[${colors.tab2Text}] data-[state=active]:shadow-md transition-all`}
+            className="text-[#4a6fa1] font-bold text-lg md:text-xl rounded-lg data-[state=active]:bg-[#FEF7CD] data-[state=active]:text-[#F97316] data-[state=active]:shadow-md transition-all"
           >
             Daily Stuff
           </TabsTrigger>
           <TabsTrigger 
             value="brand" 
-            className={`text-[${colors.baseText}] font-medium text-lg rounded-lg data-[state=active]:bg-[${colors.tab3Bg}] data-[state=active]:text-[${colors.tab3Text}] data-[state=active]:shadow-md transition-all`}
+            className="text-[#4a6fa1] font-bold text-lg md:text-xl rounded-lg data-[state=active]:bg-[#FEC6A1] data-[state=active]:text-[#D946EF] data-[state=active]:shadow-md transition-all"
           >
             Brand Exclusives
           </TabsTrigger>
           <TabsTrigger 
             value="experience" 
-            className={`text-[${colors.baseText}] font-medium text-lg rounded-lg data-[state=active]:bg-[${colors.tab4Bg}] data-[state=active]:text-[${colors.tab4Text}] data-[state=active]:shadow-md transition-all`}
+            className="text-[#4a6fa1] font-bold text-lg md:text-xl rounded-lg data-[state=active]:bg-[#F2FCE2] data-[state=active]:text-[#0EA5E9] data-[state=active]:shadow-md transition-all"
           >
             Experiences
           </TabsTrigger>

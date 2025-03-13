@@ -6,7 +6,7 @@ const AffiliatedPartners: React.FC = () => {
   const partnerLogos = [
     {
       name: 'TEMU',
-      url: 'https://logos-world.net/wp-content/uploads/2023/10/Temu-Logo.png'
+      url: 'https://cdn.icon-icons.com/icons2/3914/PNG/512/temu_logo_icon_248729.png'
     },
     {
       name: 'AMAZON',
@@ -18,7 +18,7 @@ const AffiliatedPartners: React.FC = () => {
     },
     {
       name: 'SHEIN',
-      url: 'https://logos-world.net/wp-content/uploads/2022/05/Shein-Symbol.png'
+      url: 'https://cdn.worldvectorlogo.com/logos/shein-logo.svg'
     },
     {
       name: 'LEGO',

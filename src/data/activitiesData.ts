@@ -7,7 +7,7 @@ export const developmentAreas = [
   {
     id: 'health-mind',
     name: 'Health & Mind' as DevelopmentArea,
-    icon: <Brain className="text-blue-500" />,
+    icon: Brain,
     description: "Activities that promote physical health, mental well-being, and cognitive development.",
     color: 'blue',
     bgColor: 'bg-blue-100'
@@ -15,7 +15,7 @@ export const developmentAreas = [
   {
     id: 'communication',
     name: 'Effective Communication' as DevelopmentArea,
-    icon: <MessageSquare className="text-green-500" />,
+    icon: MessageSquare,
     description: "Activities to improve verbal, written, and non-verbal communication skills.",
     color: 'green',
     bgColor: 'bg-green-100'
@@ -23,7 +23,7 @@ export const developmentAreas = [
   {
     id: 'enrichment',
     name: 'Personal Enrichment' as DevelopmentArea,
-    icon: <User className="text-purple-500" />,
+    icon: User,
     description: "Activities focused on personal growth, learning, and developing new skills.",
     color: 'purple',
     bgColor: 'bg-purple-100'
@@ -31,7 +31,7 @@ export const developmentAreas = [
   {
     id: 'creativity',
     name: 'Creativity' as DevelopmentArea,
-    icon: <Lightbulb className="text-yellow-500" />,
+    icon: Lightbulb,
     description: "Activities that foster creative thinking, artistic expression, and innovation.",
     color: 'yellow',
     bgColor: 'bg-yellow-100'
@@ -39,7 +39,7 @@ export const developmentAreas = [
   {
     id: 'family',
     name: 'Deeper Family Bonds' as DevelopmentArea,
-    icon: <Heart className="text-red-500" />,
+    icon: Heart,
     description: "Activities designed to strengthen family relationships and create meaningful memories.",
     color: 'red',
     bgColor: 'bg-red-100'
@@ -47,7 +47,7 @@ export const developmentAreas = [
   {
     id: 'emotional',
     name: 'Emotional Intelligence' as DevelopmentArea,
-    icon: <Zap className="text-orange-500" />,
+    icon: Zap,
     description: "Activities to help understand, express, and manage emotions effectively.",
     color: 'orange',
     bgColor: 'bg-orange-100'
@@ -55,7 +55,7 @@ export const developmentAreas = [
   {
     id: 'social',
     name: 'Social Skills' as DevelopmentArea,
-    icon: <Users className="text-indigo-500" />,
+    icon: Users,
     description: "Activities to develop interaction, cooperation, and positive peer relationships.",
     color: 'indigo',
     bgColor: 'bg-indigo-100'

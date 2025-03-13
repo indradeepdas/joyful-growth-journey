@@ -1,87 +1,69 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 import GoodCoinIcon from '@/components/GoodCoinIcon';
 
-const RewardsHubShowcase = () => {
+const RewardsHubShowcase: React.FC = () => {
+  const rewards = [
+    {
+      name: "Music Festival Tickets",
+      coins: 500,
+      image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+    },
+    {
+      name: "Art Supplies Kit",
+      coins: 250,
+      image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1741&q=80"
+    },
+    {
+      name: "Children's Book Bundle",
+      coins: 200,
+      image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1798&q=80"
+    },
+    {
+      name: "Movie Theater Passes",
+      coins: 300,
+      image: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+    }
+  ];
+
   return (
-    <section className="w-full py-16 px-4 bg-goodchild-background-alt">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-goodchild-text-primary mb-4">
-            Unlock Exciting Rewards
-          </h2>
-          <p className="text-goodchild-text-secondary max-w-2xl mx-auto">
-            Children can redeem their earned GoodCoins for meaningful rewards that encourage further positive behavior.
-          </p>
-        </div>
-        
-        <div className="flex flex-col md:flex-row gap-6 justify-center items-center mb-8">
-          <div className="glass-card p-6 rounded-xl max-w-xs w-full text-center">
-            <div className="h-48 mb-4 overflow-hidden rounded-lg">
-              <img 
-                src="https://m.media-amazon.com/images/I/81aJ-R4E6gL._AC_UF1000,1000_QL80_.jpg" 
-                alt="LEGO Building Set" 
-                className="w-full h-full object-cover" 
-              />
-            </div>
-            <h3 className="text-xl font-medium mb-1">LEGO Building Set</h3>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <GoodCoinIcon className="w-5 h-5" />
-              <span className="font-bold">50 GoodCoins</span>
-            </div>
-            <p className="text-goodchild-text-secondary text-sm">
-              <span className="line-through">$24.99</span> → <span className="font-bold">$19.99</span>
+    <section className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="md:flex md:items-center md:justify-between mb-12">
+          <div className="md:w-1/2 mb-8 md:mb-0">
+            <h2 className="text-3xl font-bold text-goodchild-text-primary mb-4">
+              Rewards That Matter
+            </h2>
+            <p className="text-xl text-goodchild-text-secondary mb-6">
+              Kids can exchange their earned GoodCoins for meaningful rewards that you approve - from screen time to special outings and more.
             </p>
-          </div>
-          
-          <div className="glass-card p-6 rounded-xl max-w-xs w-full text-center">
-            <div className="h-48 mb-4 overflow-hidden rounded-lg">
-              <img 
-                src="https://images.unsplash.com/photo-1599458148441-bbe7809363a4?q=80&w=1170&auto=format&fit=crop" 
-                alt="Art Supplies Kit" 
-                className="w-full h-full object-cover" 
-              />
-            </div>
-            <h3 className="text-xl font-medium mb-1">Art Supplies Kit</h3>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <GoodCoinIcon className="w-5 h-5" />
-              <span className="font-bold">40 GoodCoins</span>
-            </div>
-            <p className="text-goodchild-text-secondary text-sm">
-              <span className="line-through">$19.99</span> → <span className="font-bold">$15.99</span>
-            </p>
-          </div>
-          
-          <div className="glass-card p-6 rounded-xl max-w-xs w-full text-center">
-            <div className="h-48 mb-4 overflow-hidden rounded-lg">
-              <img 
-                src="https://images.unsplash.com/photo-1535905557558-afc4877a26fc?q=80&w=1287&auto=format&fit=crop" 
-                alt="Children's Book Bundle" 
-                className="w-full h-full object-cover" 
-              />
-            </div>
-            <h3 className="text-xl font-medium mb-1">Children's Book Bundle</h3>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <GoodCoinIcon className="w-5 h-5" />
-              <span className="font-bold">60 GoodCoins</span>
-            </div>
-            <p className="text-goodchild-text-secondary text-sm">
-              <span className="line-through">$29.99</span> → <span className="font-bold">$23.99</span>
-            </p>
-          </div>
-        </div>
-        
-        <div className="text-center">
-          <Link to="/public/rewards">
-            <Button 
-              size="lg" 
-              className="bg-[#FFA500] hover:bg-[#E69500] animate-[wiggle_1s_ease-in-out_infinite] hover:scale-105 transition-transform duration-200"
-            >
-              Visit Rewards Hub
+            <Button className="bg-goodchild-primary hover:bg-goodchild-primary-dark">
+              Explore Rewards <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-          </Link>
+          </div>
+          
+          <div className="md:w-1/2 grid grid-cols-2 gap-4">
+            {rewards.map((reward, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="h-40 overflow-hidden">
+                  <img 
+                    src={reward.image} 
+                    alt={reward.name}
+                    className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-300"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-goodchild-text-primary">{reward.name}</h3>
+                  <div className="flex items-center mt-2">
+                    <GoodCoinIcon className="w-5 h-5 mr-1" />
+                    <span className="text-goodchild-primary-dark font-medium">{reward.coins}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
