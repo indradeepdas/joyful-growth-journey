@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
 const testimonials = [
@@ -46,10 +46,10 @@ const TestimonialsSection: React.FC = () => {
     <section className="py-16 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-goodchild-text-primary mb-4">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
             Parents Love GoodChild
           </h2>
-          <p className="text-xl text-goodchild-text-secondary max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             See how families are using GoodChild to create positive habits
           </p>
         </div>
@@ -77,13 +77,13 @@ const TestimonialsSection: React.FC = () => {
                   />
                 </div>
                 <div className="p-6">
-                  <p className="text-xl font-semibold mb-4 text-goodchild-text-primary">
+                  <p className="text-xl font-semibold mb-4 text-gray-800">
                     "{testimonial.quote}"
                   </p>
                   <div className="flex items-center">
                     <div>
-                      <p className="font-bold text-goodchild-text-primary">{testimonial.name}</p>
-                      <p className="text-goodchild-text-secondary">{testimonial.role}</p>
+                      <p className="font-bold text-gray-800">{testimonial.name}</p>
+                      <p className="text-gray-600">{testimonial.role}</p>
                     </div>
                   </div>
                 </div>

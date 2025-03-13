@@ -22,7 +22,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
   onRedeemClick
 }) => {
   // Fallback image for broken URLs
-  const fallbackImageUrl = "https://placehold.co/400x200/e8eef8/4a6fa1?text=Reward";
+  const fallbackImageUrl = "https://placehold.co/400x200/e8eef8/333333?text=Reward";
   
   // Random background color from a vibrant palette - magical unicorn theme
   const bgColors = [
@@ -56,7 +56,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
       className="h-full"
     >
       <Card className={`h-full overflow-hidden shadow-lg border-2 border-[#FFC2E9] ${randomGradient}`}>
-        <div className="h-36 overflow-hidden">
+        <div className="h-28 overflow-hidden">
           <img
             src={reward.imageUrl || fallbackImageUrl}
             alt={reward.name}
@@ -68,19 +68,19 @@ const RewardCard: React.FC<RewardCardProps> = ({
           />
         </div>
         <CardHeader className="pb-2 pt-3">
-          <CardTitle className="text-lg font-bold text-white">{reward.name}</CardTitle>
-          <CardDescription className="text-white/80 font-medium text-xs">{reward.description}</CardDescription>
+          <CardTitle className="text-lg font-bold text-gray-800">{reward.name}</CardTitle>
+          <CardDescription className="text-gray-700 font-medium text-xs">{reward.description}</CardDescription>
         </CardHeader>
         <CardContent className="pb-2">
           <div className="flex items-center gap-2 mb-1">
-            <GoodCoinIcon className="h-5 w-5 text-yellow-500" />
-            <span className="font-bold text-lg text-white">{reward.goodCoins} GoodCoins</span>
+            <GoodCoinIcon className="h-5 w-5 text-amber-500" />
+            <span className="font-bold text-lg text-gray-800">{reward.goodCoins} GoodCoins</span>
           </div>
           {reward.originalPrice && (
-            <p className="text-sm text-white/80">
+            <p className="text-sm text-gray-700">
               <span className="line-through">${reward.originalPrice.toFixed(2)}</span>
               {reward.discountedPrice && (
-                <span className="ml-1 font-medium text-white">
+                <span className="ml-1 font-medium text-gray-800">
                   ${reward.discountedPrice.toFixed(2)}
                 </span>
               )}

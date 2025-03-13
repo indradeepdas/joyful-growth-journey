@@ -41,15 +41,15 @@ const RedemptionDialog: React.FC<RedemptionDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-gradient-to-b from-[#A7C2FF] to-[#FFC2E9] border-[#FF85E2]">
         <DialogHeader>
-          <DialogTitle className="text-xl text-center text-white font-['Nunito',_sans-serif]">Redeem Reward</DialogTitle>
-          <DialogDescription className="text-center text-white/80 font-['Nunito',_sans-serif]">
+          <DialogTitle className="text-xl text-center text-gray-800 font-['Nunito',_sans-serif]">Redeem Reward</DialogTitle>
+          <DialogDescription className="text-center text-gray-700 font-['Nunito',_sans-serif]">
             Are you sure you want to redeem this reward?
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex flex-col items-center p-4 border rounded-lg bg-white/20 backdrop-blur-sm mb-4">
-          <h3 className="font-bold text-lg text-white mb-2 font-['Nunito',_sans-serif]">{reward.name}</h3>
-          <div className="flex items-center text-yellow-300 font-bold">
+        <div className="flex flex-col items-center p-4 border rounded-lg bg-white/80 backdrop-blur-sm mb-4">
+          <h3 className="font-bold text-lg text-gray-800 mb-2 font-['Nunito',_sans-serif]">{reward.name}</h3>
+          <div className="flex items-center text-amber-600 font-bold">
             <GoodCoinIcon className="h-5 w-5 mr-1" />
             <span>{reward.goodCoins} GoodCoins</span>
           </div>
@@ -60,7 +60,7 @@ const RedemptionDialog: React.FC<RedemptionDialogProps> = ({
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="flex-1 border-white text-white hover:bg-white/20"
+            className="flex-1 border-gray-800 text-gray-800 hover:bg-gray-100"
           >
             Cancel
           </Button>

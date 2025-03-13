@@ -12,13 +12,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToFeatures }) => {
     <section className="py-16 md:py-24 bg-gradient-to-b from-[#91EBFF] to-[#B8A9FA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <h1 className="text-4xl md:text-6xl font-bold mb-6 font-['Nunito',_sans-serif]">
-          <span className="text-[#FF85E2]">It </span>
-          <span className="text-[#A7C2FF]">Pays </span>
-          <span className="text-[#91EBFF]">to </span>
-          <span className="text-[#FFD4A9]">Be </span>
-          <span className="text-[#FFC2E9]">Good</span>
+          <span className="text-gray-800">It </span>
+          <span className="text-gray-800">Pays </span>
+          <span className="text-gray-800">to </span>
+          <span className="text-gray-800">Be </span>
+          <span className="text-gray-800">Good</span>
         </h1>
-        <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto font-['Nunito',_sans-serif]">
+        <p className="text-xl md:text-2xl text-gray-800 mb-8 max-w-3xl mx-auto font-['Nunito',_sans-serif]">
           GoodChild helps parents motivate positive behavior through exciting activities and meaningful rewards.
         </p>
         
@@ -33,7 +33,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToFeatures }) => {
           <Button 
             variant="outline" 
             size="lg" 
-            className="border-white text-white hover:bg-white/10 font-['Nunito',_sans-serif]"
+            className="border-gray-700 text-gray-800 hover:bg-gray-100 font-['Nunito',_sans-serif]"
             onClick={scrollToFeatures}
           >
             Learn More
@@ -46,7 +46,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToFeatures }) => {
             alt="Happy Family Using GoodChild App"
             className="rounded-xl shadow-xl max-w-4xl w-full mx-auto"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://placehold.co/1200x800/FFC2E9/FFFFFF?text=GoodChild+App+Dashboard";
+              (e.target as HTMLImageElement).src = "https://placehold.co/1200x800/FFC2E9/333333?text=GoodChild+App+Dashboard";
             }}
           />
         </div>
