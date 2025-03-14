@@ -42,8 +42,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToFeatures }) => {
         
         <div className="relative">
           <img 
-            src="https://images.unsplash.com/photo-1491013516836-7db643ee125a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
-            alt="Happy Family Using GoodChild App"
+            src="/lovable-uploads/7e05244b-d2f2-469a-9445-e0f6ad535b53.png" 
+            alt="Father and son enjoying puzzle activity together"
             className="rounded-xl shadow-xl max-w-4xl w-full mx-auto"
             onError={(e) => {
               (e.target as HTMLImageElement).src = "https://placehold.co/1200x800/FFC2E9/333333?text=GoodChild+App+Dashboard";

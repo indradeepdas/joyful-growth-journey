@@ -1,97 +1,61 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { v4 as uuidv4 } from 'uuid';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import ChildAccountForm from '@/components/ChildAccountForm';
-import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { childrenService } from '@/services/childrenService';
+import { ChildProfile } from '@/types';
 
-function AddChild() {
-  const [submitting, setSubmitting] = useState(false);
+const AddChild = () => {
+  const { profile, user } = useSupabaseAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // This function would normally create a child account in the database
+  if (!profile || !user) {
+    navigate('/login');
+    return null;
+  }
+
   const handleSubmit = async (formData: any) => {
+    if (!user) return;
+    
+    setIsSubmitting(true);
     try {
-      setSubmitting(true);
+      const newChild: Partial<ChildProfile> = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        date_of_birth: formData.dateOfBirth,
+        parent_id: profile.id,
+        gender: formData.gender,
+        avatar_url: formData.avatarUrl || "https://api.dicebear.com/7.x/adventurer/svg?seed=" + formData.firstName,
+        goodcoins_balance: 0
+      };
       
-      // Generate a unique ID for the child account
-      const userId = uuidv4();
-      
-      console.log("Creating child account with data:", {
-        ...formData,
-        userId,
-      });
-      
-      /* 
-      BACKEND INTEGRATION COMMENT:
-      In a real application, this would connect to your database to:
-      1. Create a profile record for the child
-      2. Add a record in the children table linking to the parent's ID
-      3. Set up initial GoodCoins balance
-      
-      Example code (removed):
-      await createChildAccount({
-        name: formData.name,
-        surname: formData.surname,
-        nickname: formData.nickname,
-        email: formData.email,
-        avatar: formData.avatar || null,
-        userId
-      });
-      */
-      
-      // Simulate a short delay for the "API call"
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Success!",
-        description: `Child account for ${formData.name} created successfully.`,
-      });
-      
-      // Redirect back to parent dashboard
+      await childrenService.createChild(newChild);
       navigate('/parent-dashboard');
-    } catch (error: any) {
-      console.error('Error creating child account:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create child account. Please try again.",
-        variant: "destructive",
-      });
+    } catch (error) {
+      console.error("Failed to create child account:", error);
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-goodchild-background p-4 md:p-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="glass-card p-6 rounded-xl mb-6">
-          <h1 className="text-3xl font-bold text-goodchild-text-primary mb-2">
-            Add Child Account
-          </h1>
-          <p className="text-goodchild-text-secondary">
-            Create a new account for your child
+    <div className="min-h-screen bg-gradient-to-b from-white to-purple-100 py-12">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">Add a Child Account</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Create an account for your child to start tracking their progress and rewarding good behavior.
           </p>
         </div>
         
-        <div className="glass-card p-6 rounded-xl">
-          <ChildAccountForm onSubmit={handleSubmit} isSubmitting={submitting} />
-        </div>
-        
-        <div className="mt-4 text-center">
-          <Button 
-            onClick={() => navigate('/parent-dashboard')} 
-            variant="outline"
-            className="text-goodchild-blue hover:bg-goodchild-blue/10"
-          >
-            Back to Dashboard
-          </Button>
+        <div className="bg-white rounded-xl shadow-md p-6 md:p-8">
+          <ChildAccountForm />
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default AddChild;
