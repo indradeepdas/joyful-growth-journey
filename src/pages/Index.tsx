@@ -51,10 +51,10 @@ const Index: React.FC = () => {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-6">
+            <h2 className="text-5xl font-bold text-gray-800 mb-6">
               Explore What GoodChild Offers
             </h2>
-            <p className="text-2xl text-gray-700 max-w-3xl mx-auto">
+            <p className="text-3xl text-gray-700 max-w-3xl mx-auto">
               Take a tour of our key features before creating an account
             </p>
           </div>
@@ -62,10 +62,10 @@ const Index: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-center gap-8">
             <Card className="hover:shadow-lg transition-shadow flex flex-col md:max-w-[350px] border border-gray-200">
               <CardHeader>
-                <CardTitle className="text-2xl text-gray-800">Parent Dashboard</CardTitle>
+                <CardTitle className="text-3xl text-gray-800">Parent Dashboard</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-xl text-gray-700">
+                <p className="text-2xl text-gray-700">
                   Preview the parent dashboard where you can track your children's progress and manage their activities.
                 </p>
               </CardContent>
@@ -78,10 +78,10 @@ const Index: React.FC = () => {
             
             <Card className="hover:shadow-lg transition-shadow flex flex-col md:max-w-[350px] border border-gray-200">
               <CardHeader>
-                <CardTitle className="text-2xl text-gray-800">Activity Center</CardTitle>
+                <CardTitle className="text-3xl text-gray-800">Activity Center</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-xl text-gray-700">
+                <p className="text-2xl text-gray-700">
                   Browse through sample activities designed to develop your child's skills across 7 key areas.
                 </p>
               </CardContent>
@@ -94,10 +94,10 @@ const Index: React.FC = () => {
             
             <Card className="hover:shadow-lg transition-shadow flex flex-col md:max-w-[350px] border border-gray-200">
               <CardHeader>
-                <CardTitle className="text-2xl text-gray-800">Rewards Hub</CardTitle>
+                <CardTitle className="text-3xl text-gray-800">Rewards Hub</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-xl text-gray-700">
+                <p className="text-2xl text-gray-700">
                   Check out the rewards your children can earn by completing activities and earning GoodCoins.
                 </p>
               </CardContent>

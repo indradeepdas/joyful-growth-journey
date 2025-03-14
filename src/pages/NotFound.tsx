@@ -13,7 +13,7 @@ function NotFound() {
         <h2 className="text-3xl font-semibold text-gray-800 mb-6">
           Page Not Found
         </h2>
-        <p className="text-xl text-gray-700 mb-8">
+        <p className="text-2xl text-gray-700 mb-8">
           The page you are looking for doesn't exist or has been moved.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">

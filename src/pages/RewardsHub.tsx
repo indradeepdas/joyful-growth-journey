@@ -111,7 +111,7 @@ const RewardsHub = () => {
   };
 
   if (isLoading) return <LoadingState />;
-  if (error) return <ErrorState errorMessage={error} />;
+  if (error) return <ErrorState message={error} />;
   
   const categories = ['All', ...new Set(rewards.map(reward => reward.category || 'General'))];
   
@@ -130,7 +130,7 @@ const RewardsHub = () => {
           <div className="bg-white rounded-lg shadow-md p-4 mb-8 flex justify-between items-center">
             <div>
               <p className="text-xl text-gray-700">Your GoodCoins Balance</p>
-              <p className="text-2xl font-bold text-gray-800">{profile.goodcoins_balance || 0}</p>
+              <p className="text-2xl font-bold text-gray-800">{profile.goodCoins || 0}</p>
             </div>
             <div className="h-12 w-12 flex items-center justify-center rounded-full bg-yellow-400">
               <span className="text-xl font-bold">🪙</span>
@@ -152,7 +152,6 @@ const RewardsHub = () => {
           <CategoryTabs 
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
-            categories={categories}
           />
         </div>
         
@@ -164,13 +163,13 @@ const RewardsHub = () => {
                 key={reward.id}
                 reward={reward}
                 isPending={false}
-                isDisabled={profile?.role === 'child' && (profile?.goodcoins_balance || 0) < reward.goodCoins}
+                isDisabled={profile?.role === 'child' && (profile?.goodCoins || 0) < reward.goodCoins}
                 onRedeemClick={() => handleRedeemClick(reward)}
               />
             ))}
           </div>
         ) : (
-          <EmptySearch query={searchQuery} onClear={() => setSearchQuery('')} />
+          <EmptySearch onClear={() => setSearchQuery('')} />
         )}
         
         {/* Redemption Dialog */}
