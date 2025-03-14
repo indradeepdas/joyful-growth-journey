@@ -50,7 +50,7 @@ const AddChild = () => {
         </div>
         
         <div className="bg-white rounded-xl shadow-md p-6 md:p-8">
-          <ChildAccountForm isSubmitting={isSubmitting} />
+          <ChildAccountForm onSubmit={handleSubmit} />
         </div>
       </div>
     </div>

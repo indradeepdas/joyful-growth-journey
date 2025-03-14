@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const testimonials = [
   {
@@ -19,12 +19,68 @@ const testimonials = [
     quote: "GoodChild gives us quality family time while teaching responsibility.",
     name: "Japnith Kaur",
     role: "Myra's Mom"
+  },
+  {
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1740&auto=format&fit=crop",
+    quote: "The rewards system has really motivated my kids to help around the house.",
+    name: "Sarah Johnson",
+    role: "Mother of Two"
+  },
+  {
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1740&auto=format&fit=crop",
+    quote: "Our weekends are now filled with fun activities from the app. Highly recommend!",
+    name: "Michael Chen",
+    role: "Dad of Lily & James"
   }
 ];
 
 const TestimonialsSection: React.FC = () => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+    
+    let scrollInterval: NodeJS.Timeout;
+    
+    const startAutoScroll = () => {
+      scrollInterval = setInterval(() => {
+        if (scrollContainer) {
+          if (scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth) {
+            // Reset to start when we reach the end
+            scrollContainer.scrollLeft = 0;
+          } else {
+            // Smooth scroll to the right
+            scrollContainer.scrollLeft += 1;
+          }
+        }
+      }, 20);
+    };
+    
+    startAutoScroll();
+    
+    // Pause scrolling when mouse enters
+    const handleMouseEnter = () => {
+      clearInterval(scrollInterval);
+    };
+    
+    // Resume scrolling when mouse leaves
+    const handleMouseLeave = () => {
+      startAutoScroll();
+    };
+    
+    scrollContainer.addEventListener('mouseenter', handleMouseEnter);
+    scrollContainer.addEventListener('mouseleave', handleMouseLeave);
+    
+    return () => {
+      clearInterval(scrollInterval);
+      scrollContainer.removeEventListener('mouseenter', handleMouseEnter);
+      scrollContainer.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
+  
   return (
-    <section className="py-24 bg-white overflow-hidden font-nunito">
+    <section className="py-24 bg-white font-nunito">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-gray-800 mb-6">
@@ -35,9 +91,16 @@ const TestimonialsSection: React.FC = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div 
+          ref={scrollContainerRef}
+          className="flex overflow-x-auto scrollbar-none gap-6 pb-8"
+          style={{ scrollBehavior: 'smooth' }}
+        >
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden">
+            <div 
+              key={index} 
+              className="flex-shrink-0 w-full max-w-sm bg-white rounded-lg shadow-lg overflow-hidden"
+            >
               <div className="h-64 overflow-hidden">
                 <img 
                   src={testimonial.image}
@@ -46,7 +109,7 @@ const TestimonialsSection: React.FC = () => {
                 />
               </div>
               
-              <div className="p-6 flex flex-col flex-grow">
+              <div className="p-6 flex flex-col">
                 <div className="text-4xl text-gray-300 font-serif mb-4">"</div>
                 <p className="text-2xl text-gray-700 mb-6 flex-grow">
                   {testimonial.quote}

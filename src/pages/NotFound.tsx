@@ -8,7 +8,7 @@ function NotFound() {
   
   return (
     <div className="min-h-screen bg-goodchild-background flex flex-col items-center justify-center p-4 font-nunito">
-      <div className="glass-card p-8 rounded-xl text-center max-w-md w-full">
+      <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
         <h1 className="text-5xl font-bold text-gray-800 mb-4">404</h1>
         <h2 className="text-3xl font-semibold text-gray-800 mb-6">
           Page Not Found
