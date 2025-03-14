@@ -11,7 +11,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToFeatures }) => {
   return (
     <section className="py-16 md:py-24 bg-gradient-to-b from-[#91EBFF] to-[#B8A9FA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold mb-6 font-['Nunito',_sans-serif]">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-800 font-['Nunito',_sans-serif]">
           <span className="text-gray-800">It </span>
           <span className="text-gray-800">Pays </span>
           <span className="text-gray-800">to </span>
@@ -25,7 +25,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToFeatures }) => {
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
           <Button 
             size="lg" 
-            className="bg-[#FF85E2] hover:bg-[#FF59D6] text-white font-['Nunito',_sans-serif]"
+            className="bg-[#FF85E2] hover:bg-[#FF59D6] text-gray-800 font-['Nunito',_sans-serif]"
             onClick={() => window.location.href = '/auth/sign-up'}
           >
             Start Your Free Trial <ArrowRight className="ml-2 h-5 w-5" />

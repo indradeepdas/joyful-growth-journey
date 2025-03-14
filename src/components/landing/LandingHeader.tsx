@@ -38,7 +38,7 @@ const LandingHeader = () => {
           <Button variant="outline" className="hidden sm:inline-flex text-gray-800 border-gray-400">Log In</Button>
         </Link>
         <Link to="/signup">
-          <Button className="bg-[#FF85E2] hover:bg-[#FF59D6] text-white">Sign Up</Button>
+          <Button className="bg-[#FF85E2] hover:bg-[#FF59D6] text-gray-800">Sign Up</Button>
         </Link>
       </div>
     </header>

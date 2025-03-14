@@ -41,7 +41,7 @@ const RewardsHubShowcase: React.FC = () => {
             <p className="text-xl text-gray-700 mb-6 font-['Nunito',_sans-serif]">
               Kids can exchange their earned GoodCoins for meaningful rewards that you approve - from screen time to special outings and more.
             </p>
-            <Button className="bg-[#FF85E2] hover:bg-[#FF59D6] text-white font-['Nunito',_sans-serif]">
+            <Button className="bg-[#FF85E2] hover:bg-[#FF59D6] text-gray-800 font-['Nunito',_sans-serif]">
               Explore Rewards <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>

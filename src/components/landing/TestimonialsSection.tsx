@@ -49,7 +49,7 @@ const TestimonialsSection: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
             Parents Love GoodChild
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
             See how families are using GoodChild to create positive habits
           </p>
         </div>
@@ -83,7 +83,7 @@ const TestimonialsSection: React.FC = () => {
                   <div className="flex items-center">
                     <div>
                       <p className="font-bold text-gray-800">{testimonial.name}</p>
-                      <p className="text-gray-600">{testimonial.role}</p>
+                      <p className="text-gray-700">{testimonial.role}</p>
                     </div>
                   </div>
                 </div>

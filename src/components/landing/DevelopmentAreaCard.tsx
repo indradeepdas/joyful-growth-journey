@@ -23,7 +23,7 @@ const DevelopmentAreaCard = ({ area, isSelected, onSelect }: DevelopmentAreaCard
           {area.smallIcon}
         </div>
       </div>
-      <h3 className="font-medium text-goodchild-text-primary text-center mt-3">{area.name}</h3>
+      <h3 className="font-medium text-gray-800 text-center mt-3">{area.name}</h3>
     </div>
   );
 };

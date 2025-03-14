@@ -94,10 +94,10 @@ const ActivityCenterShowcase = () => {
     <section className="w-full py-16 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-goodchild-text-primary mb-4">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
             Explore Engaging Activities and Foster Growth
           </h2>
-          <p className="text-goodchild-text-secondary max-w-2xl mx-auto">
+          <p className="text-gray-700 max-w-2xl mx-auto">
             Parents can assign activities to their children, designed to promote development across 7 critical areas:
           </p>
         </div>
@@ -121,12 +121,12 @@ const ActivityCenterShowcase = () => {
                   <div className="w-10 h-10 rounded-full bg-white shadow-soft flex items-center justify-center">
                     {area.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-goodchild-text-primary">{area.name}</h3>
+                  <h3 className="text-xl font-bold text-gray-800">{area.name}</h3>
                 </div>
-                <p className="text-goodchild-text-primary mb-4">{area.description}</p>
+                <p className="text-gray-800 mb-4">{area.description}</p>
                 <div>
-                  <h4 className="font-medium text-goodchild-text-primary mb-2">Example Activities:</h4>
-                  <ul className="list-disc list-inside space-y-1 text-goodchild-text-secondary">
+                  <h4 className="font-medium text-gray-800 mb-2">Example Activities:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700">
                     {area.examples.map((example, i) => (
                       <li key={i}>{example}</li>
                     ))}
@@ -142,8 +142,8 @@ const ActivityCenterShowcase = () => {
             <div className="text-center mb-4">
               <Package className="h-12 w-12 mx-auto text-goodchild-blue" />
             </div>
-            <h3 className="text-lg font-semibold text-center mb-2 text-goodchild-text-primary">Pre-designed Activity Packages</h3>
-            <p className="text-goodchild-text-secondary text-center">
+            <h3 className="text-lg font-semibold text-center mb-2 text-gray-800">Pre-designed Activity Packages</h3>
+            <p className="text-gray-700 text-center">
               Browse and select from our curated collection of age-appropriate activities designed by child development experts.
             </p>
           </div>
@@ -152,8 +152,8 @@ const ActivityCenterShowcase = () => {
             <div className="text-center mb-4">
               <Edit3 className="h-12 w-12 mx-auto text-goodchild-green" />
             </div>
-            <h3 className="text-lg font-semibold text-center mb-2 text-goodchild-text-primary">Custom Activity Creation</h3>
-            <p className="text-goodchild-text-secondary text-center">
+            <h3 className="text-lg font-semibold text-center mb-2 text-gray-800">Custom Activity Creation</h3>
+            <p className="text-gray-700 text-center">
               Create your own activities tailored specifically to your child's interests, needs, and developmental goals.
             </p>
           </div>
@@ -162,8 +162,8 @@ const ActivityCenterShowcase = () => {
             <div className="text-center mb-4">
               <Calendar className="h-12 w-12 mx-auto text-goodchild-purple" />
             </div>
-            <h3 className="text-lg font-semibold text-center mb-2 text-goodchild-text-primary">Calendar Scheduling</h3>
-            <p className="text-goodchild-text-secondary text-center">
+            <h3 className="text-lg font-semibold text-center mb-2 text-gray-800">Calendar Scheduling</h3>
+            <p className="text-gray-700 text-center">
               Plan and schedule activities in advance, creating a balanced routine that's engaging and developmentally beneficial.
             </p>
           </div>
@@ -173,7 +173,7 @@ const ActivityCenterShowcase = () => {
           <Link to="/public/activities">
             <Button 
               size="lg" 
-              className="text-xl py-7 px-10 bg-gradient-to-r from-[#33a6b8] to-[#06D6A0] hover:from-[#2c95a6] hover:to-[#05c190] animate-[wiggle_1s_ease-in-out_infinite]"
+              className="text-xl py-7 px-10 bg-gradient-to-r from-[#33a6b8] to-[#06D6A0] hover:from-[#2c95a6] hover:to-[#05c190] text-gray-800 animate-[wiggle_1s_ease-in-out_infinite]"
             >
               View Activity Center
             </Button>

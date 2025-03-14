@@ -51,10 +51,10 @@ const Index: React.FC = () => {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-goodchild-text-primary mb-4">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">
               Explore What GoodChild Offers
             </h2>
-            <p className="text-xl text-goodchild-text-secondary max-w-3xl mx-auto">
+            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
               Take a tour of our key features before creating an account
             </p>
           </div>
@@ -65,12 +65,12 @@ const Index: React.FC = () => {
                 <CardTitle>Parent Dashboard</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-goodchild-text-secondary">
+                <p className="text-gray-700">
                   Preview the parent dashboard where you can track your children's progress and manage their activities.
                 </p>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => navigate('/public/dashboard')} className="w-full bg-[#FFA500] hover:bg-[#E69500]">
+                <Button onClick={() => navigate('/public/dashboard')} className="w-full bg-[#FFA500] hover:bg-[#E69500] text-gray-800">
                   View Sample Dashboard
                 </Button>
               </CardFooter>
@@ -81,12 +81,12 @@ const Index: React.FC = () => {
                 <CardTitle>Activity Center</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-goodchild-text-secondary">
+                <p className="text-gray-700">
                   Browse through sample activities designed to develop your child's skills across 7 key areas.
                 </p>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => navigate('/public/activities')} className="w-full bg-[#FFA500] hover:bg-[#E69500]">
+                <Button onClick={() => navigate('/public/activities')} className="w-full bg-[#FFA500] hover:bg-[#E69500] text-gray-800">
                   Explore Activities
                 </Button>
               </CardFooter>
@@ -97,12 +97,12 @@ const Index: React.FC = () => {
                 <CardTitle>Rewards Hub</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-goodchild-text-secondary">
+                <p className="text-gray-700">
                   Check out the rewards your children can earn by completing activities and earning GoodCoins.
                 </p>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => navigate('/public/rewards')} className="w-full bg-[#FFA500] hover:bg-[#E69500]">
+                <Button onClick={() => navigate('/public/rewards')} className="w-full bg-[#FFA500] hover:bg-[#E69500] text-gray-800">
                   See Rewards
                 </Button>
               </CardFooter>
