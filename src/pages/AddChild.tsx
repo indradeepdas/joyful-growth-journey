@@ -4,7 +4,6 @@ import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import ChildAccountForm from '@/components/ChildAccountForm';
 import { useNavigate } from 'react-router-dom';
 import * as childrenService from '@/services/childrenService';
-import { SupabaseProfile } from '@/services/types';
 
 const AddChild = () => {
   const { profile, user } = useSupabaseAuth();
@@ -41,17 +40,17 @@ const AddChild = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-purple-100 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-white to-purple-100 py-12 font-nunito">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Add a Child Account</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Add a Child Account</h1>
+          <p className="text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto">
             Create an account for your child to start tracking their progress and rewarding good behavior.
           </p>
         </div>
         
         <div className="bg-white rounded-xl shadow-md p-6 md:p-8">
-          <ChildAccountForm />
+          <ChildAccountForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
         </div>
       </div>
     </div>

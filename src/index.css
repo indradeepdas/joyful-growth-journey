@@ -95,17 +95,34 @@
   }
 
   body {
-    @apply bg-goodchild-background text-goodchild-text-primary antialiased;
-    font-family: 'Nunito', 'Sassoon Infant', 'Poppins', sans-serif;
+    @apply bg-goodchild-background text-gray-800 antialiased;
+    font-family: 'Nunito', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Nunito', 'Sassoon Infant', 'Quicksand', sans-serif;
-    @apply font-bold leading-tight;
+    font-family: 'Nunito', sans-serif;
+    @apply font-bold leading-tight text-gray-800;
+  }
+
+  p {
+    @apply text-gray-700;
   }
 
   button, a {
     @apply transition-all duration-300;
+  }
+
+  /* Updated font sizes */
+  h1, .h1 {
+    @apply text-4xl md:text-5xl; /* 32px -> 36px */
+  }
+
+  h2, .h2 {
+    @apply text-3xl md:text-4xl; /* 24px -> 32px */
+  }
+
+  p, .p {
+    @apply text-lg md:text-2xl; /* 16px -> 24px */
   }
 }
 
@@ -142,10 +159,6 @@
       focus:ring-goodchild-blue/50 active:scale-[0.98];
   }
   
-  .font-sassoon {
-    font-family: 'Sassoon Infant', 'Poppins', sans-serif;
-  }
-
   .font-nunito {
     font-family: 'Nunito', sans-serif;
   }
@@ -183,5 +196,18 @@
   
   .hover-lift {
     @apply transition-transform hover:-translate-y-1;
+  }
+
+  /* High contrast text utilities */
+  .text-on-light {
+    @apply text-gray-800;
+  }
+  
+  .text-on-dark {
+    @apply text-white;
+  }
+  
+  .text-on-colored {
+    @apply text-white;
   }
 }

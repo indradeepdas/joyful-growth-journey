@@ -28,7 +28,7 @@ const Index: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-goodchild-background font-sassoon">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-goodchild-background font-nunito">
       {/* Header */}
       <LandingHeader />
       
@@ -48,61 +48,61 @@ const Index: React.FC = () => {
       <TestimonialsSection />
       
       {/* Add a section for exploring public pages */}
-      <section className="py-12 bg-white">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-800 mb-6">
               Explore What GoodChild Offers
             </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+            <p className="text-2xl text-gray-700 max-w-3xl mx-auto">
               Take a tour of our key features before creating an account
             </p>
           </div>
           
-          <div className="flex flex-col md:flex-row justify-center gap-6">
-            <Card className="hover:shadow-md transition-shadow flex flex-col md:max-w-[350px]">
+          <div className="flex flex-col md:flex-row justify-center gap-8">
+            <Card className="hover:shadow-lg transition-shadow flex flex-col md:max-w-[350px] border border-gray-200">
               <CardHeader>
-                <CardTitle>Parent Dashboard</CardTitle>
+                <CardTitle className="text-2xl text-gray-800">Parent Dashboard</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-gray-700">
+                <p className="text-xl text-gray-700">
                   Preview the parent dashboard where you can track your children's progress and manage their activities.
                 </p>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => navigate('/public/dashboard')} className="w-full bg-[#FFA500] hover:bg-[#E69500] text-gray-800">
+                <Button onClick={() => navigate('/public/dashboard')} className="w-full bg-[#FFA500] hover:bg-[#E69500] text-gray-800 text-lg py-6">
                   View Sample Dashboard
                 </Button>
               </CardFooter>
             </Card>
             
-            <Card className="hover:shadow-md transition-shadow flex flex-col md:max-w-[350px]">
+            <Card className="hover:shadow-lg transition-shadow flex flex-col md:max-w-[350px] border border-gray-200">
               <CardHeader>
-                <CardTitle>Activity Center</CardTitle>
+                <CardTitle className="text-2xl text-gray-800">Activity Center</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-gray-700">
+                <p className="text-xl text-gray-700">
                   Browse through sample activities designed to develop your child's skills across 7 key areas.
                 </p>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => navigate('/public/activities')} className="w-full bg-[#FFA500] hover:bg-[#E69500] text-gray-800">
+                <Button onClick={() => navigate('/public/activities')} className="w-full bg-[#FFA500] hover:bg-[#E69500] text-gray-800 text-lg py-6">
                   Explore Activities
                 </Button>
               </CardFooter>
             </Card>
             
-            <Card className="hover:shadow-md transition-shadow flex flex-col md:max-w-[350px]">
+            <Card className="hover:shadow-lg transition-shadow flex flex-col md:max-w-[350px] border border-gray-200">
               <CardHeader>
-                <CardTitle>Rewards Hub</CardTitle>
+                <CardTitle className="text-2xl text-gray-800">Rewards Hub</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-gray-700">
+                <p className="text-xl text-gray-700">
                   Check out the rewards your children can earn by completing activities and earning GoodCoins.
                 </p>
               </CardContent>
               <CardFooter>
-                <Button onClick={() => navigate('/public/rewards')} className="w-full bg-[#FFA500] hover:bg-[#E69500] text-gray-800">
+                <Button onClick={() => navigate('/public/rewards')} className="w-full bg-[#FFA500] hover:bg-[#E69500] text-gray-800 text-lg py-6">
                   See Rewards
                 </Button>
               </CardFooter>
