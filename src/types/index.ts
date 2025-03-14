@@ -46,7 +46,9 @@ export interface Reward {
   originalPrice: number;
   discountedPrice: number;
   goodCoins: number;
-  externalUrl?: string; // Added externalUrl property
+  externalUrl?: string;
+  category?: string;
+  redeemed?: boolean;
 }
 
 export interface Transaction {
@@ -87,3 +89,15 @@ export type DevelopmentArea =
   | 'Deeper Family Bonds'
   | 'Emotional Intelligence'
   | 'Social Skills';
+
+// Add ChildProfile interface
+export interface ChildProfile {
+  id?: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth?: string;
+  parent_id: string;
+  gender?: string;
+  avatar_url?: string;
+  goodcoins_balance?: number;
+}

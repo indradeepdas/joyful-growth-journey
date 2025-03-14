@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import ChildAccountForm from '@/components/ChildAccountForm';
 import { useNavigate } from 'react-router-dom';
-import { childrenService } from '@/services/childrenService';
-import { ChildProfile } from '@/types';
+import * as childrenService from '@/services/childrenService';
+import { SupabaseProfile } from '@/services/types';
 
 const AddChild = () => {
   const { profile, user } = useSupabaseAuth();
@@ -21,7 +21,7 @@ const AddChild = () => {
     
     setIsSubmitting(true);
     try {
-      const newChild: Partial<ChildProfile> = {
+      const newChild = {
         first_name: formData.firstName,
         last_name: formData.lastName,
         date_of_birth: formData.dateOfBirth,

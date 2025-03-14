@@ -3,15 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Reward } from '@/types';
-import { rewardsService } from '@/services/rewardsService';
-import { SearchBar } from '@/components/rewards/SearchBar';
-import { CategoryTabs } from '@/components/rewards/CategoryTabs';
-import { RewardCard } from '@/components/rewards/RewardCard';
-import { RedemptionDialog } from '@/components/rewards/RedemptionDialog';
-import { LoadingState } from '@/components/rewards/LoadingState';
-import { ErrorState } from '@/components/rewards/ErrorState';
-import { EmptySearch } from '@/components/rewards/EmptySearch';
-import { AffiliatedPartners } from '@/components/rewards/AffiliatedPartners';
+import * as rewardsService from '@/services/rewardsService';
+import SearchBar from '@/components/rewards/SearchBar';
+import CategoryTabs from '@/components/rewards/CategoryTabs';
+import RewardCard from '@/components/rewards/RewardCard';
+import RedemptionDialog from '@/components/rewards/RedemptionDialog';
+import LoadingState from '@/components/rewards/LoadingState';
+import ErrorState from '@/components/rewards/ErrorState';
+import EmptySearch from '@/components/rewards/EmptySearch';
+import AffiliatedPartners from '@/components/rewards/AffiliatedPartners';
 
 const RewardsHub = () => {
   const { profile } = useSupabaseAuth();
@@ -41,6 +41,12 @@ const RewardsHub = () => {
         } else {
           rewardsData = await rewardsService.getAllRewards();
         }
+        
+        // Add a category property to each reward if not present
+        rewardsData = rewardsData.map(reward => ({
+          ...reward,
+          category: reward.category || 'General',
+        }));
         
         setRewards(rewardsData);
         setFilteredRewards(rewardsData);
@@ -107,7 +113,7 @@ const RewardsHub = () => {
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorState message={error} />;
   
-  const categories = ['All', ...new Set(rewards.map(reward => reward.category))];
+  const categories = ['All', ...new Set(rewards.map(reward => reward.category || 'General'))];
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-purple-100 pb-12">
@@ -124,7 +130,7 @@ const RewardsHub = () => {
           <div className="bg-white rounded-lg shadow-md p-4 mb-8 flex justify-between items-center">
             <div>
               <p className="text-gray-600">Your GoodCoins Balance</p>
-              <p className="text-2xl font-bold text-gray-800">{profile.goodcoins_balance}</p>
+              <p className="text-2xl font-bold text-gray-800">{profile.goodCoins || 0}</p>
             </div>
             <div className="h-12 w-12 flex items-center justify-center rounded-full bg-yellow-400">
               <span className="text-xl font-bold">🪙</span>
@@ -135,8 +141,11 @@ const RewardsHub = () => {
         <div className="flex flex-col space-y-6">
           {/* Search Bar */}
           <SearchBar 
-            searchQuery={searchQuery} 
-            setSearchQuery={setSearchQuery} 
+            searchQuery={searchQuery}
+            visibilityTab="all"
+            onSearchChange={(e) => setSearchQuery(e.target.value)}
+            onVisibilityChange={() => {}}
+            isChild={profile?.role === 'child'}
           />
           
           {/* Category Tabs */}
@@ -154,9 +163,9 @@ const RewardsHub = () => {
               <RewardCard
                 key={reward.id}
                 reward={reward}
+                isPending={false}
+                isDisabled={profile?.role === 'child' && (profile?.goodCoins || 0) < reward.goodCoins}
                 onRedeemClick={() => handleRedeemClick(reward)}
-                isAffordable={profile?.goodcoins_balance >= reward.cost}
-                isChild={profile?.role === 'child'}
               />
             ))}
           </div>

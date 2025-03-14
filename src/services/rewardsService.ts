@@ -2,19 +2,7 @@
 // Rewards service functions and data
 
 import { supabase } from '@/integrations/supabase/client';
-
-export interface Reward {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  originalPrice: number | null;
-  discountedPrice: number | null;
-  discount: number;
-  coinCost: number;
-  category: string;
-  available: boolean;
-}
+import { Reward } from '@/types';
 
 // Mock data for rewards (used as fallback or for public pages)
 export const mockRewards: Reward[] = [
@@ -25,10 +13,8 @@ export const mockRewards: Reward[] = [
     imageUrl: 'https://placehold.co/600x400/FFD166/073B4C?text=LEGO+Set',
     originalPrice: 24.99,
     discountedPrice: 19.99,
-    discount: 20,
-    coinCost: 50,
+    goodCoins: 50,
     category: 'Toys',
-    available: true
   },
   {
     id: '2',
@@ -37,10 +23,8 @@ export const mockRewards: Reward[] = [
     imageUrl: 'https://placehold.co/600x400/06D6A0/073B4C?text=Art+Kit',
     originalPrice: 19.99,
     discountedPrice: 15.99,
-    discount: 20,
-    coinCost: 40,
+    goodCoins: 40,
     category: 'Art',
-    available: true
   },
   {
     id: '3',
@@ -49,10 +33,8 @@ export const mockRewards: Reward[] = [
     imageUrl: 'https://placehold.co/600x400/118AB2/FFFFFF?text=Books',
     originalPrice: 29.99,
     discountedPrice: 23.99,
-    discount: 20,
-    coinCost: 60,
+    goodCoins: 60,
     category: 'Books',
-    available: true
   },
   {
     id: '4',
@@ -61,10 +43,8 @@ export const mockRewards: Reward[] = [
     imageUrl: 'https://placehold.co/600x400/8A63D2/FFFFFF?text=Roblox',
     originalPrice: 10.00,
     discountedPrice: 8.00,
-    discount: 20,
-    coinCost: 30,
+    goodCoins: 30,
     category: 'Digital',
-    available: true
   },
   {
     id: '5',
@@ -73,17 +53,15 @@ export const mockRewards: Reward[] = [
     imageUrl: 'https://placehold.co/600x400/EF476F/FFFFFF?text=Science+Kit',
     originalPrice: 34.99,
     discountedPrice: 27.99,
-    discount: 20,
-    coinCost: 75,
+    goodCoins: 75,
     category: 'Educational',
-    available: true
   }
 ];
 
-// Function to get all rewards from Supabase
-export const getRewards = async (): Promise<Reward[]> => {
+// Function to get all rewards
+export const getAllRewards = async (): Promise<Reward[]> => {
   try {
-    console.log('Fetching rewards from Supabase');
+    console.log('Fetching all rewards from Supabase');
     const { data, error } = await supabase
       .from('rewards')
       .select('*');
@@ -104,20 +82,27 @@ export const getRewards = async (): Promise<Reward[]> => {
       name: reward.name,
       description: reward.description || '',
       imageUrl: reward.image_url || `https://placehold.co/600x400/random?text=${encodeURIComponent(reward.name)}`,
-      originalPrice: reward.original_price,
-      discountedPrice: reward.discounted_price,
-      discount: reward.original_price && reward.discounted_price 
-        ? Math.round(((reward.original_price - reward.discounted_price) / reward.original_price) * 100) 
-        : 0,
-      coinCost: reward.good_coins,
+      originalPrice: reward.original_price || 0,
+      discountedPrice: reward.discounted_price || 0,
+      goodCoins: reward.good_coins,
       category: 'General', // Default category if not available in data
-      available: true
     }));
     
     console.log('Fetched rewards:', rewards);
     return rewards;
   } catch (error) {
-    console.error('Error in getRewards:', error);
+    console.error('Error in getAllRewards:', error);
+    return mockRewards; // Fallback to mock data
+  }
+};
+
+// Function to get rewards for a specific child
+export const getRewardsForChild = async (childId: string): Promise<Reward[]> => {
+  try {
+    // For now, return all rewards as we don't have a specific filtering mechanism
+    return await getAllRewards();
+  } catch (error) {
+    console.error('Error in getRewardsForChild:', error);
     return mockRewards; // Fallback to mock data
   }
 };
@@ -146,14 +131,10 @@ export const getRewardById = async (id: string): Promise<Reward | undefined> => 
       name: data.name,
       description: data.description || '',
       imageUrl: data.image_url || `https://placehold.co/600x400/random?text=${encodeURIComponent(data.name)}`,
-      originalPrice: data.original_price,
-      discountedPrice: data.discounted_price,
-      discount: data.original_price && data.discounted_price 
-        ? Math.round(((data.original_price - data.discounted_price) / data.original_price) * 100) 
-        : 0,
-      coinCost: data.good_coins,
+      originalPrice: data.original_price || 0,
+      discountedPrice: data.discounted_price || 0,
+      goodCoins: data.good_coins,
       category: 'General',
-      available: true
     };
   } catch (error) {
     console.error('Error in getRewardById:', error);
@@ -161,8 +142,8 @@ export const getRewardById = async (id: string): Promise<Reward | undefined> => 
   }
 };
 
-// Function to redeem a reward (would connect to backend in real implementation)
-export const redeemReward = async (rewardId: string, userId: string): Promise<{ success: boolean; message: string }> => {
+// Function to redeem a reward
+export const redeemReward = async (childId: string, rewardId: string): Promise<{ success: boolean; message: string }> => {
   try {
     // First get the reward to check its cost
     const { data: rewardData, error: rewardError } = await supabase
@@ -177,7 +158,7 @@ export const redeemReward = async (rewardId: string, userId: string): Promise<{ 
     const { data: childData, error: childError } = await supabase
       .from('children')
       .select('*')
-      .eq('id', userId)
+      .eq('id', childId)
       .single();
       
     if (childError && childError.code !== 'PGRST116') {
@@ -198,7 +179,7 @@ export const redeemReward = async (rewardId: string, userId: string): Promise<{ 
     const { error: redemptionError } = await supabase
       .from('redemptions')
       .insert({
-        child_id: userId,
+        child_id: childId,
         reward_id: rewardId,
         good_coins: rewardData.good_coins
       });
@@ -209,7 +190,7 @@ export const redeemReward = async (rewardId: string, userId: string): Promise<{ 
     const { error: updateError } = await supabase
       .from('children')
       .update({ good_coins: childData.good_coins - rewardData.good_coins })
-      .eq('id', userId);
+      .eq('id', childId);
       
     if (updateError) throw updateError;
     
@@ -217,11 +198,11 @@ export const redeemReward = async (rewardId: string, userId: string): Promise<{ 
     const { error: transactionError } = await supabase
       .from('transactions')
       .insert({
-        child_id: userId,
+        child_id: childId,
         amount: -rewardData.good_coins,
         type: 'spent',
         description: `Redeemed ${rewardData.name}`,
-        created_by: userId
+        created_by: childId
       });
       
     if (transactionError) throw transactionError;
@@ -238,3 +219,6 @@ export const redeemReward = async (rewardId: string, userId: string): Promise<{ 
     };
   }
 };
+
+// Function to get all rewards from Supabase (alias for backwards compatibility)
+export const getRewards = getAllRewards;
